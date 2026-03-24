@@ -22,3 +22,15 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+
+subprojects {
+    val project = this
+    if (project.name == "image_gallery_saver") {
+        project.plugins.withType<com.android.build.gradle.LibraryPlugin> {
+            project.extensions.configure<com.android.build.gradle.LibraryExtension> {
+                namespace = "com.example.image_gallery_saver"
+            }
+        }
+    }
+}
