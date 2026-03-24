@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
+import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +77,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           switch (index) {
             case 1:
               nextScreen = CategoryScreen();
+              break;
+            case 2:
+              nextScreen = BookmarkScreen();
               break;
             default:
               return;
