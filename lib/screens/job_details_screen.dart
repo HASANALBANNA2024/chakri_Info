@@ -42,12 +42,26 @@ class JobDetailsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // জুম করার সুবিধা
             InteractiveViewer(
-              panEnabled: true,
-              minScale: 0.5,
-              maxScale: 4.0,
-              child: Image.network(job.description, fit: BoxFit.contain),
+              clipBehavior: Clip.none, // zoom
+              panEnabled: true, // doing image drug
+              minScale: 0.5, // minimum size
+              maxScale: 4.0, // maximum size
+              child: Center(
+                child: Image.asset(
+                  job.description,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                        Text("সার্কুলার ইমেজটি পাওয়া যায়নি"),
+                      ],
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),

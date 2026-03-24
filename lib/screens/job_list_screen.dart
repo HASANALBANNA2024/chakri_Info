@@ -1,7 +1,7 @@
+import 'package:chakri_info/screens/job_details_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../models/job_model.dart';
-// import 'job_details_screen.dart';
 
 class JobListScreen extends StatelessWidget {
   final String title;
@@ -54,7 +54,13 @@ class JobListScreen extends StatelessWidget {
               isThreeLine: true,
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // Details Screen-এ যাওয়ার কোড
+                // job details screen to call
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => JobDetailsScreen(job: job),
+                  ),
+                );
               },
             ),
           );

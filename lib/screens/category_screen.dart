@@ -1,3 +1,4 @@
+import 'package:chakri_info/screens/job_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -242,9 +243,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   //  (Horizontal Scroll)
   Widget _buildPopularSection() {
-    // ১. বর্তমান থিম চেক করা
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return SizedBox(
       height: 120,
       child: ListView.builder(
@@ -253,61 +252,41 @@ class _CategoryScreenState extends State<CategoryScreen> {
         itemCount: _popularCategories.length,
         itemBuilder: (context, i) {
           final cat = _popularCategories[i];
-
-          Color cardColor = isDarkMode
-              ? Theme.of(context)
-                    .cardColor //
-              : cat['color'];
-
-          Color iconColor = isDarkMode ? cat['color'] : Colors.white;
-
-          return Container(
-            width: 105,
-            margin: EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(
-                color: isDarkMode
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.transparent,
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobListScreen(
+                    title: cat['name'].replaceAll('\n', ' '),
+                    jobs: [],
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              width: 105,
+              margin: EdgeInsets.symmetric(horizontal: 5),
+              decoration: BoxDecoration(
+                color: isDarkMode ? Theme.of(context).cardColor : cat['color'],
+                borderRadius: BorderRadius.circular(15),
               ),
-              boxShadow: [
-                if (!isDarkMode)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(cat['icon'], color: Colors.white, size: 28),
+                  SizedBox(height: 10),
+                  Text(
+                    cat['name'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // আইকন কন্টেইনার
-                Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isDarkMode
-                        ? cat['color'].withOpacity(0.1)
-                        : Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(cat['icon'], color: iconColor, size: 28),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  cat['name'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.white.withOpacity(0.9)
-                        : Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -376,35 +355,42 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   // আইটেম ডিজাইন আলাদা ফাংশনে নিয়ে আসা হয়েছে কোড ক্লিন রাখার জন্য
   Widget _buildCategoryItem(Map<String, dynamic> cat, bool isDarkMode) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDarkMode ? Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: cat['color'].withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(cat['icon'], color: cat['color'], size: 26),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                JobListScreen(title: cat['name'], jobs: []), // আপাতত খালি লিস্ট
           ),
-          SizedBox(height: 8),
-          Text(
-            cat['name'],
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              color: isDarkMode ? Colors.white : Colors.black87,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: cat['color'].withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(cat['icon'], color: cat['color'], size: 26),
             ),
-          ),
-        ],
+            SizedBox(height: 8),
+            Text(
+              cat['name'],
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }

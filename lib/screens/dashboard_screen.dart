@@ -5,6 +5,8 @@ import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
+import 'package:chakri_info/screens/job_details_screen.dart';
+import 'package:chakri_info/screens/job_list_screen.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:flutter/material.dart';
 
@@ -399,38 +401,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ), // সাইড প্যাডিং কমানো হয়েছে
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceEvenly, // সমান দূরত্বে ৫টি আইকন বসবে
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: cats.map((cat) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(7), // প্যাডিং কিছুটা কমানো হয়েছে
-                decoration: BoxDecoration(
-                  color: cat['c'].withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
+          return InkWell(
+            onTap: () {
+              // ক্যাটাগরি অনুযায়ী ফিল্টার করে লিস্ট স্ক্রিনে পাঠানো
+              List<JobModel> filtered = circulars
+                  .where((j) => j.category == cat['n'])
+                  .toList();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      JobListScreen(title: cat['n'], jobs: filtered),
                 ),
-                child: Icon(
-                  cat['i'],
-                  color: cat['c'],
-                  size: 19,
-                ), // আইকন সাইজ ১৯
-              ),
-              SizedBox(height: 4),
-              Text(
-                cat['n'],
-                style: TextStyle(
-                  fontSize: 9.5, // টেক্সট সাইজ সামান্য কমানো হয়েছে যাতে ৫টি ধরে
-                  fontWeight: FontWeight.w500,
+              );
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: cat['c'].withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(cat['i'], color: cat['c'], size: 19),
                 ),
-              ),
-            ],
+                SizedBox(height: 4),
+                Text(
+                  cat['n'],
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
           );
         }).toList(),
       ),
@@ -455,88 +461,76 @@ class _DashboardScreenState extends State<DashboardScreen> {
       itemCount: circulars.length,
       itemBuilder: (context, index) {
         final job = circulars[index];
-        return Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 3,
-          ), // ভার্টিকাল গ্যাপ মাত্র ৩
-          padding: EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 6,
-          ), // ভেতরের প্যাডিং কম
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.withOpacity(0.05)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 2),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                height: 38,
-                width: 38, // লোগো সাইজ আরও কম
-                decoration: BoxDecoration(
-                  color: Colors.indigo.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Center(
-                  child: Text(
-                    job.logo,
-                    style: TextStyle(
-                      color: Colors.indigo,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
+        return InkWell(
+          onTap: () {
+            // ক্লিক করলে সরাসরি জব ডিটেইলস স্ক্রিনে যাবে
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => JobDetailsScreen(job: job),
+              ),
+            );
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.withOpacity(0.05)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: 38,
+                  width: 38,
+                  decoration: BoxDecoration(
+                    color: Colors.indigo.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Center(
+                    child: job.logo.startsWith('http')
+                        ? Image.network(job.logo)
+                        : Text(
+                            job.logo,
+                            style: TextStyle(
+                              color: Colors.indigo,
+                              fontSize: 10,
+                            ),
+                          ),
                   ),
                 ),
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      job.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        job.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      job.company,
-                      style: TextStyle(fontSize: 10, color: Colors.grey),
-                      maxLines: 1,
-                    ),
-                    Text(
-                      "ডেডলাইন: ${job.deadline}",
-                      style: TextStyle(
-                        fontSize: 9,
-                        color: Colors.redAccent,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        job.company,
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
                       ),
-                    ),
-                  ],
+                      Text(
+                        "ডেডলাইন: ${job.deadline}",
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.redAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.remove_red_eye_outlined,
-                    size: 12,
-                    color: Colors.grey,
-                  ),
-                  Text(
-                    "১৭৫",
-                    style: TextStyle(fontSize: 9, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ],
+                Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
+              ],
+            ),
           ),
         );
       },
