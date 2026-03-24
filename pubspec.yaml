@@ -7,13 +7,9 @@ version: 1.0.0+1
 environment:
   sdk: ^3.11.0
 
-
 dependencies:
   flutter:
     sdk: flutter
-
-
-
   cupertino_icons: ^1.0.8
   share_plus: ^12.0.1
   url_launcher: ^6.3.2
@@ -25,19 +21,20 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
-
   flutter_lints: ^6.0.0
-
-
+  # আইকন জেনারেটরের জন্য এটি প্রয়োজন
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
-
-
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/images/app_icon.png
     - assets/images/bpsc_image.webp
 
-
+# এই অংশটি dev_dependencies এর বাইরে এবং একদম বাম পাশ থেকে শুরু হবে
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
