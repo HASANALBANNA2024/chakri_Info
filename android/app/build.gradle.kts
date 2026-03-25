@@ -8,6 +8,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Fixed version variables for Flutter with fallback values
+val flutterVersionCode = (project.findProperty("flutter.versionCode") as? String) ?: "1"
+val flutterVersionName = (project.findProperty("flutter.versionName") as? String) ?: "1.0"
+
 android {
     namespace = "com.example.chakri_info"
     compileSdk = flutter.compileSdkVersion
@@ -19,20 +23,26 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        // Updated to use the recommended string format for jvmTarget
+        jvmTarget = "17"
     }
 
     defaultConfig {
-        applicationId "com.example.chakri_info"
-        minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
-                versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        applicationId = "com.example.chakri_info"
+
+        // Using explicit minSdk 21 for Firebase and modern package compatibility
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+
+        versionCode = flutterVersionCode.toInt()
+        versionName = flutterVersionName
+
+        // Enabled MultiDex for Firebase compatibility
+        multiDexEnabled = true
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }

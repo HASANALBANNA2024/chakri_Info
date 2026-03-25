@@ -23,7 +23,7 @@ dependencies:
   cloud_firestore: ^5.6.3
   firebase_storage: ^12.4.1
   image_picker: ^1.1.2         # গ্যালারি থেকে সার্কুলার ছবি নিতে
-  flutter_native_image: ^0.0.6 # ছবিকে ২-১০ কেবি (KB) সাইজে ছোট করতে
+  flutter_image_compress: ^2.3.0 # ছবিকে ২-১০ কেবি (KB) সাইজে ছোট করতে
   cached_network_image: ^3.4.1 # ৭ দিন বা তার বেশি সময় ক্যাশ ধরে রাখতে
   flutter_cache_manager: ^3.4.1 # ক্যাশ কন্ট্রোল করার জন্য
 
