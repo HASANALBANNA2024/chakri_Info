@@ -290,8 +290,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   Widget _buildAllCategoryGrid(bool isDarkMode) {
-    // প্রথমে মাত্র ৯টি ক্যাটাগরি দেখাবে, 'See More' ক্লিক করলে সব দেখাবে।
-    int itemCount = _isExpanded ? _allCategories.length : 4;
+    int itemCount = _isExpanded ? _allCategories.length : 3;
 
     return Column(
       children: [
@@ -355,34 +354,43 @@ class _CategoryScreenState extends State<CategoryScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                JobListScreen(title: cat['name'], jobs: []), // আপাতত খালি লিস্ট
+            builder: (context) => JobListScreen(title: cat['name'], jobs: []),
           ),
         );
       },
       child: Container(
+        padding: EdgeInsets.all(4), // প্যাডিং একদম কমিয়ে ৪ করা হয়েছে
         decoration: BoxDecoration(
           color: isDarkMode ? Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(10), // রেডিয়াস আরও কমানো হয়েছে
           border: Border.all(color: Colors.grey.withOpacity(0.1)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(4), // আইকনের ভেতরের জায়গা কমানো হয়েছে
               decoration: BoxDecoration(
                 color: cat['color'].withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(cat['icon'], color: cat['color'], size: 26),
+              child: Icon(
+                cat['icon'],
+                color: cat['color'],
+                size: 20,
+              ), // আইকন সাইজ ২০ করা হয়েছে
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 4), // গ্যাপ ৮ থেকে কমিয়ে ৪ করা হয়েছে
             Text(
               cat['name'],
               textAlign: TextAlign.center,
               maxLines: 2,
-              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 9, // ফন্ট সাইজ আরও ১ পয়েন্ট কমানো হয়েছে
+                fontWeight: FontWeight.w600,
+                height: 1.0,
+              ),
             ),
           ],
         ),

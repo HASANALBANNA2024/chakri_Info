@@ -1,28 +1,36 @@
+import 'package:chakri_info/screens/admin_panel_ui.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/category_screen.dart'; // আপনার ক্যাটাগরি স্ক্রিনের পাথ অনুযায়ী ইমপোর্ট করুন
+import '../screens/category_screen.dart';
 
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   final bool isDarkMode;
 
   const AppDrawer({super.key, required this.isDarkMode});
 
   @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  // গোপন ১২ বার ক্লিক কাউন্টার
+  int _clickCount = 0;
+
+  @override
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+        color: widget.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
         child: Column(
           children: [
-            // --- ড্রয়ার হেডার ---
-            _buildDrawerHeader(isDarkMode),
+            // --- ড্রয়ার হেডার (গোপন লজিক এখানে যুক্ত করা হয়েছে) ---
+            _buildDrawerHeader(widget.isDarkMode),
 
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  // --- প্রধান মেনু ---
                   _sectionTitle("প্রধান মেনু"),
                   _drawerItem(
                     Icons.home_filled,
@@ -42,9 +50,7 @@ class AppDrawer extends StatelessWidget {
                     "ফেভারিট ও বুকমার্ক",
                     () {},
                   ),
-
-                  // --- ডেডলাইন ও সময়সীমা ---
-                  _sectionTitle("সময়সীমা ও তালিকা"),
+                  _sectionTitle("সময়সীমা ও তালিকা"),
                   _drawerItem(
                     Icons.event_available_rounded,
                     "পরীক্ষার তারিখ (Exam Date)",
@@ -52,11 +58,9 @@ class AppDrawer extends StatelessWidget {
                   ),
                   _drawerItem(
                     Icons.timer_outlined,
-                    "ডেডলাইন অনুযায়ী তালিকা",
+                    "ডেডলাইন অনুযায়ী তালিকা",
                     () {},
                   ),
-
-                  // --- প্রিপারেশন সেন্টার (Quiz & Model Test) ---
                   _sectionTitle("প্রিপারেশন সেন্টার"),
                   _drawerItem(
                     Icons.menu_book_rounded,
@@ -89,16 +93,10 @@ class AppDrawer extends StatelessWidget {
                     () {},
                     isHighlight: true,
                   ),
-
-                  // --- শিক্ষাগত যোগ্যতা অনুযায়ী ---
-                  _sectionTitle("যোগ্যতা অনুযায়ী চাকরি"),
+                  _sectionTitle("যোগ্যতা অনুযায়ী চাকরি"),
                   _buildEducationChips(),
-
                   const Divider(height: 30, thickness: 1),
-
-                  // --- লিগ্যাল ও সাপোর্ট ---
                   _buildSupportGrid(),
-
                   const SizedBox(height: 20),
                 ],
               ),
@@ -109,45 +107,78 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  // --- Helper Widgets ---
-
   Widget _buildDrawerHeader(bool isDarkMode) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.only(top: 50, bottom: 20, left: 16, right: 16),
-      decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1F1F1F) : Colors.indigo[900],
-        borderRadius: const BorderRadius.only(bottomRight: Radius.circular(30)),
-      ),
-      child: const Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.white24,
-            child: Icon(Icons.person, color: Colors.white, size: 35),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _clickCount++;
+
+          if (_clickCount == 20) {
+            _clickCount = 0;
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminPanelScreen()),
+            );
+          }
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.only(
+          top: 50,
+          bottom: 20,
+          left: 16,
+          right: 16,
+        ),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1F1F1F) : Colors.indigo[900],
+          borderRadius: const BorderRadius.only(
+            bottomRight: Radius.circular(30),
           ),
-          SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "চাকরি ইনফো",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+        ),
+        child: Row(
+          children: [
+            // Assets থেকে আপনার অ্যাপ আইকন
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.white24,
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/images/app_icon.png', // আপনার আইকন পাথ
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.person, color: Colors.white, size: 35),
                 ),
               ),
-              Text(
-                "ক্যারিয়ার গড়ুন আমাদের সাথে",
-                style: TextStyle(color: Colors.white70, fontSize: 11),
-              ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(width: 15),
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "চাকরি ইনফো",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                  "ক্যারিয়ার গড়ুন আমাদের সাথে",
+                  style: TextStyle(color: Colors.white70, fontSize: 11),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  // --- অন্যান্য হেল্পার উইজেটস (অপরিবর্তিত) ---
 
   Widget _sectionTitle(String title) {
     return Padding(
