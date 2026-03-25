@@ -192,33 +192,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+        // ভার্টিকাল প্যাডিং ১০ থেকে কমিয়ে ৬ করা হয়েছে
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.2)),
+          gradient: LinearGradient(
+            colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(
+            10,
+          ), // ১২ থেকে কমিয়ে ১০ করা হয়েছে ছোট জায়গায় মানানোর জন্য
+          border: Border.all(color: color.withOpacity(0.2), width: 0.8),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(icon, color: color, size: 20),
-            SizedBox(width: 6),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  count,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: color,
+            Container(
+              padding: const EdgeInsets.all(5), // ৬ থেকে কমিয়ে ৫ করা হয়েছে
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 16, // ১৮ থেকে কমিয়ে ১৬ করা হয়েছে
+              ),
+            ),
+            const SizedBox(width: 8), // ১০ থেকে কমিয়ে ৮ করা হয়েছে
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    count,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13, // ১৪ থেকে কমিয়ে ১৩ করা হয়েছে
+                      color: color,
+                      letterSpacing: -0.5,
+                      height: 1.1, // লাইন হাইট কমিয়ে টেক্সটের গ্যাপ কমানো হয়েছে
+                    ),
                   ),
-                ),
-                Text(
-                  label,
-                  style: TextStyle(fontSize: 9, color: Colors.grey[600]),
-                ),
-              ],
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 8.5, // ৯ থেকে কমিয়ে ৮.৫ করা হয়েছে
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                      letterSpacing: 0.2,
+                      height: 1.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -230,66 +267,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 16,
-        vertical: 6,
-      ), // ভার্টিকাল গ্যাপ সামান্য বাড়ানো হয়েছে যাতে ক্লিয়ার মনে হয়
+        vertical: 4, // ৬ থেকে কমিয়ে ৪ করা হয়েছে স্পেস বাঁচাতে
+      ),
       child: Container(
-        height: 44, // ৪২ থেকে বাড়িয়ে ৪৪ করা হয়েছে Better Touch Target এর জন্য
+        height: 42, // ৪৪ থেকে কমিয়ে ৪২ করা হয়েছে আরও স্লিম লুকের জন্য
         decoration: BoxDecoration(
           boxShadow: [
-            if (!isDarkMode) // লাইট মোডে হালকা শ্যাডো যা প্রিমিয়াম লুক দিবে
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              ),
+            BoxShadow(
+              color: isDarkMode
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.indigo.withOpacity(0.05),
+              blurRadius: 15,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: TextField(
-          textAlignVertical:
-              TextAlignVertical.center, // টেক্সট একদম মাঝখানে থাকবে
+          textAlignVertical: TextAlignVertical.center,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 13, // ১৪ থেকে কমিয়ে ১৩ করা হয়েছে
             color: isDarkMode ? Colors.white : Colors.black87,
           ),
           decoration: InputDecoration(
             hintText: "সার্চ করুন (যেমন: ব্যাংক, সরকারি...)",
-            hintStyle: TextStyle(fontSize: 13, color: Colors.grey[500]),
+            hintStyle: TextStyle(
+              fontSize: 12,
+              color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
+            ),
             prefixIcon: Icon(
               Icons.search_rounded,
-              size: 20,
+              size: 18, // ২০ থেকে কমিয়ে ১৮ করা হয়েছে
               color: Colors.indigo,
-            ), // আইকন কালারফুল করা হয়েছে
-            // ডানপাশে ফিল্টার আইকন যা চাকুরি খোঁজার জন্য খুব দরকারি
+            ),
             suffixIcon: Container(
-              margin: EdgeInsets.all(8),
-              padding: EdgeInsets.all(4),
+              margin: const EdgeInsets.all(7),
+              padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 color: Colors.indigo.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(
+                  8,
+                ), // রাউন্ড শেপ আরও স্মুথ করা হয়েছে
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.tune_rounded,
-                size: 16,
+                size: 14, // ১৬ থেকে কমিয়ে ১৪ করা হয়েছে
                 color: Colors.indigo,
-              ), // ফিল্টার আইকন
+              ),
             ),
-
-            fillColor: isDarkMode ? Color(0xFF2C2C2C) : Colors.white,
+            fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
             filled: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 10),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            // বর্ডারগুলো আরও রাউন্ড (২০) করা হয়েছে যা এখনকার ট্রেন্ড
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(
                 color: isDarkMode
-                    ? Colors.transparent
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.white10
+                    : Colors.indigo.withOpacity(0.05),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(
-                color: Colors.indigo.withOpacity(0.5),
-                width: 1,
+                color: Colors.indigo.withOpacity(0.3),
+                width: 1.2,
               ),
             ),
           ),
@@ -337,22 +378,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildFeaturedSlider() {
     return Container(
-      height: 125,
-      margin: EdgeInsets.symmetric(vertical: 5),
+      height: 110, // উচ্চতা কমানো হয়েছে
+      margin: EdgeInsets.symmetric(vertical: 2), // উপরে-নিচে গ্যাপ কমানো হয়েছে
       child: LayoutBuilder(
         builder: (context, constraints) {
-          double cardWidth = constraints.maxWidth / 2;
+          double cardWidth = constraints.maxWidth * 0.45;
+
           return ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
             physics: BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             itemCount: 6,
             itemBuilder: (context, index) {
               return Container(
-                width: cardWidth - 12,
-                margin: EdgeInsets.symmetric(horizontal: 6),
+                width: cardWidth,
+                margin: EdgeInsets.symmetric(horizontal: 5),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   image: DecorationImage(
                     image: AssetImage("assets/images/bpsc_image.webp"),
                     fit: BoxFit.cover,
@@ -362,9 +405,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
+                // এখানে ভুল ছিল, সরাসরি Padding-এর পর Column হবে
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
+                    // এই Column টি দিতে ভুলে গেলে children লাল দেখাবে
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -373,12 +418,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 11,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
                         "১৫ এপ্রিল ডেডলাইন",
-                        style: TextStyle(color: Colors.white70, fontSize: 9),
+                        style: TextStyle(color: Colors.white70, fontSize: 8.5),
                       ),
                     ],
                   ),
@@ -398,16 +445,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {'n': 'বেসরকারি', 'i': Icons.apartment, 'c': Colors.purple},
       {'n': 'ডিফেন্স', 'i': Icons.security, 'c': Colors.red},
       {'n': 'এনজিও', 'i': Icons.groups_rounded, 'c': Colors.teal},
+      {'n': 'এডুকেশন ', 'i': Icons.menu_book, 'c': Colors.lightGreen},
+      {'n': 'ভর্তি', 'i': Icons.history_edu, 'c': Colors.indigo},
+      {'n': 'রেজাল্ট', 'i': Icons.assignment_turned_in, 'c': Colors.cyan[700]},
+      {'n': 'মেডিকেল', 'i': Icons.medical_services, 'c': Colors.teal},
+      {'n': 'হেলথকেয়ার', 'i': Icons.medication, 'c': Colors.deepOrange},
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: cats.map((cat) {
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 4,
+      ), // সেকশনের বাইরের গ্যাপ কমানো হয়েছে
+      child: GridView.builder(
+        shrinkWrap: true,
+        padding:
+            EdgeInsets.zero, // গ্রিডের ভেতরের ডিফল্ট প্যাডিং রিমুভ করা হয়েছে
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 5,
+          mainAxisSpacing: 4, // দুই রো-এর মাঝের স্পেস কমানো হয়েছে
+          crossAxisSpacing: 4,
+          mainAxisExtent: 58, // আইটেমের উচ্চতা কমিয়ে আরও টাইট করা হয়েছে
+        ),
+        itemCount: cats.length,
+        itemBuilder: (context, index) {
+          var cat = cats[index];
           return InkWell(
             onTap: () {
-              // ক্যাটাগরি অনুযায়ী ফিল্টার করে লিস্ট স্ক্রিনে পাঠানো
               List<JobModel> filtered = circulars
                   .where((j) => j.category == cat['n'])
                   .toList();
@@ -421,24 +486,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment:
+                  MainAxisAlignment.center, // কন্টেন্ট মাঝে রাখার জন্য
               children: [
                 Container(
-                  padding: EdgeInsets.all(7),
+                  padding: const EdgeInsets.all(
+                    6,
+                  ), // আইকনের ভেতরের গ্যাপ কমানো হয়েছে
                   decoration: BoxDecoration(
                     color: cat['c'].withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(cat['i'], color: cat['c'], size: 19),
+                  child: Icon(cat['i'], color: cat['c'], size: 18),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(
+                  height: 2,
+                ), // আইকন ও টেক্সটের মাঝের স্পেস কমানো হয়েছে
                 Text(
                   cat['n'],
-                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w500),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 8.5, // টেক্সট সাইজ কিছুটা কমানো হয়েছে
+                    fontWeight: FontWeight.w500,
+                    color: isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }

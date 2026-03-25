@@ -63,11 +63,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'icon': Icons.person_add_alt_1,
       'color': Colors.tealAccent[700],
     },
-    {
-      'name': 'ফার্মাসিউটিক্যালস',
-      'icon': Icons.biotech,
-      'color': Colors.pink[400],
-    },
 
     // --- ৪. আইটি ও টেকনিক্যাল ---
     {
