@@ -1,1 +1,31 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"chakri-info","appId":"1:123791858648:android:00b790c43e5b0f2e8f70ad","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"chakri-info","configurations":{"android":"1:123791858648:android:00b790c43e5b0f2e8f70ad","ios":"1:123791858648:ios:dba5546e277fc0678f70ad","macos":"1:123791858648:ios:dba5546e277fc0678f70ad","web":"1:123791858648:web:a1e810c9ddd60e838f70ad","windows":"1:123791858648:web:05d15e1f268ade248f70ad"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "chakri-info",
+          "appId": "1:123791858648:android:00b790c43e5b0f2e8f70ad",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "chakri-info",
+          "configurations": {
+            "android": "1:123791858648:android:00b790c43e5b0f2e8f70ad",
+            "ios": "1:123791858648:ios:dba5546e277fc0678f70ad",
+            "macos": "1:123791858648:ios:dba5546e277fc0678f70ad",
+            "web": "1:123791858648:web:a1e810c9ddd60e838f70ad",
+            "windows": "1:123791858648:web:05d15e1f268ade248f70ad"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-south1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

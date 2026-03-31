@@ -1,0 +1,54 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Job Circular",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "step1", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Job Circular",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "step1", "order": "ASCENDING" },
+        { "fieldPath": "step2", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Job Circular",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "step1", "order": "ASCENDING" },
+        { "fieldPath": "step2", "order": "ASCENDING" },
+        { "fieldPath": "step3", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Job Circular",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "step1", "order": "ASCENDING" },
+        { "fieldPath": "step2", "order": "ASCENDING" },
+        { "fieldPath": "step3", "order": "ASCENDING" },
+        { "fieldPath": "step4", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "Job Circular",
+      "fieldPath": "timestamp",
+      "indexes": [
+        {
+          "queryScope": "COLLECTION_GROUP",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ]
+}
