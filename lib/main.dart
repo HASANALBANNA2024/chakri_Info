@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
 
-// থিম কন্ট্রোলার
+// Theme controller
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
-  // ১. ফ্লাটার বাইন্ডিং নিশ্চিত করা
+  //flutter binding
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ২. ফায়ারবেস শুরু করা (এটি আপনার আগের এররগুলো সমাধান করবে)
+  // firebase start
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(MyApp());
@@ -26,19 +26,19 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Chakri Info',
-          // লাইট থিম সেটিংস
+          // light theme
           theme: ThemeData(
             brightness: Brightness.light,
             primarySwatch: Colors.indigo,
             scaffoldBackgroundColor: const Color(0xFFF0F2F5),
           ),
-          // ডার্ক থিম সেটিংস
+          // dark theme
           darkTheme: ThemeData(
             brightness: Brightness.dark,
             scaffoldBackgroundColor: const Color(0xFF121212),
             cardColor: const Color(0xFF1E1E1E),
           ),
-          themeMode: currentMode, // থিম পরিবর্তন নিয়ন্ত্রণ করবে
+          themeMode: currentMode, // theme control
           home: DashboardScreen(),
         );
       },

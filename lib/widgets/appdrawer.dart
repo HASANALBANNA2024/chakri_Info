@@ -13,7 +13,7 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-  // গোপন ১২ বার ক্লিক কাউন্টার
+  // secret open to admin panel
   int _clickCount = 0;
 
   @override
@@ -23,7 +23,7 @@ class _AppDrawerState extends State<AppDrawer> {
         color: widget.isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
         child: Column(
           children: [
-            // --- ড্রয়ার হেডার (গোপন লজিক এখানে যুক্ত করা হয়েছে) ---
+            // --- drawer header secret open logic ---
             _buildDrawerHeader(widget.isDarkMode),
 
             Expanded(
@@ -139,13 +139,13 @@ class _AppDrawerState extends State<AppDrawer> {
         ),
         child: Row(
           children: [
-            // Assets থেকে আপনার অ্যাপ আইকন
+            // to icon from assets
             CircleAvatar(
               radius: 30,
               backgroundColor: Colors.white24,
               child: ClipOval(
                 child: Image.asset(
-                  'assets/images/app_icon.png', // আপনার আইকন পাথ
+                  'assets/images/app_icon.png',
                   width: 60,
                   height: 60,
                   fit: BoxFit.cover,
@@ -178,7 +178,7 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  // --- অন্যান্য হেল্পার উইজেটস (অপরিবর্তিত) ---
+  // --- helper widgets ---
 
   Widget _sectionTitle(String title) {
     return Padding(

@@ -16,7 +16,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // লজিক: ফিল্টার অনুযায়ী লিস্ট তৈরি করা
+    //  bookmark filter and list
     List<JobBookmark> filteredJobs = _selectedFilter == "সবগুলো"
         ? allSavedJobs
         : allSavedJobs.where((job) => job.category == _selectedFilter).toList();
@@ -28,10 +28,10 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       appBar: _buildAppBar(isDarkMode),
       body: Column(
         children: [
-          _buildFilterBar(isDarkMode), // ফিল্টার চিপস
+          _buildFilterBar(isDarkMode),
           Expanded(
             child: filteredJobs.isEmpty
-                ? _buildEmptyState() // যদি কোনো সেভ করা চাকরি না থাকে
+                ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: filteredJobs.length,
@@ -109,7 +109,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
       ),
       child: Row(
         children: [
-          // লোগো সেকশন
+          // logo section
           Container(
             height: 50,
             width: 50,
@@ -150,7 +150,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
               ],
             ),
           ),
-          // রিমুভ বাটন
+          // Remove button
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.delete_outline, color: Colors.grey),

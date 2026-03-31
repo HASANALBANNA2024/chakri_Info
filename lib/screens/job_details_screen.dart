@@ -135,7 +135,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // কোম্পানি প্রোফাইল
+                // company profile
                 Row(
                   children: [
                     Container(
@@ -150,7 +150,7 @@ class _JobDetailsScreenState extends State<JobDetailsScreen> {
                         child: widget.job.logo.startsWith('http')
                             ? Image.network(widget.job.logo, fit: BoxFit.cover)
                             : Image.asset(
-                                'assets/images/placeholder_logo.png', // এখানে লোগো পাথ দিন
+                                'assets/images/placeholder_logo.png', // logo path
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
                                     Icon(Icons.business, color: primaryColor),

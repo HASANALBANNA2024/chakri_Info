@@ -10,7 +10,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   bool _isExpanded = false;
   // all category
   final List<Map<String, dynamic>> _allCategories = [
-    // --- ১. টপ ও সরকারি জবস (Most Searched) ---
+    // --- top and government (Most Searched) ---
     {'name': 'বিসিএস (BCS)', 'icon': Icons.stars, 'color': Colors.amber[800]},
     {
       'name': 'সরকারি চাকরি',
@@ -29,7 +29,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     },
     {'name': 'রেলওয়ে জবস', 'icon': Icons.train, 'color': Colors.deepPurple},
 
-    // --- ২. শিক্ষা ও গবেষণা ---
     {'name': 'শিক্ষক নিয়োগ', 'icon': Icons.school, 'color': Colors.green},
     {
       'name': 'এডুকেশন ও ট্রেনিং',
@@ -47,7 +46,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'color': Colors.cyan[700],
     },
 
-    // --- ৩. মেডিকেল ও স্বাস্থ্য ---
     {
       'name': 'মেডিকেল ও নার্সিং',
       'icon': Icons.medical_services,
@@ -64,7 +62,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'color': Colors.tealAccent[700],
     },
 
-    // --- ৪. আইটি ও টেকনিক্যাল ---
     {
       'name': 'IT ও টেলিকম',
       'icon': Icons.on_device_training,
@@ -86,7 +83,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'color': Colors.indigo[300],
     },
 
-    // --- ৫. কর্পোরেট ও কমার্শিয়াল ---
     {
       'name': 'অ্যাকাউন্টিং ও ফিন্যান্স',
       'icon': Icons.account_balance_wallet,
@@ -104,7 +100,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'color': Colors.pink,
     },
 
-    // --- ৬. কৃষি ও এনজিও ---
     {
       'name': 'এগ্রো (উদ্ভিদ/প্রাণী)',
       'icon': Icons.agriculture,
@@ -121,7 +116,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       'color': Colors.indigo,
     },
 
-    // --- ৭. অন্যান্য ---
     {'name': 'বেসরকারি চাকরি', 'icon': Icons.apartment, 'color': Colors.purple},
     {
       'name': 'অন্যান্য (Others)',
@@ -162,22 +156,15 @@ class _CategoryScreenState extends State<CategoryScreen> {
       backgroundColor: isDarkMode ? Color(0xFF121212) : Color(0xFFF5F7FA),
       appBar: _buildAppBar(isDarkMode),
       body: SingleChildScrollView(
-        // ওভারফ্লো রোধ করতে স্ক্রল ব্যবহার করা হয়েছে
         physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ১. সার্চবার সেকশন
             _buildSearchBar(isDarkMode),
-
-            // ২. জনপ্রিয় বিভাগসমূহ (Horizontal)
             _buildTitle("জনপ্রিয় বিভাগসমূহ", isDarkMode),
             _buildPopularSection(),
-
-            // ৩. সব ক্যাটাগরি (Grid)
             _buildTitle("সব ক্যাটাগরি", isDarkMode),
             _buildAllCategoryGrid(isDarkMode),
-            // নিচের দিকে একটু গ্যাপ রাখার জন্য
           ],
         ),
       ),
@@ -333,12 +320,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
             ),
           ),
         ),
-
-        // ৪. কুইজ প্রমোশন ব্যানার (এখন এটি সহজেই দেখা যাবে)
         _buildTitle("প্রস্তুতি শুরু করুন", isDarkMode),
         _buildQuizBanner(isDarkMode),
-
-        // ৫. কন্টাক্ট বা রিকোয়েস্ট কার্ড
         _buildTitle("সহযোগিতা", isDarkMode),
         _buildContactCard(isDarkMode),
 
@@ -347,7 +330,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  // আইটেম ডিজাইন আলাদা ফাংশনে নিয়ে আসা হয়েছে কোড ক্লিন রাখার জন্য
+  // build category item
   Widget _buildCategoryItem(Map<String, dynamic> cat, bool isDarkMode) {
     return InkWell(
       onTap: () {
@@ -359,35 +342,31 @@ class _CategoryScreenState extends State<CategoryScreen> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(4), // প্যাডিং একদম কমিয়ে ৪ করা হয়েছে
+        padding: EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: isDarkMode ? Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(10), // রেডিয়াস আরও কমানো হয়েছে
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.grey.withOpacity(0.1)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(4), // আইকনের ভেতরের জায়গা কমানো হয়েছে
+              padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: cat['color'].withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                cat['icon'],
-                color: cat['color'],
-                size: 20,
-              ), // আইকন সাইজ ২০ করা হয়েছে
+              child: Icon(cat['icon'], color: cat['color'], size: 20),
             ),
-            SizedBox(height: 4), // গ্যাপ ৮ থেকে কমিয়ে ৪ করা হয়েছে
+            SizedBox(height: 4),
             Text(
               cat['name'],
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 9, // ফন্ট সাইজ আরও ১ পয়েন্ট কমানো হয়েছে
+                fontSize: 9,
                 fontWeight: FontWeight.w600,
                 height: 1.0,
               ),
@@ -404,21 +383,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        // ডার্ক মোডে কালো না হয়ে যেন একটা প্রিমিয়াম ডার্ক ব্লু/গ্রে শেড থাকে
         gradient: LinearGradient(
           colors: isDarkMode
               ? [
-                  const Color(0xFF2C3E50), // ডার্ক মোডের জন্য কালচে নীল শেড
-                  const Color(
-                    0xFF000000,
-                  ).withOpacity(0.8), // কিছুটা ডার্ক গভীরতা
+                  const Color(0xFF2C3E50),
+                  const Color(0xFF000000).withOpacity(0.8),
                 ]
               : [Colors.indigo[800]!, Colors.blue[600]!],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        // বর্ডারের চারপাশ দিয়ে হালকা একটি বর্ডার দিলে ডার্ক মোডে জিনিসটা ফুটে ওঠে
         border: Border.all(
           color: isDarkMode
               ? Colors.white.withOpacity(0.05)
@@ -458,12 +433,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: () {
-                    // এখানে কুইজ স্ক্রিনে যাওয়ার লজিক থাকবে
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors
-                        .orange[800], // ডার্ক মোডে একটু উজ্জ্বল অরেঞ্জ ভালো দেখায়
+                    backgroundColor: Colors.orange[800],
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -478,7 +450,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ],
             ),
           ),
-          // আইকনটিকে ডার্ক মোডে আরও একটু সফট লুক দেওয়ার জন্য Opacity কমানো হয়েছে
           Icon(
             Icons.quiz_rounded,
             size: 70,
@@ -491,7 +462,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  // ২. কন্টাক্ট বা রিকোয়েস্ট কার্ড
   Widget _buildContactCard(bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
