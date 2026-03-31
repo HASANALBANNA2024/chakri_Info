@@ -15,7 +15,7 @@ class AdminSyncPage extends StatefulWidget {
 class _AdminSyncPageState extends State<AdminSyncPage> {
   final JobRepository _jobRepo = JobRepository();
   String _mainCat = "All";
-  String _subCat = "All";
+  String _subCat = "All"; // যদি সাব-ক্যাটেগরি ড্রপডাউন থাকে তবে কাজে লাগবে
   DateTimeRange? _selectedDateRange;
 
   @override
@@ -24,13 +24,15 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
       appBar: AppBar(
         title: const Text("Database Sync Manager"),
         centerTitle: true,
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
-          // filter panel
+          // ফিল্টার সেকশন
           _buildFilterUI(),
 
-          // Data list
+          // ডাটা লিস্ট সেকশন
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: _jobRepo.getFilteredJobs(
@@ -39,22 +41,36 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
                 dateRange: _selectedDateRange,
               ),
               builder: (context, snapshot) {
-                if (snapshot.hasError)
-                  return Center(child: Text("Error: ${snapshot.error}"));
-                if (snapshot.connectionState == ConnectionState.waiting)
-                  return const Center(child: CircularProgressIndicator());
-
-                var docs = snapshot.data?.docs ?? [];
-                if (docs.isEmpty)
-                  return const Center(
-                    child: Text("No Data Found in Firestore!"),
+                // ইনডেক্স না থাকলে এখানে এরর মেসেজ এবং লিঙ্ক শো করবে
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        "Error: ${snapshot.error}\n\nপরামর্শ: ফায়ারবেস কনসোলে ইনডেক্স তৈরি করুন।",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
                   );
+                }
+
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final docs = snapshot.data?.docs ?? [];
+                if (docs.isEmpty) {
+                  return const Center(
+                    child: Text("No Data Found! Check internet or index."),
+                  );
+                }
 
                 return ListView.builder(
                   itemCount: docs.length,
                   itemBuilder: (context, index) {
-                    var doc = docs[index];
-                    var data = doc.data() as Map<String, dynamic>;
+                    final doc = docs[index];
+                    final data = doc.data() as Map<String, dynamic>;
                     return _buildJobCard(doc, data);
                   },
                 );
@@ -66,79 +82,82 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
     );
   }
 
-  // Filter Widgets
   Widget _buildFilterUI() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
-      ),
+    return Card(
       margin: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButton<String>(
-                  value: _mainCat,
-                  isExpanded: true,
-                  items: ["All", "Government", "Bank", "NGO", "Private"]
-                      .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                      .toList(),
-                  onChanged: (val) => setState(() {
-                    _mainCat = val!;
-                    _subCat = "All";
-                  }),
-                ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            const Icon(Icons.filter_list, color: Colors.indigo),
+            const SizedBox(width: 10),
+            Expanded(
+              child: DropdownButton<String>(
+                value: _mainCat,
+                isExpanded: true,
+                underline: const SizedBox(),
+                items: ["All", "Government", "Bank", "NGO", "Private"]
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (val) => setState(() {
+                  _mainCat = val!;
+                }),
               ),
-              const SizedBox(width: 10),
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.date_range,
+                color: _selectedDateRange != null ? Colors.indigo : Colors.grey,
+              ),
+              onPressed: () async {
+                final picked = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(2024),
+                  lastDate: DateTime(2030),
+                );
+                if (picked != null) setState(() => _selectedDateRange = picked);
+              },
+            ),
+            if (_selectedDateRange != null)
               IconButton(
-                icon: const Icon(Icons.date_range),
-                onPressed: () async {
-                  final picked = await showDateRangePicker(
-                    context: context,
-                    firstDate: DateTime(2024),
-                    lastDate: DateTime(2030),
-                  );
-                  if (picked != null)
-                    setState(() => _selectedDateRange = picked);
-                },
+                icon: const Icon(Icons.refresh, color: Colors.red),
+                onPressed: () => setState(() => _selectedDateRange = null),
               ),
-              if (_selectedDateRange != null)
-                IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.red),
-                  onPressed: () => setState(() => _selectedDateRange = null),
-                ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  // Job card
   Widget _buildJobCard(DocumentSnapshot doc, Map<String, dynamic> data) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       child: ListTile(
-        leading: (data['images'] != null && data['images'].isNotEmpty)
-            ? Image.network(
-                data['images'][0],
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-              )
-            : const Icon(Icons.work_outline),
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(5),
+          child: (data['images'] != null && (data['images'] as List).isNotEmpty)
+              ? Image.network(
+                  data['images'][0],
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+              : Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image),
+                ),
+        ),
         title: Text(
           data['title'] ?? 'No Title',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(
-          "Deadline: ${data['deadline']}\n${data['mainCategory']} > ${data['subCategory']}",
+          "${data['mainCategory']} | ${data['deadline'] ?? 'No Date'}",
         ),
-        isThreeLine: true,
         trailing: PopupMenuButton(
           onSelected: (val) {
             if (val == 'edit') _showEditSheet(doc, data);
@@ -156,7 +175,6 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
     );
   }
 
-  // Edit Logic
   void _showEditSheet(DocumentSnapshot doc, Map<String, dynamic> data) {
     final titleCtrl = TextEditingController(text: data['title']);
     File? pickedFile;
@@ -177,14 +195,15 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
             children: [
               TextField(
                 controller: titleCtrl,
-                decoration: const InputDecoration(labelText: "Job Title"),
+                decoration: const InputDecoration(
+                  labelText: "Update Job Title",
+                  border: OutlineInputBorder(),
+                ),
               ),
-              const SizedBox(height: 10),
-              pickedFile != null
-                  ? Image.file(pickedFile!, height: 100)
-                  : const Text("No new image selected"),
+              const SizedBox(height: 15),
+              if (pickedFile != null) Image.file(pickedFile!, height: 80),
               TextButton.icon(
-                icon: const Icon(Icons.image),
+                icon: const Icon(Icons.add_a_photo),
                 label: const Text("Change Image"),
                 onPressed: () async {
                   final file = await ImagePicker().pickImage(
@@ -194,14 +213,22 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
                     setInternalState(() => pickedFile = File(file.path));
                 },
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  await _jobRepo.updateJob(doc.reference, {
-                    'title': titleCtrl.text,
-                  }, pickedFile);
-                  Navigator.pop(context);
-                },
-                child: const Text("Update Database"),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () async {
+                    await _jobRepo.updateJob(doc.reference, {
+                      'title': titleCtrl.text,
+                    }, pickedFile);
+                    if (mounted) Navigator.pop(context);
+                  },
+                  child: const Text("Update Database"),
+                ),
               ),
               const SizedBox(height: 20),
             ],
