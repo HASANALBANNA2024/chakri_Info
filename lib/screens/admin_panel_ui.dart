@@ -795,27 +795,62 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     );
   }
 
+  // Widget _buildLoginScreen() {
+  //   return Scaffold(
+  //     body: Center(
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(35.0),
+  //         child: Column(
+  //           mainAxisAlignment: MainAxisAlignment.center,
+  //           children: [
+  //             Icon(Icons.admin_panel_settings, size: 70, color: Colors.indigo),
+  //             SizedBox(height: 20),
+  //             _buildInputField("অ্যাডমিন ইমেইল", Icons.email, "", _emailCtrl),
+  //             _buildInputField("পাসওয়ার্ড", Icons.lock, "", _passCtrl),
+  //             _buildActionButton("লগইন করুন", Colors.indigo, _handleLogin),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  //Database sync
+
+
   Widget _buildLoginScreen() {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(35.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.admin_panel_settings, size: 70, color: Colors.indigo),
-              SizedBox(height: 20),
-              _buildInputField("অ্যাডমিন ইমেইল", Icons.email, "", _emailCtrl),
-              _buildInputField("পাসওয়ার্ড", Icons.lock, "", _passCtrl),
-              _buildActionButton("লগইন করুন", Colors.indigo, _handleLogin),
-            ],
+      body: SafeArea(
+        child: Center(
+       child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(35.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.admin_panel_settings, size: 70, color: Colors.indigo),
+                const SizedBox(height: 30),
+
+                _buildInputField("অ্যাডমিন ইমেইল", Icons.email, "", _emailCtrl),
+                const SizedBox(height: 15),
+
+                _buildInputField("পাসওয়ার্ড", Icons.lock, "", _passCtrl),
+                const SizedBox(height: 30),
+
+                _buildActionButton("লগইন করুন", Colors.indigo, _handleLogin),
+
+
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  //Database sync
+
   Widget _buildManageCircularTab() {
     return AdminSyncPage();
   }
