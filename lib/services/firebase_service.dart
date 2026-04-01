@@ -18,6 +18,24 @@ class FirebaseService {
   }
 
   // dynamic path data logic
+  // Future<void> saveCircular({
+  //   required String step1,
+  //   required String step2,
+  //   String? step3,
+  //   String? step4,
+  //   required Map<String, dynamic> circularData,
+  // }) async {
+  //   String finalCollection = step4 ?? step3 ?? step2;
+  //
+  //   await _firestore
+  //       .collection('All_Data')
+  //       .doc(step1)
+  //       .collection(step2)
+  //       .doc(step3 ?? 'General')
+  //       .collection(finalCollection)
+  //       .add(circularData);
+  // }
+
   Future<void> saveCircular({
     required String step1,
     required String step2,
@@ -25,14 +43,22 @@ class FirebaseService {
     String? step4,
     required Map<String, dynamic> circularData,
   }) async {
-    String finalCollection = step4 ?? step3 ?? step2;
+    // ডাটার ভেতরেই ফিল্টার করার জন্য স্টেপগুলো ঢুকিয়ে দিচ্ছি
+    circularData['step1'] = step1;
+    circularData['step2'] = step2;
+    circularData['step3'] = step3;
+    circularData['step4'] = step4;
 
-    await _firestore
-        .collection('All_Data')
-        .doc(step1)
-        .collection(step2)
-        .doc(step3 ?? 'General')
-        .collection(finalCollection)
+    // আপনার কাঙ্ক্ষিত ডাইনামিক পাথ
+    DocumentReference docRef = _firestore.collection('All_Data').doc(step1);
+    var collectionPath = docRef.collection(step2);
+    var finalDoc = collectionPath.doc(step3 ?? 'General');
+
+    // সমাধান: শেষে 'circular_items' কালেকশনে ডাটা সেভ করা
+    await finalDoc
+        .collection(step4 ?? step3 ?? step2)
+        .doc('posts')
+        .collection('circular_items')
         .add(circularData);
   }
 }

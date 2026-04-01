@@ -1,7 +1,7 @@
 {
   "indexes": [
     {
-      "collectionGroup": "Job Circular",
+      "collectionGroup": "circular_items",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "step1", "order": "ASCENDING" },
@@ -9,7 +9,7 @@
       ]
     },
     {
-      "collectionGroup": "Job Circular",
+      "collectionGroup": "circular_items",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "step1", "order": "ASCENDING" },
@@ -18,7 +18,7 @@
       ]
     },
     {
-      "collectionGroup": "Job Circular",
+      "collectionGroup": "circular_items",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "step1", "order": "ASCENDING" },
@@ -28,7 +28,7 @@
       ]
     },
     {
-      "collectionGroup": "Job Circular",
+      "collectionGroup": "circular_items",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "step1", "order": "ASCENDING" },
@@ -41,7 +41,7 @@
   ],
   "fieldOverrides": [
     {
-      "collectionGroup": "Job Circular",
+      "collectionGroup": "circular_items",
       "fieldPath": "timestamp",
       "indexes": [
         {

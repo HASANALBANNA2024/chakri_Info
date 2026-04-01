@@ -8,29 +8,58 @@ class JobRepository {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // আপনার AdminPanelScreen এর ৪-ধাপের ফিল্টার লজিক
+  // Stream<QuerySnapshot> getAdvancedFilteredJobs({
+  //   String? step1,
+  //   String? step2,
+  //   String? step3,
+  //   String? step4,
+  // }) {
+  //   Query query = _db.collectionGroup('Job Circular');
+  //
+  //   // ধাপে ধাপে ফিল্টার যোগ করা
+  //   if (step1 != null && step1 != "All")
+  //     query = query.where('step1', isEqualTo: step1);
+  //   if (step2 != null && step2 != "All")
+  //     query = query.where('step2', isEqualTo: step2);
+  //   if (step3 != null && step3 != "All")
+  //     query = query.where('step3', isEqualTo: step3);
+  //   if (step4 != null && step4 != "All")
+  //     query = query.where('step4', isEqualTo: step4);
+  //
+  //   // সবশেষে নতুন ডাটা আগে দেখানোর জন্য সর্টিং
+  //   return query.orderBy('timestamp', descending: true).snapshots();
+  // }
+
+  // ডাটা আপডেট ও ডিলিট লজিক আগের মতোই থাকবে
+
   Stream<QuerySnapshot> getAdvancedFilteredJobs({
     String? step1,
     String? step2,
     String? step3,
     String? step4,
   }) {
-    Query query = _db.collectionGroup('Job Circular');
+    // সব ক্যাটাগরি থেকে ডাটা টানার ইঞ্জিন
+    Query query = _db.collectionGroup('circular_items');
 
-    // ধাপে ধাপে ফিল্টার যোগ করা
-    if (step1 != null && step1 != "All")
+    // আপনার বর্তমান ফিল্টার লজিক (যা UI-তে ড্রপডাউন দিয়ে সিলেক্ট করেন)
+    if (step1 != null && step1 != "All") {
       query = query.where('step1', isEqualTo: step1);
-    if (step2 != null && step2 != "All")
+    }
+    if (step2 != null && step2 != "All") {
       query = query.where('step2', isEqualTo: step2);
-    if (step3 != null && step3 != "All")
+    }
+    if (step3 != null && step3 != "All") {
       query = query.where('step3', isEqualTo: step3);
-    if (step4 != null && step4 != "All")
+    }
+    if (step4 != null && step4 != "All") {
       query = query.where('step4', isEqualTo: step4);
+    }
 
-    // সবশেষে নতুন ডাটা আগে দেখানোর জন্য সর্টিং
     return query.orderBy('timestamp', descending: true).snapshots();
   }
 
-  // ডাটা আপডেট ও ডিলিট লজিক আগের মতোই থাকবে
+  // update and delete job circular
+
   Future<void> updateJob(
     DocumentReference ref,
     Map<String, dynamic> updatedData,
