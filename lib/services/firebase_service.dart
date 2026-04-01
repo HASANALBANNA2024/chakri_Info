@@ -17,24 +17,6 @@ class FirebaseService {
     return base64Images;
   }
 
-  // dynamic path data logic
-  // Future<void> saveCircular({
-  //   required String step1,
-  //   required String step2,
-  //   String? step3,
-  //   String? step4,
-  //   required Map<String, dynamic> circularData,
-  // }) async {
-  //   String finalCollection = step4 ?? step3 ?? step2;
-  //
-  //   await _firestore
-  //       .collection('All_Data')
-  //       .doc(step1)
-  //       .collection(step2)
-  //       .doc(step3 ?? 'General')
-  //       .collection(finalCollection)
-  //       .add(circularData);
-  // }
 
   Future<void> saveCircular({
     required String step1,
@@ -43,22 +25,51 @@ class FirebaseService {
     String? step4,
     required Map<String, dynamic> circularData,
   }) async {
-    // ডাটার ভেতরেই ফিল্টার করার জন্য স্টেপগুলো ঢুকিয়ে দিচ্ছি
+    // filter step
     circularData['step1'] = step1;
     circularData['step2'] = step2;
     circularData['step3'] = step3;
     circularData['step4'] = step4;
 
-    // আপনার কাঙ্ক্ষিত ডাইনামিক পাথ
+    // dynamic path
     DocumentReference docRef = _firestore.collection('All_Data').doc(step1);
     var collectionPath = docRef.collection(step2);
     var finalDoc = collectionPath.doc(step3 ?? 'General');
 
-    // সমাধান: শেষে 'circular_items' কালেকশনে ডাটা সেভ করা
+    // solved problem 'circular_items' collection data save
     await finalDoc
         .collection(step4 ?? step3 ?? step2)
         .doc('posts')
         .collection('circular_items')
         .add(circularData);
   }
+
+
+
+  Future<void> updateCircular({
+    required String docId,
+    required Map<String, dynamic> updatedData,
+  }) async {
+    await _firestore.collectionGroup('circular_items')
+        .where(FieldPath.documentId, isEqualTo: docId)
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs) {
+        ds.reference.update(updatedData);
+      }
+    });
+  }
+
+  Future<void> deleteCircular(String docId) async {
+    await _firestore.collectionGroup('circular_items')
+        .where(FieldPath.documentId, isEqualTo: docId)
+        .get()
+        .then((snapshot) {
+      for (DocumentSnapshot ds in snapshot.docs) {
+        ds.reference.delete();
+      }
+    });
+  }
+
+
 }

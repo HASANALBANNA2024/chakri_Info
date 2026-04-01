@@ -7,30 +7,7 @@ class JobRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  // আপনার AdminPanelScreen এর ৪-ধাপের ফিল্টার লজিক
-  // Stream<QuerySnapshot> getAdvancedFilteredJobs({
-  //   String? step1,
-  //   String? step2,
-  //   String? step3,
-  //   String? step4,
-  // }) {
-  //   Query query = _db.collectionGroup('Job Circular');
-  //
-  //   // ধাপে ধাপে ফিল্টার যোগ করা
-  //   if (step1 != null && step1 != "All")
-  //     query = query.where('step1', isEqualTo: step1);
-  //   if (step2 != null && step2 != "All")
-  //     query = query.where('step2', isEqualTo: step2);
-  //   if (step3 != null && step3 != "All")
-  //     query = query.where('step3', isEqualTo: step3);
-  //   if (step4 != null && step4 != "All")
-  //     query = query.where('step4', isEqualTo: step4);
-  //
-  //   // সবশেষে নতুন ডাটা আগে দেখানোর জন্য সর্টিং
-  //   return query.orderBy('timestamp', descending: true).snapshots();
-  // }
 
-  // ডাটা আপডেট ও ডিলিট লজিক আগের মতোই থাকবে
 
   Stream<QuerySnapshot> getAdvancedFilteredJobs({
     String? step1,
@@ -38,10 +15,10 @@ class JobRepository {
     String? step3,
     String? step4,
   }) {
-    // সব ক্যাটাগরি থেকে ডাটা টানার ইঞ্জিন
+    // all data receive engine
     Query query = _db.collectionGroup('circular_items');
 
-    // আপনার বর্তমান ফিল্টার লজিক (যা UI-তে ড্রপডাউন দিয়ে সিলেক্ট করেন)
+    // filter dropdown
     if (step1 != null && step1 != "All") {
       query = query.where('step1', isEqualTo: step1);
     }
@@ -60,11 +37,31 @@ class JobRepository {
 
   // update and delete job circular
 
+  // Future<void> updateJob(
+  //   DocumentReference ref,
+  //   Map<String, dynamic> updatedData,
+  //   File? imageFile,
+  // ) async {
+  //   if (imageFile != null) {
+  //     String fileName = 'jobs/${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //     UploadTask uploadTask = _storage.ref().child(fileName).putFile(imageFile);
+  //     TaskSnapshot snapshot = await uploadTask;
+  //     String downloadUrl = await snapshot.ref.getDownloadURL();
+  //     updatedData['images'] = [downloadUrl];
+  //   }
+  //   return await ref.update(updatedData);
+  // }
+  //
+  // Future<void> deleteJob(DocumentReference ref) async {
+  //   return await ref.delete();
+  // }
+
+
   Future<void> updateJob(
-    DocumentReference ref,
-    Map<String, dynamic> updatedData,
-    File? imageFile,
-  ) async {
+      DocumentReference ref,
+      Map<String, dynamic> updatedData,
+      File? imageFile,
+      ) async {
     if (imageFile != null) {
       String fileName = 'jobs/${DateTime.now().millisecondsSinceEpoch}.jpg';
       UploadTask uploadTask = _storage.ref().child(fileName).putFile(imageFile);

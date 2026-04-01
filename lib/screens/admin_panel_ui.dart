@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:chakri_info/services/admin_sync_page.dart';
 import 'package:chakri_info/services/firebase_service.dart';
 import 'package:chakri_info/widgets/admin_syn_page_section.dart';
@@ -211,79 +210,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
       ),
     );
   }
-
-  // Future<void> _handlePublish() async {
-  //   setState(() => _isPublishing = true);
-  //   try {
-  //     List<String> base64Images = [];
-  //     for (var file in _selectedImages) {
-  //       List<int> imageBytes = await file.readAsBytes();
-  //       String base64String = base64Encode(imageBytes);
-  //       base64Images.add(base64String);
-  //     }
-  //
-  //     List<Map<String, dynamic>> positionData = positions
-  //         .map(
-  //           (p) => {
-  //             'name': p['name']!.text,
-  //             'post': p['post']!.text,
-  //             'salary_grade': p['salary']!.text,
-  //           },
-  //         )
-  //         .toList();
-  //
-  //     Map<String, dynamic> fullData = {
-  //       'title': _titleCtrl.text,
-  //       'company': _companyCtrl.text,
-  //       'images': base64Images,
-  //       'positions': positionData,
-  //       'total_posts': _totalPostCtrl.text,
-  //       'publish_date': _publishDateCtrl.text, // New Field
-  //       'start_date': _startDateCtrl.text,
-  //       'end_date': _endDateCtrl.text,
-  //       'apply_link': _linkCtrl.text,
-  //       'description': _descCtrl.text,
-  //       'is_govt': isGovtJob,
-  //       'timestamp': FieldValue.serverTimestamp(),
-  //     };
-  //
-  //     await _firebaseService.saveCircular(
-  //       step1: selectedStep1!,
-  //       step2: selectedStep2!,
-  //       step3: selectedStep3,
-  //       step4: selectedStep4,
-  //       circularData: fullData,
-  //     );
-  //
-  //     setState(() {
-  //       _selectedImages.clear();
-  //       _titleCtrl.clear();
-  //       _companyCtrl.clear();
-  //       _publishDateCtrl.clear();
-  //       _startDateCtrl.clear();
-  //       _endDateCtrl.clear();
-  //       _linkCtrl.clear();
-  //       _descCtrl.clear();
-  //       positions = [
-  //         {
-  //           'name': TextEditingController(),
-  //           'post': TextEditingController(),
-  //           'salary': TextEditingController(),
-  //         },
-  //       ];
-  //       _isPublishing = false;
-  //     });
-  //
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text("সফলভাবে পাবলিশ হয়েছে!")));
-  //   } catch (e) {
-  //     setState(() => _isPublishing = false);
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text("Error: $e")));
-  //   }
-  // }
 
   Future<void> _handlePublish() async {
     setState(() => _isPublishing = true);
