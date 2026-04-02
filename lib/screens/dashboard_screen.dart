@@ -503,9 +503,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
-          mainAxisSpacing: 8,
+          mainAxisSpacing: 0,
           crossAxisSpacing: 4,
-          mainAxisExtent: 95, // Increased from 75 to 95 to prevent overflow
+          mainAxisExtent: 70, // Increased from 75 to 95 to prevent overflow
         ),
         itemCount: cats.length,
         itemBuilder: (context, index) {
@@ -534,7 +534,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   child: Icon(cat['i'], color: cat['c'], size: 20),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 1),
                 // Wrapped in Expanded or Flexible to prevent vertical overflow
                 Flexible(
                   child: Column(
@@ -546,7 +546,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 9,
+                          fontSize: 10,
                           fontWeight: FontWeight.bold,
                           height: 1.1,
                           color: isDarkMode ? Colors.white : Colors.black87,
@@ -559,7 +559,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 7.5,
+                          fontSize: 8.5,
                           fontWeight: FontWeight.w400,
                           height: 1.1,
                           color: isDarkMode ? Colors.white70 : Colors.black54,
