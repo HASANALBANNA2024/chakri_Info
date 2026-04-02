@@ -9,7 +9,6 @@ import 'package:chakri_info/providers/job_providers.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
 import 'package:chakri_info/screens/job_details_screen.dart';
-import 'package:chakri_info/screens/job_list_screen.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:flutter/material.dart';
 

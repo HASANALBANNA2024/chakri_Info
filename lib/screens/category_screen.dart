@@ -1,6 +1,6 @@
 import 'package:chakri_info/models/job_model.dart';
 import 'package:chakri_info/providers/job_providers.dart';
-import 'package:chakri_info/screens/job_list_screen.dart';
+
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -241,17 +241,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
         itemBuilder: (context, i) {
           final cat = _popularCategories[i];
           return InkWell(
-            // onTap: () {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => JobListScreen(
-            //         title: cat['name'].replaceAll('\n', ' '),
-            //         jobs: [],
-            //       ),
-            //     ),
-            //   );
-            // },
+
             child: Container(
               width: 105,
               margin: EdgeInsets.symmetric(horizontal: 5),

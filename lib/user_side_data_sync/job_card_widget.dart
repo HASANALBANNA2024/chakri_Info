@@ -23,7 +23,7 @@ class JobCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // লজিক: শুধুমাত্র Job Circular হলে ব্যাজ দেখাবে
+    // logic only job circular show the badge ok
     bool isJobCircular = job.step1.trim() == "Job Circular";
 
     return Container(
@@ -43,7 +43,7 @@ class JobCardWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // --- স্মার্ট ব্যাজ (শুধুমাত্র Job Circular হলে দেখাবে) ---
+            // --- Smart Badge only Job circular ar jonno ---
             if (isJobCircular)
               Positioned(
                 top: 0,
@@ -87,7 +87,7 @@ class JobCardWidget extends StatelessWidget {
               padding: EdgeInsets.fromLTRB(14, isJobCircular ? 34 : 18, 14, 18),
               child: Row(
                 children: [
-                  // --- প্রতিষ্ঠানের লোগো ---
+                  // --- Organization Logo---
                   Container(
                     width: 60,
                     height: 60,
@@ -108,7 +108,7 @@ class JobCardWidget extends StatelessWidget {
 
                   const SizedBox(width: 16),
 
-                  // --- তথ্য সেকশন ---
+                  // --- Information Section---
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +134,7 @@ class JobCardWidget extends StatelessWidget {
                           ),
                         ),
 
-                        // --- ডেট সেকশন (এটি এখন সব ক্যাটাগরিতেই দেখাবে) ---
+                        // ---Date Section---
                         const SizedBox(height: 10),
                         Row(
                           children: [
@@ -167,7 +167,7 @@ class JobCardWidget extends StatelessWidget {
     );
   }
 
-  // ডেট ব্যাজ উইজেট
+  // Data badge Widget
   Widget _dateBadge(IconData icon, String text, Color textColor, Color bgColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
