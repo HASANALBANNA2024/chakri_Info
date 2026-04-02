@@ -8,143 +8,147 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen> {
   bool _isExpanded = false;
-  // all category
   final List<Map<String, dynamic>> _allCategories = [
-    // --- top and government (Most Searched) ---
-    {'name': 'বিসিএস (BCS)', 'icon': Icons.stars, 'color': Colors.amber[800]},
+    // --- 1. Job Circular Sections ---
     {
-      'name': 'সরকারি চাকরি',
+      'e': 'Government',
+      'b': 'সরকারি',
+      'name': 'Government (সরকারি)',
       'icon': Icons.account_balance,
       'color': Colors.orange[900],
     },
     {
-      'name': 'ব্যাংক ও ফিন্যান্স',
-      'icon': Icons.business,
-      'color': Colors.blue[800],
-    },
-    {
-      'name': 'ডিফেন্স ও পুলিশ',
-      'icon': Icons.security,
-      'color': Colors.redAccent,
-    },
-    {'name': 'রেলওয়ে জবস', 'icon': Icons.train, 'color': Colors.deepPurple},
-
-    {'name': 'শিক্ষক নিয়োগ', 'icon': Icons.school, 'color': Colors.green},
-    {
-      'name': 'এডুকেশন ও ট্রেনিং',
-      'icon': Icons.menu_book,
-      'color': Colors.lightGreen,
-    },
-    {
-      'name': 'বিশ্ববিদ্যালয় ভর্তি',
-      'icon': Icons.history_edu,
-      'color': Colors.indigo,
-    },
-    {
-      'name': 'পরীক্ষার রেজাল্ট',
-      'icon': Icons.assignment_turned_in,
-      'color': Colors.cyan[700],
-    },
-
-    {
-      'name': 'মেডিকেল ও নার্সিং',
-      'icon': Icons.medical_services,
-      'color': Colors.teal,
-    },
-    {
-      'name': 'হেলথকেয়ার ও ফার্মা',
-      'icon': Icons.medication,
-      'color': Colors.deepOrange,
-    },
-    {
-      'name': 'নার্স (Nurse)',
-      'icon': Icons.person_add_alt_1,
-      'color': Colors.tealAccent[700],
-    },
-
-    {
-      'name': 'IT ও টেলিকম',
-      'icon': Icons.on_device_training,
-      'color': Colors.blue,
-    },
-    {
-      'name': 'ইঞ্জিনিয়ারিং',
+      'e': 'Engineering',
+      'b': 'ইঞ্জিনিয়ারিং',
+      'name': 'Engineering (ইঞ্জিনিয়ারিং)',
       'icon': Icons.engineering,
       'color': Colors.blueGrey,
     },
     {
-      'name': 'ডেটা এন্ট্রি',
-      'icon': Icons.keyboard,
-      'color': Colors.blueGrey[400],
+      'e': 'Bank',
+      'b': 'ব্যাংক',
+      'name': 'Bank (ব্যাংক)',
+      'icon': Icons.business,
+      'color': Colors.blue[800],
     },
     {
-      'name': 'প্রোডাকশন',
-      'icon': Icons.settings_suggest,
-      'color': Colors.indigo[300],
-    },
-
-    {
-      'name': 'অ্যাকাউন্টিং ও ফিন্যান্স',
-      'icon': Icons.account_balance_wallet,
-      'color': Colors.blueGrey,
-    },
-    {'name': 'অ্যাডমিন ও সেলস', 'icon': Icons.campaign, 'color': Colors.orange},
-    {
-      'name': 'কমার্শিয়াল',
-      'icon': Icons.business_center,
-      'color': Colors.brown,
+      'e': 'Defense',
+      'b': 'ডিফেন্স',
+      'name': 'Defense (ডিফেন্স)',
+      'icon': Icons.security,
+      'color': Colors.redAccent,
     },
     {
-      'name': 'গার্মেন্টস ও টেক্সটাইল',
-      'icon': Icons.dry_cleaning,
-      'color': Colors.pink,
-    },
-
-    {
-      'name': 'এগ্রো (উদ্ভিদ/প্রাণী)',
-      'icon': Icons.agriculture,
-      'color': Colors.green[800],
+      'e': 'Medical',
+      'b': 'মেডিক্যাল',
+      'name': 'Medical (মেডিক্যাল)',
+      'icon': Icons.medical_services,
+      'color': Colors.teal,
     },
     {
-      'name': 'মৎস্য (Fisheries)',
-      'icon': Icons.phishing,
-      'color': Colors.lightBlue,
+      'e': 'Private',
+      'b': 'বেসরকারি',
+      'name': 'Private (বেসরকারি)',
+      'icon': Icons.apartment,
+      'color': Colors.purple,
+    },
+    // --- 2. Special & Popular Sub-Categories ---
+    {
+      'e': 'BCS',
+      'b': 'বিসিএস',
+      'name': 'BCS (বিসিএস)',
+      'icon': Icons.stars,
+      'color': Colors.amber[800],
     },
     {
-      'name': 'এনজিও (NGO)',
+      'e': 'Teacher',
+      'b': 'শিক্ষক নিয়োগ',
+      'name': 'Teacher (শিক্ষক নিয়োগ)',
+      'icon': Icons.school,
+      'color': Colors.green[700],
+    },
+    {
+      'e': 'Pharma',
+      'b': 'ফার্মাসিউটিক্যালস',
+      'name': 'Pharmaceuticals (ফার্মাসিউটিক্যালস)',
+      'icon': Icons.medication,
+      'color': Colors.deepOrange,
+    },
+    {
+      'e': 'NGO',
+      'b': 'এনজিও',
+      'name': 'NGO (এনজিও)',
       'icon': Icons.volunteer_activism,
       'color': Colors.indigo,
     },
-
-    {'name': 'বেসরকারি চাকরি', 'icon': Icons.apartment, 'color': Colors.purple},
     {
-      'name': 'অন্যান্য (Others)',
+      'e': 'IT & Soft',
+      'b': 'আইটি ও সফটওয়্যার',
+      'name': 'IT & Software (আইটি ও সফটওয়্যার)',
+      'icon': Icons.computer,
+      'color': Colors.blue,
+    },
+
+    // --- 3. Admission & Questions ---
+    {
+      'e': 'Admission',
+      'b': 'ভর্তি পরীক্ষা',
+      'name': 'Admission (ভর্তি পরীক্ষা)',
+      'icon': Icons.history_edu,
+      'color': Colors.indigo[900],
+    },
+    {
+      'e': 'Question',
+      'b': 'প্রশ্ন ব্যাংক',
+      'name': 'Question Bank (প্রশ্ন ব্যাংক)',
+      'icon': Icons.collections_bookmark,
+      'color': Colors.brown,
+    },
+    {
+      'e': 'Result',
+      'b': 'নোটিশ ও রেজাল্ট',
+      'name': 'Notice or Result (নোটিশ ও রেজাল্ট)',
+      'icon': Icons.assignment_turned_in,
+      'color': Colors.cyan[800],
+    },
+    {
+      'e': 'Others',
+      'b': 'অন্যান্য',
+      'name': 'Others (অন্যান্য)',
       'icon': Icons.more_horiz,
-      'color': Colors.grey,
+      'color': Colors.grey[700],
     },
   ];
 
-  // popular list for future database update ok
+  // --- ৪. Popular Grid  ---
   final List<Map<String, dynamic>> _popularCategories = [
     {
-      'name': 'সরকারি\nচাকরি',
+      'e': 'Govt',
+      'b': 'সরকারি',
+      'name': 'Government (সরকারি)',
       'icon': Icons.account_balance,
-      'color': Color(0xFF1A237E),
+      'color': const Color(0xFF1A237E),
     },
     {
-      'name': 'ব্যাংক\nজবস',
+      'e': 'Bank',
+      'b': 'ব্যাংক',
+      'name': 'Bank (ব্যাংক)',
       'icon': Icons.business_center,
-      'color': Color(0xFF00796B),
+      'color': const Color(0xFF00796B),
     },
     {
-      'name': 'প্রাইভেট\nকোম্পানি',
-      'icon': Icons.apartment,
-      'color': Color(0xFF7B1FA2),
+      'e': 'Engineering',
+      'b': 'ইঞ্জিনিয়ারিং',
+      'name': 'Engineering (ইঞ্জিনিয়ারিং)',
+      'icon': Icons.engineering,
+      'color': const Color(0xFF1976D2),
     },
     {
-      'name': 'আইটি &\nসফটওয়্যার',
-      'icon': Icons.computer,
-      'color': Color(0xFF1976D2),
+      'e': ' Medical',
+      'b': 'মেডিক্যাল',
+      'name': 'Medical (মেডিক্যাল)',
+      'icon': Icons.medical_services,
+      'color': const Color(0xFFD81B60),
     },
   ];
 
@@ -257,14 +261,29 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(cat['icon'], color: Colors.white, size: 28),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 6),
+
+                  // English Text
                   Text(
-                    cat['name'],
+                    cat['e'],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 1),
+
+                  // Bangla Language text
+                  Text(
+                    cat['b'],
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                      color: Colors.white.withOpacity(0.85),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ],
@@ -352,23 +371,39 @@ class _CategoryScreenState extends State<CategoryScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: EdgeInsets.all(4),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: cat['color'].withOpacity(0.1),
+                color: cat['color'].withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(cat['icon'], color: cat['color'], size: 20),
+              child: Icon(cat['icon'], color: cat['color'], size: 24),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 6),
+
+            // English Name
             Text(
-              cat['name'],
+              cat['e'], // English Short Name
               textAlign: TextAlign.center,
-              maxLines: 2,
+              maxLines: 1,
+              style: TextStyle(
+                fontSize: 10, //
+                fontWeight: FontWeight.bold,
+                height: 1.1,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+
+            // Bangla Name
+            Text(
+              cat['b'], // Bangla Name
+              textAlign: TextAlign.center,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                height: 1.0,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w900,
+                height: 1.1,
+                color: isDarkMode ? Colors.white70 : Colors.black54,
               ),
             ),
           ],
@@ -377,7 +412,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  // ১. কুইজ প্রমোশন ব্যানার
+  // Quiz Banner
   Widget _buildQuizBanner(bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),

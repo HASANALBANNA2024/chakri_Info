@@ -419,34 +419,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildCategoryGrid(bool isDarkMode) {
     List<Map<String, dynamic>> cats = [
-      {'n': 'সরকারি', 'i': Icons.account_balance, 'c': Colors.orange},
-      {'n': 'ব্যাংক', 'i': Icons.business, 'c': Colors.blue},
-      {'n': 'বেসরকারি', 'i': Icons.apartment, 'c': Colors.purple},
-      {'n': 'ডিফেন্স', 'i': Icons.security, 'c': Colors.red},
-      {'n': 'এনজিও', 'i': Icons.groups_rounded, 'c': Colors.teal},
-      {'n': 'এডুকেশন ', 'i': Icons.menu_book, 'c': Colors.lightGreen},
-      {'n': 'ভর্তি', 'i': Icons.history_edu, 'c': Colors.indigo},
-      {'n': 'রেজাল্ট', 'i': Icons.assignment_turned_in, 'c': Colors.cyan[700]},
-      {'n': 'মেডিকেল', 'i': Icons.medical_services, 'c': Colors.teal},
-      {'n': 'হেলথকেয়ার', 'i': Icons.medication, 'c': Colors.deepOrange},
+      {
+        'e': 'BCS',
+        'b': 'বিসিএস',
+        'n': 'BCS (বিসিএস)',
+        'i': Icons.stars,
+        'c': Colors.amber[800],
+      },
+      {
+        'e': 'Govt',
+        'b': 'সরকারি',
+        'n': 'Government (সরকারি)',
+        'i': Icons.account_balance,
+        'c': Colors.orange[900],
+      },
+      {
+        'e': 'Bank',
+        'b': 'ব্যাংক',
+        'n': 'Bank (ব্যাংক)',
+        'i': Icons.business,
+        'c': Colors.blue[800],
+      },
+      {
+        'e': 'Private',
+        'b': 'বেসরকারি',
+        'n': 'Private (বেসরকারি)',
+        'i': Icons.apartment,
+        'c': Colors.purple,
+      },
+      {
+        'e': 'Defense',
+        'b': 'ডিফেন্স',
+        'n': 'Defense (ডিফেন্স)',
+        'i': Icons.security,
+        'c': Colors.redAccent,
+      },
+      {
+        'e': 'NGO',
+        'b': 'এনজিও',
+        'n': 'NGO (এনজিও)',
+        'i': Icons.groups_rounded,
+        'c': Colors.teal,
+      },
+      {
+        'e': 'Teacher',
+        'b': 'শিক্ষক নিয়োগ',
+        'n': 'Teacher (শিক্ষক নিয়োগ)',
+        'i': Icons.school,
+        'c': Colors.lightGreen,
+      },
+      {
+        'e': 'Admission',
+        'b': 'ভর্তি পরীক্ষা',
+        'n': 'Admission (ভর্তি পরীক্ষা)',
+        'i': Icons.history_edu,
+        'c': Colors.indigo,
+      },
+      {
+        'e': 'Notice & Result',
+        'b': 'নোটিশ ও রেজাল্ট',
+        'n': 'Notice or Result (নোটিশ ও রেজাল্ট)',
+        'i': Icons.assignment_turned_in,
+        'c': Colors.cyan[700],
+      },
+      {
+        'e': 'Medical',
+        'b': 'মেডিক্যাল',
+        'n': 'Medical (মেডিক্যাল)',
+        'i': Icons.medical_services,
+        'c': Colors.teal,
+      },
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: GridView.builder(
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
-          mainAxisSpacing: 4,
-          crossAxisSpacing: 4,
-          mainAxisExtent: 58,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 8,
+          mainAxisExtent: 75,
         ),
         itemCount: cats.length,
         itemBuilder: (context, index) {
           var cat = cats[index];
           return InkWell(
+            borderRadius: BorderRadius.circular(10),
             onTap: () {
               List<JobModel> filtered = circulars
                   .where((j) => j.category == cat['n'])
@@ -460,28 +521,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             },
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(6),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: cat['c'].withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: cat['c'].withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(cat['i'], color: cat['c'], size: 18),
+                  child: Icon(cat['i'], color: cat['c'], size: 22),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  cat['n'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.w500,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 5),
+                Column(
+                  children: [
+                    Text(
+                      cat['e'],
+                      style: TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                        color: isDarkMode ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      cat['b'],
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w400,
+                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ],
             ),
