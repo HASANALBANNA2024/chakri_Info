@@ -19,6 +19,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     with SingleTickerProviderStateMixin {
   // --- Service & State ---
   final FirebaseService _firebaseService = FirebaseService();
+  File? _selectedLogo;
+  bool _isLogoCompressing = false;
 
   List<File> _selectedImages = [];
   bool _isCompressing = false;
@@ -498,6 +500,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   Future<void> _handlePublish() async {
     setState(() => _isPublishing = true);
     try {
+      // 1. Process Circular Images
       List<String> base64Images = [];
       for (var file in _selectedImages) {
         List<int> imageBytes = await file.readAsBytes();
@@ -505,6 +508,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         base64Images.add(base64String);
       }
 
+      // 2. Process Logo Image (Moved inside try block and before fullData)
+      String? logoBase64;
+      if (_selectedLogo != null) {
+        List<int> logoBytes = await _selectedLogo!.readAsBytes();
+        logoBase64 = base64Encode(logoBytes);
+      }
+
+      // 3. Process Positions
       List<Map<String, dynamic>> positionData = positions
           .map(
             (p) => {
@@ -515,10 +526,11 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
           )
           .toList();
 
-      // এখানে আপনার UI এর ডাটাগুলো গুছিয়ে নেওয়া হচ্ছে
+      // 4. Organize Data (Logo included here)
       Map<String, dynamic> fullData = {
         'title': _titleCtrl.text,
         'company': _companyCtrl.text,
+        'logo': logoBase64 ?? "", // Adding logo to database
         'images': base64Images,
         'positions': positionData,
         'total_posts': _totalPostCtrl.text,
@@ -528,15 +540,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         'apply_link': _linkCtrl.text,
         'description': _descCtrl.text,
         'is_govt': isGovtJob,
-        'timestamp': FieldValue.serverTimestamp(), // এটি ডাটা সর্টিং এর জন্য
-        // এই ফিল্ডগুলো অবশ্যই থাকতে হবে যাতে আপনার Filter কাজ করে
+        'timestamp': FieldValue.serverTimestamp(),
         'step1': selectedStep1,
         'step2': selectedStep2,
         'step3': selectedStep3,
         'step4': selectedStep4,
       };
 
-      // ফায়ারবেস সার্ভিসে ডাটা পাঠিয়ে দেওয়া
+      // 5. Send to Firebase
       await _firebaseService.saveCircular(
         step1: selectedStep1!,
         step2: selectedStep2!,
@@ -545,9 +556,10 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         circularData: fullData,
       );
 
-      // পাবলিশ হওয়ার পর ফর্ম রিসেট করা
+      // 6. Reset Form
       setState(() {
         _selectedImages.clear();
+        _selectedLogo = null; // Clear logo after publish
         _titleCtrl.clear();
         _companyCtrl.clear();
         _publishDateCtrl.clear();
@@ -555,6 +567,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         _endDateCtrl.clear();
         _linkCtrl.clear();
         _descCtrl.clear();
+        _totalPostCtrl.clear();
         positions = [
           {
             'name': TextEditingController(),
@@ -567,7 +580,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text("সফলভাবে পাবলিশ হয়েছে!")));
+      ).showSnackBar(const SnackBar(content: Text("সফলভাবে পাবলিশ হয়েছে!")));
     } catch (e) {
       setState(() => _isPublishing = false);
       ScaffoldMessenger.of(
@@ -658,6 +671,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
           _buildSectionCard("Circular Images (Multiple)", [
             _buildMultiImagePicker(),
           ]),
+          _buildSingleLogoPicker(),
           _buildSectionCard("ডাটাবেস টেবিল সিলেকশন", [
             _buildDropdown(
               "ধাপ ১: মূল টেবিল",
@@ -1056,6 +1070,129 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
           borderSide: BorderSide(color: Colors.blue.shade50),
         ),
       ),
+    );
+  }
+
+  // logo
+  Future<void> _pickAndCompressLogo() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
+
+    if (pickedFile != null) {
+      setState(() => _isLogoCompressing = true);
+
+      final dir = await path_provider.getTemporaryDirectory();
+      final targetPath =
+          "${dir.absolute.path}/logo_${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+      // লোগো সাইজ একদম কমিয়ে (KB-তে) আনার জন্য স্পেশাল কমপ্রেশন
+      var result = await FlutterImageCompress.compressAndGetFile(
+        pickedFile.path,
+        targetPath,
+        quality: 5, // কোয়ালিটি অনেক কম যাতে সাইজ ছোট হয়
+        minWidth: 150, // লোগোর জন্য ১৫০ পিক্সেল যথেষ্ট
+        minHeight: 150,
+      );
+
+      setState(() {
+        if (result != null) _selectedLogo = File(result.path);
+        _isLogoCompressing = false;
+      });
+    }
+  }
+
+  // build
+  Widget _buildSingleLogoPicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "প্রতিষ্ঠানের লোগো (সিঙ্গেল)",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 10),
+        GestureDetector(
+          onTap: _pickAndCompressLogo,
+          child: Container(
+            height: 120, // ইমেজ পিকারের মতো বড় করা হয়েছে
+            width: double.infinity, // পুরো স্ক্রিন জুড়ে থাকবে
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: Colors.blueAccent.withOpacity(0.2),
+                style: BorderStyle.solid,
+                width: 1.5,
+              ),
+            ),
+            child: _isLogoCompressing
+                ? const Center(child: CircularProgressIndicator())
+                : _selectedLogo != null
+                ? Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // লোগো প্রিভিউ
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.file(
+                            _selectedLogo!,
+                            fit: BoxFit.contain, // লোগো যেন কেটে না যায়
+                          ),
+                        ),
+                      ),
+                      // রিমুভ বাটন
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _selectedLogo = null),
+                          child: const CircleAvatar(
+                            radius: 15,
+                            backgroundColor: Colors.red,
+                            child: Icon(
+                              Icons.delete_forever,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_business_rounded,
+                        color: Colors.blueAccent.withOpacity(0.6),
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "লোগো সিলেক্ট করুন",
+                        style: TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Text(
+                        "(বর্গাকার লোগো হলে ভালো দেখাবে)",
+                        style: TextStyle(color: Colors.grey, fontSize: 10),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ],
     );
   }
 

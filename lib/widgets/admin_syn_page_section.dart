@@ -490,33 +490,142 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
   }
 
   Widget _buildJobCard(DocumentSnapshot doc, Map<String, dynamic> data) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: _buildLeadingImage(data['images']),
-        ),
-        title: Text(
-          data['title'] ?? 'No Title',
-          maxLines: 1,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-        ),
-        subtitle: Text(
-          "Deadline: ${data['end_date'] ?? 'N/A'}\n${data['company'] ?? ''}",
-          style: const TextStyle(fontSize: 11),
-        ),
-        trailing: PopupMenuButton(
-          onSelected: (val) {
-            if (val == 'edit') _showEditSheet(doc, data);
-            if (val == 'delete') _jobRepo.deleteJob(doc.reference);
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'edit', child: Text("Edit")),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Text("Delete", style: TextStyle(color: Colors.red)),
+    bool isGovt = data['is_govt'] ?? false;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 5,
+      ), // Vertical margin কমানো হয়েছে
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Stack(
+          children: [
+            // --- Compact Badge ---
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ), // Padding কমানো হয়েছে
+                decoration: BoxDecoration(
+                  color: isGovt
+                      ? Colors.blue.shade700
+                      : Colors.blueGrey.shade400,
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  isGovt ? "GOVT" : "NON-GOVT", // টেক্সট ছোট করা হয়েছে
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 7,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(top: 8), // টপ প্যাডিং কমানো হয়েছে
+              child: ListTile(
+                dense: true, // এটি লিস্টের উচ্চতা অনেক কমিয়ে দিবে
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 0,
+                ), // Vertical padding ০ করা হয়েছে
+
+                leading: Container(
+                  width: 45, // লোগোর সাইজ কিছুটা ছোট করা হয়েছে
+                  height: 45,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.blue.withOpacity(0.1)),
+                  ),
+                  child: ClipOval(
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: _getLogoWidget(data['logo']),
+                    ),
+                  ),
+                ),
+
+                title: Text(
+                  data['title'] ?? 'No Title',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min, // এটি হাইট কমাতে সাহায্য করবে
+                  children: [
+                    Text(
+                      data['company'] ?? '',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.blueAccent.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      "Deadline: ${data['end_date'] ?? 'N/A'}",
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.red,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                trailing: PopupMenuButton(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(
+                    Icons.more_vert,
+                    size: 18,
+                    color: Colors.grey,
+                  ),
+                  onSelected: (val) {
+                    if (val == 'edit') _showEditSheet(doc, data);
+                    if (val == 'delete') _jobRepo.deleteJob(doc.reference);
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      height: 35,
+                      child: Text("Edit", style: TextStyle(fontSize: 13)),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      height: 35,
+                      child: Text(
+                        "Delete",
+                        style: TextStyle(color: Colors.red, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -524,20 +633,58 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
     );
   }
 
-  Widget _buildLeadingImage(dynamic images) {
-    if (images != null && images is List && images.isNotEmpty) {
+  Widget _buildLeadingImage(dynamic logoData) {
+    return Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.grey.withOpacity(0.15), width: 1.2),
+      ),
+      child: ClipOval(child: _getLogoWidget(logoData)),
+    );
+  }
+
+  Widget _getLogoWidget(dynamic logoData) {
+    if (logoData != null) {
       try {
-        return Image.memory(
-          base64Decode(images[0]),
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-        );
+        String base64String = "";
+
+        // Handling both List and String types for data safety
+        if (logoData is List && logoData.isNotEmpty) {
+          base64String = logoData[0];
+        } else if (logoData is String && logoData.isNotEmpty) {
+          base64String = logoData;
+        }
+
+        if (base64String.isNotEmpty) {
+          return Padding(
+            padding: const EdgeInsets.all(4.0), // Padding inside the circle
+            child: Image.memory(
+              base64Decode(base64String),
+              fit: BoxFit.contain, // Ensuring logo is not cropped
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.business_rounded,
+                color: Colors.grey,
+                size: 24,
+              ),
+            ),
+          );
+        }
       } catch (e) {
-        return const Icon(Icons.image);
+        return const Icon(
+          Icons.broken_image_outlined,
+          color: Colors.grey,
+          size: 20,
+        );
       }
     }
-    return const Icon(Icons.work_outline);
+    return const Icon(
+      Icons.work_outline_rounded,
+      color: Colors.indigo,
+      size: 24,
+    );
   }
 
   void _showEditSheet(DocumentSnapshot doc, Map<String, dynamic> data) {
