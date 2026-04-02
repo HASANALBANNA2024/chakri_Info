@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
+import 'package:chakri_info/providers/job_providers.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
 import 'package:chakri_info/screens/job_details_screen.dart';
@@ -25,6 +26,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Data Sync
+    jobProvider.syncJobsFromAdmin();
+
     circulars = _jobController.fetchAllCirculars();
     _scrollController = ScrollController();
 
@@ -476,8 +480,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'c': Colors.indigo,
       },
       {
-        'e': 'Notice & Result',
-        'b': 'নোটিশ ও রেজাল্ট',
+        'e': 'Notice',
+        'b': 'নোটিশ',
         'n': 'Notice or Result (নোটিশ ও রেজাল্ট)',
         'i': Icons.assignment_turned_in,
         'c': Colors.cyan[700],
@@ -492,16 +496,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: GridView.builder(
         shrinkWrap: true,
         padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 8,
-          mainAxisExtent: 75,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 4,
+          mainAxisExtent: 95, // Increased from 75 to 95 to prevent overflow
         ),
         itemCount: cats.length,
         itemBuilder: (context, index) {
@@ -509,9 +513,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return InkWell(
             borderRadius: BorderRadius.circular(10),
             onTap: () {
-              List<JobModel> filtered = circulars
-                  .where((j) => j.category == cat['n'])
-                  .toList();
+              // Updated to use the sync data logic from provider
+              List<JobModel> filtered = jobProvider.getJobsByCategory(cat['n']);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -524,35 +527,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6), // Slightly reduced padding
                   decoration: BoxDecoration(
                     color: cat['c'].withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(cat['i'], color: cat['c'], size: 22),
+                  child: Icon(cat['i'], color: cat['c'], size: 20),
                 ),
-                const SizedBox(height: 5),
-                Column(
-                  children: [
-                    Text(
-                      cat['e'],
-                      style: TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.bold,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                const SizedBox(height: 4),
+                // Wrapped in Expanded or Flexible to prevent vertical overflow
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        cat['e'],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          height: 1.1,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
                       ),
-                    ),
-                    Text(
-                      cat['b'],
-                      style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.w400,
-                        color: isDarkMode ? Colors.white70 : Colors.black54,
+                      const SizedBox(height: 1),
+                      Text(
+                        cat['b'],
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 7.5,
+                          fontWeight: FontWeight.w400,
+                          height: 1.1,
+                          color: isDarkMode ? Colors.white70 : Colors.black54,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
