@@ -241,17 +241,17 @@ class _CategoryScreenState extends State<CategoryScreen> {
         itemBuilder: (context, i) {
           final cat = _popularCategories[i];
           return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JobListScreen(
-                    title: cat['name'].replaceAll('\n', ' '),
-                    jobs: [],
-                  ),
-                ),
-              );
-            },
+            // onTap: () {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => JobListScreen(
+            //         title: cat['name'].replaceAll('\n', ' '),
+            //         jobs: [],
+            //       ),
+            //     ),
+            //   );
+            // },
             child: Container(
               width: 105,
               margin: EdgeInsets.symmetric(horizontal: 5),
@@ -351,92 +351,28 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  // build category item
-  // Widget _buildCategoryItem(Map<String, dynamic> cat, bool isDarkMode) {
-  //   return InkWell(
-  //     onTap: () {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder: (context) => JobListScreen(title: cat['name'], jobs: []),
-  //         ),
-  //       );
-  //     },
-  //     child: Container(
-  //       padding: EdgeInsets.all(4),
-  //       decoration: BoxDecoration(
-  //         color: isDarkMode ? Color(0xFF1E1E1E) : Colors.white,
-  //         borderRadius: BorderRadius.circular(10),
-  //         border: Border.all(color: Colors.grey.withOpacity(0.1)),
-  //       ),
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Container(
-  //             padding: const EdgeInsets.all(6),
-  //             decoration: BoxDecoration(
-  //               color: cat['color'].withOpacity(0.12),
-  //               shape: BoxShape.circle,
-  //             ),
-  //             child: Icon(cat['icon'], color: cat['color'], size: 24),
-  //           ),
-  //           const SizedBox(height: 6),
-  //
-  //           // English Name
-  //           Text(
-  //             cat['e'], // English Short Name
-  //             textAlign: TextAlign.center,
-  //             maxLines: 1,
-  //             style: TextStyle(
-  //               fontSize: 10, //
-  //               fontWeight: FontWeight.bold,
-  //               height: 1.1,
-  //               color: isDarkMode ? Colors.white : Colors.black87,
-  //             ),
-  //           ),
-  //
-  //           // Bangla Name
-  //           Text(
-  //             cat['b'], // Bangla Name
-  //             textAlign: TextAlign.center,
-  //             maxLines: 1,
-  //             overflow: TextOverflow.ellipsis,
-  //             style: TextStyle(
-  //               fontSize: 8.5,
-  //               fontWeight: FontWeight.w900,
-  //               height: 1.1,
-  //               color: isDarkMode ? Colors.white70 : Colors.black54,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Quiz Banner
 
   Widget _buildCategoryItem(Map<String, dynamic> cat, bool isDarkMode) {
     return InkWell(
       borderRadius: BorderRadius.circular(
         10,
       ), // Added for better touch ripple effect
-      onTap: () {
-        // Logic: Filter jobs from the jobProvider using the full category name
-        final List<JobModel> filteredJobs = jobProvider.getJobsByCategory(
-          cat['name'],
-        );
-
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => JobListScreen(
-              title: cat['name'],
-              jobs: filteredJobs, // Passing the synced/filtered data
-            ),
-          ),
-        );
-      },
+      // onTap: () {
+      //   // Logic: Filter jobs from the jobProvider using the full category name
+      //   final List<JobModel> filteredJobs = jobProvider.getJobsByCategory(
+      //     cat['name'],
+      //   );
+      //
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //       builder: (context) => JobListScreen(
+      //         title: cat['name'],
+      //         jobs: filteredJobs, // Passing the synced/filtered data
+      //       ),
+      //     ),
+      //   );
+      // },
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
