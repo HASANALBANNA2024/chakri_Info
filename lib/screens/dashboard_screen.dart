@@ -532,7 +532,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: cat['c'].withOpacity(0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(cat['i'], color: cat['c'], size: 20),
+                  child: Icon(cat['i'], color: cat['c'], size: 22),
                 ),
                 const SizedBox(height: 1),
                 // Wrapped in Expanded or Flexible to prevent vertical overflow
