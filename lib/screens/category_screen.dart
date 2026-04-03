@@ -241,6 +241,29 @@ class _CategoryScreenState extends State<CategoryScreen> {
         itemBuilder: (context, i) {
           final cat = _popularCategories[i];
           return InkWell(
+            onTap: () {
+              // key default value
+              final String? clickedName = cat['name']?.toString();
+
+              if (clickedName == null || clickedName.isEmpty) {
+                print("Error: Category name ('n') missing in data!");
+                // User Message show
+                return;
+              }
+
+              // filter check
+              List<JobSyncModel> results = jobProvider.getJobsByFilter(
+                clickedName,
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      JobListScreen(title: clickedName, jobs: results),
+                ),
+              );
+            },
             child: Container(
               width: 105,
               margin: EdgeInsets.symmetric(horizontal: 5),
