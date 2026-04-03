@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/job_details_screen.dart';
 
-// ১. অফসেট পেপার আর্ট স্টাইল পেইন্টার
+// offset paper art painter
 class AlphabetPainter extends CustomPainter {
   final Color color;
   AlphabetPainter({required this.color});
@@ -114,8 +114,8 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-    // ২. অফসেট পেপার কালার লজিক
-    // লাইট মোডে হালকা ক্রিম/অফসেট পেপার কালার, ডার্ক মোডে গাঢ় চারকোল
+    // offset paper logic
+    // light and dark mode background
     final cardBgColor = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFFF9F0);
     final titleTextColor = isDark ? Colors.white : const Color(0xFF2D2D2D);
     final alphabetAlpha = isDark ? 0.15 : 0.25; // ডার্ক মোডে আরও আবছা
@@ -167,7 +167,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                     borderRadius: BorderRadius.circular(20),
                     child: Stack(
                       children: [
-                        // ব্যাকগ্রাউন্ড বর্ণমালা আর্ট
+                        // background bornomala art
                         Positioned.fill(
                           child: CustomPaint(
                             painter: AlphabetPainter(color: alphabetColor),
@@ -195,7 +195,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // লোগো
+                              // logo
                               Container(
                                 height: 65, width: 65,
                                 decoration: BoxDecoration(
@@ -230,7 +230,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
 
                               const SizedBox(height: 6),
 
-                              // ডেট সেকশন
+                              // Date Section
                               Container(
                                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                                 decoration: BoxDecoration(
