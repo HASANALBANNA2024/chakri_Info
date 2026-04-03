@@ -5,7 +5,6 @@ import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
-import 'package:chakri_info/screens/job_details_screen.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
@@ -601,14 +600,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       itemBuilder: (context, index) {
         final job = circulars[index];
         return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => JobDetailsScreen(job: job),
-              ),
-            );
-          },
+          // onTap: () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => JobDetailsScreen(job: job),
+          //     ),
+          //   );
+          // },
           child: Container(
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
