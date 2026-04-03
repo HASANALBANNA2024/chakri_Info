@@ -1,6 +1,6 @@
-import 'package:chakri_info/models/job_model.dart';
-import 'package:chakri_info/providers/job_providers.dart';
-
+import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -241,7 +241,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
         itemBuilder: (context, i) {
           final cat = _popularCategories[i];
           return InkWell(
-
             child: Container(
               width: 105,
               margin: EdgeInsets.symmetric(horizontal: 5),
@@ -268,7 +267,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
                   const SizedBox(height: 1),
 
-                  // Bangla Language text
+                  //Bangla Language text
                   Text(
                     cat['b'],
                     textAlign: TextAlign.center,
@@ -341,28 +340,30 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-
   Widget _buildCategoryItem(Map<String, dynamic> cat, bool isDarkMode) {
     return InkWell(
-      borderRadius: BorderRadius.circular(
-        10,
-      ), // Added for better touch ripple effect
-      // onTap: () {
-      //   // Logic: Filter jobs from the jobProvider using the full category name
-      //   final List<JobModel> filteredJobs = jobProvider.getJobsByCategory(
-      //     cat['name'],
-      //   );
-      //
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => JobListScreen(
-      //         title: cat['name'],
-      //         jobs: filteredJobs, // Passing the synced/filtered data
-      //       ),
-      //     ),
-      //   );
-      // },
+      borderRadius: BorderRadius.circular(10),
+
+      onTap: () {
+        // key default value
+        final String? clickedName = cat['name']?.toString();
+
+        if (clickedName == null || clickedName.isEmpty) {
+          print("Error: Category name ('n') missing in data!");
+          // User Message show
+          return;
+        }
+
+        // filter check
+        List<JobSyncModel> results = jobProvider.getJobsByFilter(clickedName);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => JobListScreen(title: clickedName, jobs: results),
+          ),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
