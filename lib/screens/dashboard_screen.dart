@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
-import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
-import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
+
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
-import 'package:chakri_info/providers/job_providers.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
 import 'package:chakri_info/screens/job_details_screen.dart';
+import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:flutter/material.dart';
 
@@ -513,24 +513,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
           var cat = cats[index];
           return InkWell(
             borderRadius: BorderRadius.circular(10),
-            // onTap: () {
-            //   // Updated to use the sync data logic from provider
-            //   List<JobModel> filtered = jobProvider.getJobsByCategory(cat['n']);
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) =>
-            //           JobListScreen(title: cat['n'], jobs: filtered),
-            //     ),
-            //   );
-            // },
-           onTap: (){
+
+            onTap: () {
               String clickedName = cat['n'];
 
-              List<JobSyncModel> results = jobProvider.getJobsByFilter(clickedName);
+              List<JobSyncModel> results = jobProvider.getJobsByFilter(
+                clickedName,
+              );
 
-              Navigator.push(context, MaterialPageRoute(builder: (_)=> JobListScreen(title: clickedName, jobs: results)));
-           },
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      JobListScreen(title: clickedName, jobs: results),
+                ),
+              );
+            },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
