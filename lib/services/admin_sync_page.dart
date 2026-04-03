@@ -35,28 +35,6 @@ class JobRepository {
     return query.orderBy('timestamp', descending: true).snapshots();
   }
 
-  // update and delete job circular
-
-  // Future<void> updateJob(
-  //   DocumentReference ref,
-  //   Map<String, dynamic> updatedData,
-  //   File? imageFile,
-  // ) async {
-  //   if (imageFile != null) {
-  //     String fileName = 'jobs/${DateTime.now().millisecondsSinceEpoch}.jpg';
-  //     UploadTask uploadTask = _storage.ref().child(fileName).putFile(imageFile);
-  //     TaskSnapshot snapshot = await uploadTask;
-  //     String downloadUrl = await snapshot.ref.getDownloadURL();
-  //     updatedData['images'] = [downloadUrl];
-  //   }
-  //   return await ref.update(updatedData);
-  // }
-  //
-  // Future<void> deleteJob(DocumentReference ref) async {
-  //   return await ref.delete();
-  // }
-
-
   Future<void> updateJob(
       DocumentReference ref,
       Map<String, dynamic> updatedData,

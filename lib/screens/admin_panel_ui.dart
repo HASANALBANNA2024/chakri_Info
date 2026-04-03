@@ -112,7 +112,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   final Map<String, List<String>> _step3Specific = {
     'Engineering (ইঞ্জিনিয়ারিং)': [
       'All',
-      'BSc Engineering',
+      'BSC Engineering',
       'Diploma Engineering',
     ],
     'Government (সরকারি)': [
