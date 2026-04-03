@@ -3,11 +3,11 @@ import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'dart:async';
 
 class JobProvider {
-  /// Local cache to store jobs in memory for fast access
+  // Local cache to store jobs in memory for fast access
   List<JobSyncModel> _allJobs = [];
   StreamSubscription? _jobSubscription;
 
-  /// Starts a real-time listener to sync database changes automatically
+  // Starts a real-time listener to sync database changes automatically
   void startRealTimeSync() {
     // Prevent multiple subscriptions
     if (_jobSubscription != null) return;
@@ -28,8 +28,8 @@ class JobProvider {
     });
   }
 
-  /// Live Stream for UI (StreamBuilder) to get data updates in real-time
-  /// Usage: stream: jobProvider.getJobStream()
+  // Live Stream for UI (StreamBuilder) to get data updates in real-time
+  // Usage: stream: jobProvider.getJobStream()
   Stream<List<JobSyncModel>> getJobStream() {
     return FirebaseFirestore.instance
         .collectionGroup('circular_items')
@@ -42,7 +42,7 @@ class JobProvider {
     });
   }
 
-  /// Filters jobs from local memory without calling the database again
+  // Filters jobs from local memory without calling the database again
   List<JobSyncModel> getJobsByFilter(String categoryName) {
     if (categoryName == 'All' || categoryName.isEmpty) return _allJobs;
 
@@ -57,15 +57,15 @@ class JobProvider {
     ).toList();
   }
 
-  /// Returns all jobs currently stored in memory
+  // Returns all jobs currently stored in memory
   List<JobSyncModel> get allJobs => _allJobs;
 
-  /// Cancels the subscription to free up resources
+  // Cancels the subscription to free up resources
   void dispose() {
     _jobSubscription?.cancel();
     _jobSubscription = null;
   }
 }
 
-/// Global instance of JobProvider
+//Global instance of JobProvider
 final jobProvider = JobProvider();
