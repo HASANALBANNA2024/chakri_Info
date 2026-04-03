@@ -1,7 +1,5 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
 import '../user_side_data_sync/jobsync_model.dart'; // আপনার পাথ অনুযায়ী দিন
 
 class SlidingNoticeBar extends StatefulWidget {
@@ -52,33 +50,33 @@ class _SlidingNoticeBarState extends State<SlidingNoticeBar> {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor = widget.isDarkMode
-        ? Colors.redAccent.withOpacity(0.15)
-        : Colors.redAccent.withOpacity(0.08);
-    final Color textColor = widget.isDarkMode
-        ? Colors.redAccent.shade100
-        : Colors.redAccent;
+    // আপনার দেওয়া স্ট্যাটিক ডিজাইনের হুবহু কালার কোড
+    final Color accentColor = Colors.redAccent;
+    final Color bgColor = accentColor.withOpacity(0.08);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(10),
+      // আপনার দেওয়া মার্জিন এবং প্যাডিং
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: textColor.withOpacity(0.2), width: 0.5),
+        borderRadius: BorderRadius.circular(6), // ৬ পিক্সেল রেডিয়াস
       ),
       child: Row(
         children: [
-          Icon(Icons.campaign, color: textColor, size: 20),
-          const SizedBox(width: 10),
+          // আইকন সাইজ ১৬ আপনার দেওয়া কোড অনুযায়ী
+          Icon(Icons.campaign, color: accentColor, size: 16),
+          const SizedBox(width: 6),
+
           Expanded(
             child: SizedBox(
-              height: 25,
+              height: 18, // টেক্সট লাইনের উচ্চতা অনুযায়ী ফিক্সড হাইট
               child: PageView.builder(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
                 itemBuilder: (context, index) {
                   final job = widget.jobs[index % widget.jobs.length];
+                  print(job);
                   return GestureDetector(
                     onTap: () => widget.onTap(job),
                     child: Text(
@@ -86,9 +84,9 @@ class _SlidingNoticeBarState extends State<SlidingNoticeBar> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 13,
-                        color: textColor,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 11, // আপনার দেওয়া ফন্ট সাইজ ১১
+                        color: accentColor,
+                        fontWeight: FontWeight.w600, // Semi-bold স্টাইল
                       ),
                     ),
                   );
@@ -96,7 +94,10 @@ class _SlidingNoticeBarState extends State<SlidingNoticeBar> {
               ),
             ),
           ),
-          Icon(Icons.arrow_forward_ios, size: 12, color: textColor),
+
+          // শেষের অ্যারো আইকন সাইজ ৮ আপনার দেওয়া কোড অনুযায়ী
+          Icon(Icons.arrow_forward_ios, size: 8, color: accentColor),
+
         ],
       ),
     );
