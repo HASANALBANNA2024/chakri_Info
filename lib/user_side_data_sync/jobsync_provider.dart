@@ -3,52 +3,54 @@ import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'dart:async';
 
 class JobProvider {
-  // Local cache to store jobs in memory for fast access
+  // ১. মেমোরি ক্যাশ এবং স্ট্রিম কন্ট্রোলার
   List<JobSyncModel> _allJobs = [];
   StreamSubscription? _jobSubscription;
 
-  // Starts a real-time listener to sync database changes automatically
+  // Broadcast controller যাতে একাধিক স্ক্রিন থেকে একই ডেটা দেখা যায়
+  final StreamController<List<JobSyncModel>> _jobStreamController =
+  StreamController<List<JobSyncModel>>.broadcast();
+
+  // ২. রিয়েল-টাইম লিসেনার (এটিই আপনার মেইন ইঞ্জিন)
   void startRealTimeSync() {
-    // Prevent multiple subscriptions
     if (_jobSubscription != null) return;
 
+    // snapshots() ফাংশনটি নিজে থেকেই শুধু 'Delta' বা পরিবর্তনটুকু নিয়ে আসে
     _jobSubscription = FirebaseFirestore.instance
         .collectionGroup('circular_items')
         .snapshots()
         .listen((snapshot) {
 
-      // Update local memory whenever database changes (Add/Edit/Delete)
+      // ডাটাবেসে কোনো চেঞ্জ আসলে (Add/Edit/Delete) সেটি প্রসেস করা
       _allJobs = snapshot.docs.map((doc) {
         return JobSyncModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
 
-      print("Real-time Update: ${_allJobs.length} jobs synced to memory.");
+      // মেমোরিতে ডেটা আপডেট করে স্ট্রিম-এ পাঠিয়ে দেওয়া
+      _jobStreamController.add(_allJobs);
+
+      print("Sync Info: ${_allJobs.length} jobs are now in memory (Only changes synced).");
     }, onError: (error) {
       print("Sync Error: $error");
     });
   }
 
-  // Live Stream for UI (StreamBuilder) to get data updates in real-time
-  // Usage: stream: jobProvider.getJobStream()
+  // ৩. UI-এর জন্য স্ট্রিম (এটি এখন আর ডাটাবেস কল করবে না, মেমোরি থেকে ডেটা দিবে)
   Stream<List<JobSyncModel>> getJobStream() {
-    return FirebaseFirestore.instance
-        .collectionGroup('circular_items')
-        .snapshots()
-        .map((snapshot) {
-      _allJobs = snapshot.docs.map((doc) {
-        return JobSyncModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
-      }).toList();
-      return _allJobs;
-    });
+    // যদি লিসেনার চালু না থাকে, তবে চালু করে দিবে
+    if (_jobSubscription == null) {
+      startRealTimeSync();
+    }
+
+    // সরাসরি কন্ট্রোলার থেকে স্ট্রিম দিবে, ফলে ডাটাবেসে রিড কম হবে
+    return _jobStreamController.stream;
   }
 
-  // Filters jobs from local memory without calling the database again
+  // ৪. ফিল্টারিং (এটিও মেমোরি থেকে হয়, ডাটাবেস কল নেই)
   List<JobSyncModel> getJobsByFilter(String categoryName) {
     if (categoryName == 'All' || categoryName.isEmpty) return _allJobs;
-
     String searchKey = categoryName.toLowerCase().trim();
 
-    // Filtering logic from local cache for better performance
     return _allJobs.where((job) =>
     job.step1.toLowerCase().contains(searchKey) ||
         job.step2.toLowerCase().contains(searchKey) ||
@@ -57,15 +59,13 @@ class JobProvider {
     ).toList();
   }
 
-  // Returns all jobs currently stored in memory
   List<JobSyncModel> get allJobs => _allJobs;
 
-  // Cancels the subscription to free up resources
   void dispose() {
     _jobSubscription?.cancel();
     _jobSubscription = null;
+    _jobStreamController.close();
   }
 }
 
-//Global instance of JobProvider
 final jobProvider = JobProvider();

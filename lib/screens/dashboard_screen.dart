@@ -1,5 +1,7 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:chakri_info/widgets/featured_job_slider.dart';
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
@@ -128,7 +130,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           _buildStatsSection(isDarkMode),
           _buildSearchSection(isDarkMode),
-          _buildFeaturedSlider(),
+
+          FeaturedJobSlider(jobProvider: jobProvider),
           _buildCategoryGrid(isDarkMode),
           _buildNoticeSection(), //optimization notice bar
           _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
@@ -389,69 +392,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }, // This bracket closes the builder
     ); // This bracket closes the StreamBuilder
   }
-
-  // slider start code
-  Widget _buildFeaturedSlider() {
-    return Container(
-      height: 110,
-      margin: EdgeInsets.symmetric(vertical: 2),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          double cardWidth = constraints.maxWidth * 0.45;
-
-          return ListView.builder(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            physics: BouncingScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            itemCount: 6,
-            itemBuilder: (context, index) {
-              return Container(
-                width: cardWidth,
-                margin: EdgeInsets.symmetric(horizontal: 5),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/bpsc_image.webp"),
-                    fit: BoxFit.cover,
-                    colorFilter: ColorFilter.mode(
-                      Colors.black.withOpacity(0.35),
-                      BlendMode.darken,
-                    ),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "৪৭তম বিসিএস",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        "১৫ এপ্রিল ডেডলাইন",
-                        style: TextStyle(color: Colors.white70, fontSize: 8.5),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
- // slider ended code
 
   Widget _buildCategoryGrid(bool isDarkMode) {
     List<Map<String, dynamic>> cats = [
