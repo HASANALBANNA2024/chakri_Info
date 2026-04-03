@@ -5,9 +5,11 @@ import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
+import 'package:chakri_info/user_side_data_sync/job_details_screen.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
+import 'package:chakri_info/user_side_data_sync/sliding_notice_bar.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:flutter/material.dart';
 
@@ -128,7 +130,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildSearchSection(isDarkMode),
           _buildFeaturedSlider(),
           _buildCategoryGrid(isDarkMode),
-          _buildNoticeBar(isDarkMode), //optimization notice bar
+          _buildNoticeSection(), //optimization notice bar
           _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
           _buildJobList(isDarkMode), // optimization circular bar
         ],
@@ -331,33 +333,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // notice bar (Ultra Compact)
-  Widget _buildNoticeBar(bool isDarkMode) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        color: Colors.redAccent.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.campaign, color: Colors.redAccent, size: 16),
-          SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              "৪৬তম বিসিএস প্রিলি রেজাল্ট প্রকাশিত হয়েছে...",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.redAccent,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+  Widget _buildNoticeSection() {
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // ১. সরাসরি লিস্ট থেকে ফিল্টার করা (Provider/Consumer ছাড়া)
+    final noticeJobs = jobProvider.allJobs.where((job) {
+      // পদের সংখ্যা থেকে শুধু সংখ্যা বের করা
+      int postCount =
+          int.tryParse(job.totalpost.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+
+      // সরকারি চাকরি চেক
+      bool isGovernment = job.isGovt;
+
+      // ডেডলাইন চেক
+      bool isNotExpired = true;
+      if (job.deadline.isNotEmpty) {
+        DateTime? deadlineDate = DateTime.tryParse(job.deadline);
+        if (deadlineDate != null) {
+          final targetDate = DateTime(
+            deadlineDate.year,
+            deadlineDate.month,
+            deadlineDate.day,
+          );
+          isNotExpired =
+              targetDate.isAtSameMomentAs(today) || targetDate.isAfter(today);
+        }
+      }
+
+      // আপনার শর্ত: সরকারি + ৬০ বা তার বেশি পদ + মেয়াদ আছে
+      return isGovernment && postCount >= 60 && isNotExpired;
+    }).toList();
+
+    // ২. যদি কোনো ম্যাচিং জব না থাকে তবে কিছু দেখাবে না
+    if (noticeJobs.isEmpty) return const SizedBox.shrink();
+
+    // ৩. ডাটা থাকলে স্লাইডিং বার দেখাবে
+    return SlidingNoticeBar(
+      jobs: noticeJobs,
+      isDarkMode: isDarkMode,
+      onTap: (clickedJob) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => JobDetailsScreen(job: clickedJob),
           ),
-          Icon(Icons.arrow_forward_ios, size: 8, color: Colors.redAccent),
-        ],
-      ),
+        );
+      },
     );
   }
 

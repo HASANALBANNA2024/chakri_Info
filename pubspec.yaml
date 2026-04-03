@@ -27,6 +27,7 @@ dependencies:
   flutter_image_compress: ^2.3.0 # ছবিকে ২-১০ কেবি (KB) সাইজে ছোট করতে
   cached_network_image: ^3.4.1 # ৭ দিন বা তার বেশি সময় ক্যাশ ধরে রাখতে
   flutter_cache_manager: ^3.4.1 # ক্যাশ কন্ট্রোল করার জন্য
+  provider: ^6.1.5+1
 
 dev_dependencies:
   flutter_test:
