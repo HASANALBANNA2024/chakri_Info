@@ -1,8 +1,50 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/job_details_screen.dart';
+
+// ১. অফসেট পেপার আর্ট স্টাইল পেইন্টার
+class AlphabetPainter extends CustomPainter {
+  final Color color;
+  AlphabetPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final random = math.Random();
+    const textStyle = TextStyle(
+      fontSize: 22, // ১. বর্ণমালা বড় করা হয়েছে
+      fontWeight: FontWeight.w900, // আরও স্পষ্ট করা হয়েছে
+      fontFamily: 'serif',
+    );
+
+    final alphabets = ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ'];
+
+    for (int i = 0; i < 30; i++) { // কতগুলো বর্ণ থাকবে তা এখানে নিয়ন্ত্রণ করুন
+      final char = alphabets[random.nextInt(alphabets.length)];
+      final textPainter = TextPainter(
+        text: TextSpan(text: char, style: textStyle.copyWith(color: color)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+
+      // ২. এলোমেলো পজিশন (Random Position)
+      double x = random.nextDouble() * size.width;
+      double y = random.nextDouble() * size.height;
+
+      // ৩. বাঁকা-তেরা করার লজিক (Rotation)
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(random.nextDouble() * 0.5); // হালকা বাঁকা হবে (০.৫ রেডিয়ান)
+
+      textPainter.paint(canvas, const Offset(0, 0));
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
 
 class FeaturedJobSlider extends StatefulWidget {
   final dynamic jobProvider;
@@ -20,7 +62,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.85); // একটু বড় করা হয়েছে
+    _pageController = PageController(viewportFraction: 0.85);
     _jobStream = widget.jobProvider.getJobStream();
 
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
@@ -59,7 +101,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
   }
 
   Widget _buildImg(String s) {
-    if (s.isEmpty) return const Icon(Icons.business, size: 40, color: Colors.grey);
+    if (s.isEmpty) return const Icon(Icons.business, size: 35, color: Colors.grey);
     try {
       return s.startsWith('http')
           ? Image.network(s, fit: BoxFit.contain, errorBuilder: (c,e,s)=>const Icon(Icons.broken_image))
@@ -67,17 +109,17 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     } catch (e) { return const Icon(Icons.error_outline); }
   }
 
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-    // কালার স্কিম
-    final cardBgColor = isDark ? const Color(0xFF2C2C2C) : const Color(0xFFF0F0F0);
-    final titleTextColor = isDark ? Colors.white : Colors.black87;
-    final dateTextColor = isDark ? Colors.white70 : Colors.black54;
-    final dateBgColor = isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05);
+    // ২. অফসেট পেপার কালার লজিক
+    // লাইট মোডে হালকা ক্রিম/অফসেট পেপার কালার, ডার্ক মোডে গাঢ় চারকোল
+    final cardBgColor = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFFF9F0);
+    final titleTextColor = isDark ? Colors.white : const Color(0xFF2D2D2D);
+    final alphabetAlpha = isDark ? 0.15 : 0.25; // ডার্ক মোডে আরও আবছা
+    final alphabetColor = (isDark ? Colors.white : const Color(0xFF8B7355)).withOpacity(alphabetAlpha);
 
     return StreamBuilder<List<JobSyncModel>>(
       stream: _jobStream,
@@ -92,7 +134,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
         }).toList();
 
         return SizedBox(
-          height: 190, // টাইটেল ৩ লাইন হতে পারে তাই হাইট সামান্য বাড়ানো হয়েছে
+          height: 175,
           child: PageView.builder(
             controller: _pageController,
             itemBuilder: (context, index) {
@@ -106,55 +148,61 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                     context, MaterialPageRoute(builder: (context) => JobDetailsScreen(job: job))
                 ),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                   decoration: BoxDecoration(
                     color: cardBgColor,
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark ? Colors.white10 : const Color(0xFFE8DFD0),
+                      width: 1,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(isDark ? 0.3 : 0.1),
-                        blurRadius: 12, offset: const Offset(0, 5),
+                        color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+                        blurRadius: 8, offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(20),
                     child: Stack(
                       children: [
+                        // ব্যাকগ্রাউন্ড বর্ণমালা আর্ট
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: AlphabetPainter(color: alphabetColor),
+                          ),
+                        ),
+
                         if (isUrgent)
                           Positioned(
                             top: 0, right: 0,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: const BoxDecoration(
-                                color: Colors.deepOrangeAccent,
-                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15)),
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12)),
                               ),
                               child: Text(
                                 diff == 0 ? "আজ শেষ" : "বাকি ${_toBN(diff.toString())} দিন",
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
                               ),
                             ),
                           ),
 
                         Padding(
-                          padding: const EdgeInsets.only(top: 2, left: 10, right: 10, bottom: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center, // সবকিছু মাঝখানে থাকবে
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // লোগো সেকশন
+                              // লোগো
                               Container(
-                                height: 72, width: 72,
+                                height: 65, width: 65,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 4, spreadRadius: 1,
-                                    )
-                                  ],
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                                  border: Border.all(color: isDark ? Colors.grey[800]! : Colors.white, width: 2),
                                 ),
                                 child: ClipOval(child: Padding(
                                   padding: const EdgeInsets.all(4.0),
@@ -162,38 +210,39 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                                 )),
                               ),
 
-                              const SizedBox(height: 4), // লোগোর নিচের গ্যাপ কমানো হয়েছে
+                              const SizedBox(height: 6),
 
-                              // টাইটেল সেকশন - ২ বা ৩ লাইন পর্যন্ত জায়গা নিবে
+                              // টাইটেল
                               Flexible(
                                 child: Text(
                                   job.title,
                                   textAlign: TextAlign.center,
-                                  maxLines: 3, // ৩ লাইন পর্যন্ত দেখাবে
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 15.0,
+                                    fontSize: 14.5,
                                     color: titleTextColor,
                                     height: 1.1,
                                   ),
                                 ),
                               ),
 
-                              const SizedBox(height: 4), // টাইটেল ও ডেট সেকশনের গ্যাপ কমানো হয়েছে
+                              const SizedBox(height: 6),
 
                               // ডেট সেকশন
                               Container(
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                                 decoration: BoxDecoration(
-                                  color: dateBgColor,
-                                  borderRadius: BorderRadius.circular(12),
+                                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _dateInfo("শুরু: ${_fmtBN(job.start)}", Icons.calendar_today, dateTextColor),
-                                    _dateInfo("শেষ: ${_fmtBN(job.deadline)}", Icons.timer_outlined, dateTextColor),
+                                    _dateInfo("শুরু: ${_fmtBN(job.start)}", Icons.calendar_today, isDark),
+                                    _dateInfo("শেষ: ${_fmtBN(job.deadline)}", Icons.timer_outlined, isDark),
                                   ],
                                 ),
                               ),
@@ -212,16 +261,16 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     );
   }
 
-  Widget _dateInfo(String text, IconData icon, Color color) {
+  Widget _dateInfo(String text, IconData icon, bool isDark) {
     return Row(
       children: [
-        Icon(icon, size: 12, color: Colors.red),
+        Icon(icon, size: 11, color: Colors.redAccent),
         const SizedBox(width: 4),
         Text(
           text,
-          style: TextStyle(
-              color: Colors.red,
-              fontSize: 11.5,
+          style: const TextStyle(
+              color: Colors.redAccent,
+              fontSize: 12.0,
               fontWeight: FontWeight.bold
           ),
         ),
