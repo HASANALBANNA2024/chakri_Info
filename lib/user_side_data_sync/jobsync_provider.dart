@@ -4,7 +4,7 @@ import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 class JobProvider {
   List<JobSyncModel> _allJobs = [];
 
-  // সব নেস্টেড ডাটা একসাথে সিঙ্ক করার জন্য collectionGroup
+  // ncollectionGroup
   Future<void> syncJobsFromAdmin() async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
