@@ -8,7 +8,7 @@ class JobCardWidget extends StatelessWidget {
   final JobSyncModel job;
   const JobCardWidget({super.key, required this.job});
 
-  /// Optimized Image Builder with better error handling
+  // Optimized Image Builder with better error handling
   Widget _buildImage(String imageStr) {
     if (imageStr.isEmpty) return Icon(Icons.business_rounded, color: Colors.blue.shade200, size: 28);
     try {

@@ -390,6 +390,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ); // This bracket closes the StreamBuilder
   }
 
+  // slider start code
   Widget _buildFeaturedSlider() {
     return Container(
       height: 110,
@@ -449,6 +450,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+ // slider ended code
 
   Widget _buildCategoryGrid(bool isDarkMode) {
     List<Map<String, dynamic>> cats = [
