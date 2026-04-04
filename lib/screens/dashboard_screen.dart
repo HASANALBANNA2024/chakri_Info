@@ -14,6 +14,7 @@ import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/user_side_data_sync/sliding_notice_bar.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
+import 'package:chakri_info/widgets/job_stats_widget.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -124,23 +125,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // --- UI Body (Maximum Space Optimization) ---
   Widget _buildHomeBody(bool isDarkMode) {
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStatsSection(isDarkMode),
-          _buildSearchSection(isDarkMode),
-          FeaturedJobSlider(jobProvider: jobProvider),
-          _buildCategoryGrid(isDarkMode),
-          _buildNoticeSection(), //optimization notice bar
-          _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
-          _buildJobList(isDarkMode), // optimization circular bar
-        ],
-      ),
+    return StreamBuilder<List<JobSyncModel>>(
+      stream: jobProvider.getJobStream(),
+      builder: (context, snapshot) {
+
+        final allJobs = snapshot.data ?? [];
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
+              _buildSearchSection(isDarkMode),
+              FeaturedJobSlider(jobProvider: jobProvider),
+              _buildCategoryGrid(isDarkMode),
+              _buildNoticeSection(),
+              _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
+              _buildJobList(isDarkMode),
+            ],
+          ),
+        );
+      },
     );
   }
-
+// home end
   PreferredSizeWidget _buildCustomAppBar(bool isDarkMode) {
     return AppBar(
       title: Text(
@@ -160,7 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Icons.menu_rounded,
             color: Colors.white,
             size: 26,
-          ), // ড্রয়ার ওপেন করার মেনু আইকন
+          ), // drawer open
           onPressed: () =>
               Scaffold.of(context).openDrawer(), // to click open drawer
         ),
@@ -179,94 +188,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
-// stats section
-  Widget _buildStatsSection(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Row(
-        children: [
-          _buildStatCard("১৪ নতুন", "সার্কুলার", Colors.indigo, Icons.bolt),
-          SizedBox(width: 8),
-          _buildStatCard("৩ শেষ", "ডেডলাইন", Colors.teal, Icons.timer_outlined),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(
-    String count,
-    String label,
-    Color color,
-    IconData icon,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.15), color.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withOpacity(0.2), width: 0.8),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 16),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    count,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 13,
-                      color: color,
-                      letterSpacing: -0.5,
-                      height: 1.1,
-                    ),
-                  ),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[600],
-                      letterSpacing: 0.2,
-                      height: 1.1,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // states section end
-
 
   Widget _buildSearchSection(bool isDarkMode) {
     return Padding(
