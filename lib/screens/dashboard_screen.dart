@@ -338,59 +338,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // notice bar (Ultra Compact)
   Widget _buildNoticeSection() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today = DateTime.now();
 
     return StreamBuilder<List<JobSyncModel>>(
-      // 1. Establish a live connection with the database
       stream: jobProvider.getJobStream(),
       builder: (context, snapshot) {
-        // Show nothing if data is loading or empty
         if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
         }
 
         final allJobs = snapshot.data!;
 
-        // 2. Filtering logic: Government jobs with 60+ posts and active deadline
+        // ফিল্টারিং লজিক আপডেট
         final noticeJobs = allJobs.where((job) {
-          // Extracting only numbers from totalpost (e.g., "60 জন" -> 60)
-          int postCount = int.tryParse(job.totalpost.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+          // পদ সংখ্যা বের করা (যদি খালি থাকে তবে ০ ধরবে)
+          String postStr = job.totalpost.replaceAll(RegExp(r'[^0-9]'), '');
+          int postCount = postStr.isNotEmpty ? int.parse(postStr) : 0;
 
-          // Check if it's a government job
-          bool isGovernment = job.isGovt == true;
-
-          // Deadline validation
+          // ডেডলাইন চেক
           bool isNotExpired = true;
-          if (job.deadline.isNotEmpty) {
+          if (job.deadline.isNotEmpty && job.deadline != "null") {
             DateTime? deadlineDate = DateTime.tryParse(job.deadline);
             if (deadlineDate != null) {
-              final targetDate = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
-              isNotExpired = targetDate.isAtSameMomentAs(today) || targetDate.isAfter(today);
+              // ডেডলাইন আজকের বা ভবিষ্যতের হলে ট্রু হবে
+              isNotExpired = deadlineDate.isAfter(today.subtract(const Duration(days: 1)));
             }
           }
 
-          return isGovernment && postCount >= 60 && isNotExpired;
+          // আপনার প্রয়োজন অনুযায়ী এখানে পদ সংখ্যা ৬০ এর বদলে কমিয়ে বা বাড়িয়ে চেক করতে পারেন
+          return job.isGovt == true && postCount >= 10 && isNotExpired;
         }).toList();
 
-        // 3. Hide section if no jobs match the filter
         if (noticeJobs.isEmpty) return const SizedBox.shrink();
 
-        // 4. Return the 100% matched UI Sliding Notice Bar
-        return SlidingNoticeBar(
-          jobs: noticeJobs,
-          isDarkMode: isDarkMode,
-          onTap: (clickedJob) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => JobDetailsScreen(job: clickedJob),
-              ),
-            );
-          },
+        // নোটিশ বারটি একটু প্যাডিং দিয়ে রিটার্ন করা যাতে স্পষ্ট হয়
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: SlidingNoticeBar(
+            jobs: noticeJobs,
+            isDarkMode: isDarkMode,
+            onTap: (clickedJob) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JobDetailsScreen(job: clickedJob),
+                ),
+              );
+            },
+          ),
         );
-      }, // This bracket closes the builder
-    ); // This bracket closes the StreamBuilder
+      },
+    );
   }
 
   Widget _buildCategoryGrid(bool isDarkMode) {
