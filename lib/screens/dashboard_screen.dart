@@ -15,6 +15,7 @@ import 'package:chakri_info/user_side_data_sync/sliding_notice_bar.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
 import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
 import 'package:chakri_info/widgets/job_stats_widget.dart';
+import 'package:chakri_info/widgets/global_search_delegate.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -137,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
-              _buildSearchSection(isDarkMode),
+              buildGlobalSearchSection(context, isDarkMode, jobProvider.allJobs),
               FeaturedJobSlider(jobProvider: jobProvider),
               _buildCategoryGrid(isDarkMode),
               _buildNoticeSection(),
@@ -188,77 +189,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
-
-  Widget _buildSearchSection(bool isDarkMode) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Container(
-        height: 42,
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: isDarkMode
-                  ? Colors.black.withOpacity(0.2)
-                  : Colors.indigo.withOpacity(0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: TextField(
-          textAlignVertical: TextAlignVertical.center,
-          style: TextStyle(
-            fontSize: 13,
-            color: isDarkMode ? Colors.white : Colors.black87,
-          ),
-          decoration: InputDecoration(
-            hintText: "সার্চ করুন (যেমন: ব্যাংক, সরকারি...)",
-            hintStyle: TextStyle(
-              fontSize: 12,
-              color: isDarkMode ? Colors.grey[400] : Colors.grey[500],
-            ),
-            prefixIcon: Icon(
-              Icons.search_rounded,
-              size: 18,
-              color: Colors.indigo,
-            ),
-            suffixIcon: Container(
-              margin: const EdgeInsets.all(7),
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: Colors.indigo.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.tune_rounded,
-                size: 14,
-                color: Colors.indigo,
-              ),
-            ),
-            fillColor: isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
-            filled: true,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(
-                color: isDarkMode
-                    ? Colors.white10
-                    : Colors.indigo.withOpacity(0.05),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide(
-                color: Colors.indigo.withOpacity(0.3),
-                width: 1.2,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   // notice bar (Ultra Compact)
   Widget _buildNoticeSection() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -314,7 +244,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-
+// category item
   Widget _buildCategoryGrid(bool isDarkMode) {
     List<Map<String, dynamic>> cats = [
       {
@@ -474,7 +404,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-
+// section title
   Widget _buildSectionTitle(String title, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
@@ -484,7 +414,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-
   // Recent  (Maximum Data Density)
   Widget _buildJobList(bool isDarkMode) {
     final today = DateTime.now();
@@ -540,5 +469,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-
 }
