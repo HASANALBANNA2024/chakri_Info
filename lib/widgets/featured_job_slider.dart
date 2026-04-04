@@ -114,13 +114,19 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
 
-    // offset paper logic
-    // light and dark mode background
-    final cardBgColor = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFFF9F0);
-    final titleTextColor = isDark ? Colors.white : const Color(0xFF2D2D2D);
-    final alphabetAlpha = isDark ? 0.15 : 0.25;
-    final alphabetColor = (isDark ? Colors.white : const Color(0xFF8B7355)).withOpacity(alphabetAlpha);
+    //card main background
+    // Light Mode blue shade
+    final cardBgColor = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFF8FAFC);
 
+    // ২. title text color
+    final titleTextColor = isDark ? Colors.white : const Color(0xFF1E293B);
+
+    // alphabet color
+    final alphabetAlpha = isDark ? 0.15 : 0.10; // লাইট মোডে অপাসিটি একটু কমিয়েছি যাতে টেক্সট পড়তে সুবিধা হয়
+    final alphabetColor = (isDark ? Colors.white : const Color(0xFF64748B)).withOpacity(alphabetAlpha);
+
+    // border color
+    final borderColor = isDark ? Colors.white10 : Colors.blue.withOpacity(0.1);
     return StreamBuilder<List<JobSyncModel>>(
       stream: _jobStream,
       builder: (context, snapshot) {
