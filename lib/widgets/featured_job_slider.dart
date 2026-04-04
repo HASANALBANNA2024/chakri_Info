@@ -14,14 +14,36 @@ class AlphabetPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final random = math.Random();
     const textStyle = TextStyle(
-      fontSize: 22,
-      fontWeight: FontWeight.w900,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
       fontFamily: 'serif',
+
     );
 
-    final alphabets = ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ'];
+    final alphabets = [
+      // --- সব বাংলা বর্ণ (স্বরবর্ণ) ---
+      'অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ',
 
-    for (int i = 0; i < 30; i++) {
+      // --- সব বাংলা বর্ণ (ব্যঞ্জনবর্ণ) ---
+      'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ',
+      'ট', 'ঠ', 'ড', 'ঢ', 'ণ', 'ত', 'থ', 'দ', 'ধ', 'ন',
+      'প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ',
+      'স', 'হ', 'ড়', 'ঢ়', 'য়', 'ৎ', 'ঃ', 'ং', 'ঁ',
+
+      // --- জাতীয় সংগীতের শব্দ ও বাক্য ---
+      'আমার সোনার বাংলা',
+      'আমি তোমায় ভালোবাসি',
+      'চিরদিন তোমার আকাশ',
+      'তোমার বাতাস',
+      'আমার প্রাণে বাজায় বাঁশি',
+      'সোনার বাংলা',
+      'মা',
+      'অমলিন',
+      'সুধা',
+      'মা তোর বদনখানি',
+      'নয়নজলে ভাসি',
+    ];
+    for (int i = 0; i < 18; i++) {
       final char = alphabets[random.nextInt(alphabets.length)];
       final textPainter = TextPainter(
         text: TextSpan(text: char, style: textStyle.copyWith(color: color)),
@@ -35,7 +57,7 @@ class AlphabetPainter extends CustomPainter {
       // design background rotation logic
       canvas.save();
       canvas.translate(x, y);
-      canvas.rotate(random.nextDouble() * 0.5);
+      canvas.rotate(random.nextDouble() * 0.2);
 
       textPainter.paint(canvas, const Offset(0, 0));
       canvas.restore();
@@ -122,8 +144,12 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     final titleTextColor = isDark ? Colors.white : const Color(0xFF1E293B);
 
     // alphabet color
-    final alphabetAlpha = isDark ? 0.15 : 0.10; // লাইট মোডে অপাসিটি একটু কমিয়েছি যাতে টেক্সট পড়তে সুবিধা হয়
-    final alphabetColor = (isDark ? Colors.white : const Color(0xFF64748B)).withOpacity(alphabetAlpha);
+    final alphabetAlpha = isDark ? 0.25 : 0.20;
+
+// alphabet color
+    final alphabetColor = (isDark
+        ? Colors.white.withOpacity(alphabetAlpha)
+        : const Color(0xFF475569).withOpacity(alphabetAlpha));
 
     // border color
     final borderColor = isDark ? Colors.white10 : Colors.blue.withOpacity(0.1);
