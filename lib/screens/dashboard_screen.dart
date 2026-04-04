@@ -179,7 +179,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
-
+// stats section
   Widget _buildStatsSection(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -264,6 +264,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
+  // states section end
+
 
   Widget _buildSearchSection(bool isDarkMode) {
     return Padding(
