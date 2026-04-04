@@ -184,7 +184,7 @@ class GlobalSearchDelegate extends SearchDelegate {
 // --- ড্যাশবোর্ডে কল করার জন্য ফাংশন ---
 Widget buildGlobalSearchSection(BuildContext context, bool isDarkMode, List<JobSyncModel> allData) {
   return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    padding: const EdgeInsets.only(left: 14, right: 14, top: 6, bottom: 1),
     child: GestureDetector(
       onTap: () => showSearch(
         context: context,
