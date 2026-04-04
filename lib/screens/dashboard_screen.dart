@@ -565,7 +565,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // Recent  (Maximum Data Density)
   Widget _buildJobList(bool isDarkMode) {
     final today = DateTime.now();
-    // Sudhu matro ajker date porjonto active check korar jonno
+    // active job checker
     final currentDay = DateTime(today.year, today.month, today.day);
 
     return StreamBuilder<List<JobSyncModel>>(
@@ -577,7 +577,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         // ১. Filter & Sort Logic
         List<JobSyncModel> filteredJobs = snapshot.data!.where((job) {
-          // Deadline jodi khali thake tobe seta "Choman" dore show korbe
+          // deadline not over then show the recent ok
           if (job.deadline.isEmpty || job.deadline == "null") return true;
 
           try {
@@ -591,8 +591,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         }).toList();
 
-        // ২. Newest Upload First (Sorting by ID or any timestamp)
-        // Jader ID boro tara shobar upore ashbe (Last Uploaded)
+        // Newest Upload First (Sorting by ID or any timestamp)
         filteredJobs.sort((a, b) => b.id.compareTo(a.id));
 
         if (filteredJobs.isEmpty) {
