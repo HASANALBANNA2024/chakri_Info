@@ -8,7 +8,6 @@ class JobCardWidget extends StatelessWidget {
   final JobSyncModel job;
   const JobCardWidget({super.key, required this.job});
 
-  // Optimized Image Builder with better error handling
   Widget _buildImage(String imageStr) {
     if (imageStr.isEmpty) return Icon(Icons.business_rounded, color: Colors.blue.shade200, size: 28);
     try {
@@ -55,7 +54,6 @@ class JobCardWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // --- Ultra Modern Badge Design ---
               if (isJobCircular)
                 Positioned(
                   top: 0,
@@ -71,35 +69,15 @@ class JobCardWidget extends StatelessWidget {
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(1, 1),
-                        ),
-                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
-                          child: Icon(
-                            job.isGovt ? Icons.account_balance : Icons.bolt,
-                            color: Colors.white,
-                            size: 9,
-                          ),
-                        ),
+                        Icon(job.isGovt ? Icons.account_balance : Icons.bolt, color: Colors.white, size: 9),
                         const SizedBox(width: 6),
                         Text(
                           job.isGovt ? "GOVERNMENT" : "PRIVATE",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w900, letterSpacing: 0.8),
                         ),
                       ],
                     ),
@@ -107,87 +85,71 @@ class JobCardWidget extends StatelessWidget {
                 ),
 
               Padding(
-                padding: EdgeInsets.fromLTRB(14, isJobCircular ? 38 : 16, 12, 16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: EdgeInsets.fromLTRB(14, isJobCircular ? 32 : 10, 12, 8),
+                child: Column(
                   children: [
-                    // --- Organization Logo with Modern Ring ---
-                    Container(
-                      width: 58,
-                      height: 58,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        border: Border.all(color: Colors.blue.shade50, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blue.withOpacity(0.05),
-                            blurRadius: 6,
-                            spreadRadius: 1,
+                    // --- Row 1: Logo + Title/Company + Chevron ---
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.blue.shade50, width: 2),
                           ),
-                        ],
-                      ),
-                      child: ClipOval(child: _buildImage(job.logo)),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    // --- Information Section ---
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Title: No Line Limit, Dynamic Wrapping
-                          Text(
-                            job.title,
-                            softWrap: true,
-                            style: const TextStyle(
-                              height: 1.25,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14.5, // Refined size for better look
-                              color: Color(0xFF232631),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            job.company,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blue.shade700,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-
-                          // --- Minimalist Date Badges ---
-                          const SizedBox(height: 12),
-                          Wrap(
-                            spacing: 6,
-                            runSpacing: 6,
+                          child: ClipOval(child: _buildImage(job.logo)),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _dateBadge(
-                                Icons.calendar_today_outlined,
-                                "Start: ${job.start}",
-                                Colors.green.shade800,
-                                Colors.green.shade50.withOpacity(0.7),
+                              Text(
+                                job.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(height: 1.2, fontWeight: FontWeight.w800, fontSize: 14.5, color: Color(0xFF232631)),
                               ),
-                              _dateBadge(
-                                Icons.alarm_on_outlined,
-                                "End: ${job.deadline}",
-                                Colors.red.shade800,
-                                Colors.red.shade50.withOpacity(0.7),
+                              const SizedBox(height: 2),
+                              Text(
+                                job.company,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 12, color: Colors.blue.shade700, fontWeight: FontWeight.w600),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFE0E0E0), size: 14),
+                      ],
                     ),
 
-                    // Right Chevron
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFE0E0E0), size: 14),
+                    const SizedBox(height: 8),
+
+                    // --- Row 2: Date Badges (Start & End) ---
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _dateBadge(
+                            Icons.calendar_today_outlined,
+                            "Start: ${job.start}",
+                            Colors.green.shade800,
+                            Colors.green.shade50.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _dateBadge(
+                            Icons.alarm_on_outlined,
+                            "End: ${job.deadline}",
+                            Colors.red.shade800,
+                            Colors.red.shade50.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -199,26 +161,24 @@ class JobCardWidget extends StatelessWidget {
     );
   }
 
-  // Stylish Compact Date Badge
   Widget _dateBadge(IconData icon, String text, Color textColor, Color bgColor) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: textColor.withOpacity(0.05)),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 10, color: textColor),
           const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 9.5,
-              color: textColor,
-              fontWeight: FontWeight.w700,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 9.5, color: textColor, fontWeight: FontWeight.w700),
             ),
           ),
         ],

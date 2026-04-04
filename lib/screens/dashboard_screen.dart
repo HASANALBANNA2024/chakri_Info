@@ -131,7 +131,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           _buildStatsSection(isDarkMode),
           _buildSearchSection(isDarkMode),
-
           FeaturedJobSlider(jobProvider: jobProvider),
           _buildCategoryGrid(isDarkMode),
           _buildNoticeSection(), //optimization notice bar
