@@ -1,6 +1,8 @@
 import 'package:chakri_info/screens/admin_panel_ui.dart';
 import 'package:flutter/material.dart';
-
+import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
+import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import '../screens/category_screen.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -37,7 +39,42 @@ class _AppDrawerState extends State<AppDrawer> {
                     "হোম",
                     () => Navigator.pop(context),
                   ),
-                  _drawerItem(Icons.fiber_new_rounded, "নতুন সার্কুলার", () {}),
+                  // new circular
+                  _drawerItem(
+                    Icons.fiber_new_rounded,
+                    "নতুন সার্কুলার",
+                        () {
+                      Navigator.pop(context);
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+                      final activeJobs = jobProvider.allJobs.where((job) {
+                        if (job.deadline.isEmpty || job.deadline.toLowerCase() == "null" || job.deadline.contains("চলমান")) {
+                          return true;
+                        }
+                        try {
+                          DateTime dDate = DateTime.parse(job.deadline);
+                          DateTime compareDate = DateTime(dDate.year, dDate.month, dDate.day);
+                          return compareDate.isAfter(today) || compareDate.isAtSameMomentAs(today);
+                        } catch (e) {
+                          return true;
+                        }
+                      }).toList();
+
+                      //all active jobs circular page convert
+                      if (activeJobs.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JobListScreen(
+                              title: "সক্রিয় সার্কুলার",
+                              jobs: activeJobs,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  // browse category
                   _drawerItem(Icons.grid_view_rounded, "ব্রাউজ ক্যাটাগরি", () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -56,11 +93,63 @@ class _AppDrawerState extends State<AppDrawer> {
                     "পরীক্ষার তারিখ (Exam Date)",
                     () {},
                   ),
+
+
+                  // start deadline
                   _drawerItem(
-                    Icons.timer_outlined,
+                    Icons.fiber_new_rounded,
                     "ডেডলাইন অনুযায়ী তালিকা",
-                    () {},
+                        () {
+                      Navigator.pop(context); // Close drawer
+
+                      final now = DateTime.now();
+                      final today = DateTime(now.year, now.month, now.day);
+
+                      // 1. Filter all active jobs
+                      List<JobSyncModel> activeJobs = jobProvider.allJobs.where((job) {
+                        // If deadline is empty or "Running", it is always active
+                        if (job.deadline.isEmpty || job.deadline.toLowerCase() == "null" || job.deadline.contains("চলমান")) {
+                          return true;
+                        }
+                        try {
+                          DateTime dDate = DateTime.parse(job.deadline);
+                          DateTime compareDate = DateTime(dDate.year, dDate.month, dDate.day);
+                          return compareDate.isAfter(today) || compareDate.isAtSameMomentAs(today);
+                        } catch (e) {
+                          return true; // Keep it if date parsing fails
+                        }
+                      }).toList();
+
+                      // 2. Sorting Logic: Sort by deadline (Nearest deadline first)
+                      activeJobs.sort((a, b) {
+                        // If deadline is "Running" or empty, put it at the end of the list
+                        if (a.deadline.isEmpty || a.deadline.contains("চলমান")) return 1;
+                        if (b.deadline.isEmpty || b.deadline.contains("চলমান")) return -1;
+
+                        try {
+                          DateTime dateA = DateTime.parse(a.deadline);
+                          DateTime dateB = DateTime.parse(b.deadline);
+                          return dateA.compareTo(dateB); // Ascending order: Nearest date first
+                        } catch (e) {
+                          return 0;
+                        }
+                      });
+
+                      // 3. Navigate to screen
+                      if (activeJobs.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JobListScreen(
+                              title: "সক্রিয় সার্কুলার",
+                              jobs: activeJobs,
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
+                  // end deadline
                   _sectionTitle("প্রিপারেশন সেন্টার"),
                   _drawerItem(
                     Icons.menu_book_rounded,
