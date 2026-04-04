@@ -140,7 +140,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
         }).toList();
 
         return SizedBox(
-          height: 160,
+          height: 142,
           child: PageView.builder(
             controller: _pageController,
             itemBuilder: (context, index) {
@@ -154,7 +154,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                     context, MaterialPageRoute(builder: (context) => JobDetailsScreen(job: job))
                 ),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: cardBgColor,
                     borderRadius: BorderRadius.circular(20),
@@ -180,13 +180,13 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               // logo
                               Container(
-                                height: 65, width: 65,
+                                height: 55, width: 60,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.white,
@@ -202,7 +202,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                                 ),
                               ),
 
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
 
                               // টাইটেল
                               Flexible(
@@ -220,7 +220,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                                 ),
                               ),
 
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
 
                               // Date Section
                               Container(
