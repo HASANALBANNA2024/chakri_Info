@@ -62,7 +62,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.85);
+    _pageController = PageController(viewportFraction: 0.97);
     _jobStream = widget.jobProvider.getJobStream();
 
     _autoSlideTimer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
@@ -105,7 +105,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     try {
       return s.startsWith('http')
           ? Image.network(s, fit: BoxFit.contain, errorBuilder: (c,e,s)=>const Icon(Icons.broken_image))
-          : Image.memory(base64Decode(s), fit: BoxFit.contain);
+          : Image.memory(base64Decode(s), fit: BoxFit.cover);
     } catch (e) { return const Icon(Icons.error_outline); }
   }
 
@@ -118,7 +118,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
     // light and dark mode background
     final cardBgColor = isDark ? const Color(0xFF1A1A1A) : const Color(0xFFFFF9F0);
     final titleTextColor = isDark ? Colors.white : const Color(0xFF2D2D2D);
-    final alphabetAlpha = isDark ? 0.15 : 0.25; // ডার্ক মোডে আরও আবছা
+    final alphabetAlpha = isDark ? 0.15 : 0.25;
     final alphabetColor = (isDark ? Colors.white : const Color(0xFF8B7355)).withOpacity(alphabetAlpha);
 
     return StreamBuilder<List<JobSyncModel>>(
@@ -134,7 +134,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
         }).toList();
 
         return SizedBox(
-          height: 175,
+          height: 160,
           child: PageView.builder(
             controller: _pageController,
             itemBuilder: (context, index) {
@@ -148,7 +148,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                     context, MaterialPageRoute(builder: (context) => JobDetailsScreen(job: job))
                 ),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                  margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
                   decoration: BoxDecoration(
                     color: cardBgColor,
                     borderRadius: BorderRadius.circular(20),
@@ -187,10 +187,13 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                                   boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
                                   border: Border.all(color: isDark ? Colors.grey[800]! : Colors.white, width: 2),
                                 ),
-                                child: ClipOval(child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: _buildImg(job.logo),
-                                )),
+                                child: SizedBox.expand(
+                                  child: ClipOval(
+                                    child: _buildImg(
+                                      job.logo,
+                                    ),
+                                  ),
+                                ),
                               ),
 
                               const SizedBox(height: 6),
@@ -204,7 +207,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 14.5,
+                                    fontSize: 12.5,
                                     color: titleTextColor,
                                     height: 1.1,
                                   ),
@@ -253,7 +256,7 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
           text,
           style: const TextStyle(
               color: Colors.redAccent,
-              fontSize: 12.0,
+              fontSize: 10.0,
               fontWeight: FontWeight.bold
           ),
         ),

@@ -418,7 +418,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     );
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.day}-${picked.month}-${picked.year}";
+        // controller.text = "${picked.day}-${picked.month}-${picked.year}";
+        controller.text = formatToBanglaDate(picked);
       });
     }
   }
@@ -453,9 +454,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
   // --- Preview & Publish Logic ---
   void _showPreviewDialog() {
-    if (_selectedImages.isEmpty ||
-        selectedStep1 == null ||
-        _titleCtrl.text.isEmpty) {
+    if (_titleCtrl.text.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("সব তথ্য এবং ইমেজ প্রদান করুন!")));
@@ -528,23 +527,25 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
       // 4. Organize Data (Logo included here)
       Map<String, dynamic> fullData = {
-        'title': _titleCtrl.text,
-        'company': _companyCtrl.text,
-        'logo': logoBase64 ?? "", // Adding logo to database
-        'images': base64Images,
-        'positions': positionData,
-        'total_posts': _totalPostCtrl.text,
-        'publish_date': _publishDateCtrl.text,
-        'start_date': _startDateCtrl.text,
-        'end_date': _endDateCtrl.text,
-        'apply_link': _linkCtrl.text,
-        'description': _descCtrl.text,
-        'is_govt': isGovtJob,
+        'title': _titleCtrl.text.trim(),
+        'company': _companyCtrl.text.trim() ?? "",
+        'logo': logoBase64 ?? "",
+        'images': base64Images ?? [],
+        'positions': positionData ?? [],
+        'total_posts': _totalPostCtrl.text ?? "0",
+        'publish_date': _publishDateCtrl.text ?? "",
+        'start_date': _startDateCtrl.text ?? "",
+        'end_date': _endDateCtrl.text ?? "",
+        'apply_link': _linkCtrl.text ?? "",
+        'description': _descCtrl.text ?? "",
+        'is_govt': isGovtJob ?? true,
         'timestamp': FieldValue.serverTimestamp(),
-        'step1': selectedStep1,
-        'step2': selectedStep2,
-        'step3': selectedStep3,
-        'step4': selectedStep4,
+
+        // Dropdown default
+        'step1': selectedStep1 ?? "Other",
+        'step2': selectedStep2 ?? "General",
+        'step3': selectedStep3 ?? "",
+        'step4': selectedStep4 ?? "",
       };
 
       // 5. Send to Firebase
@@ -1253,6 +1254,24 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
   Widget _buildManageCircularTab() {
     return AdminSyncPage();
+  }
+
+  // date convert
+  String formatToBanglaDate(DateTime date) {
+    final List<String> banglaMonths = [
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+    ];
+
+    final Map<String, String> engToBngDigits = {
+      '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
+      '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯',
+    };
+
+    String convert(String input) =>
+        input.split('').map((char) => engToBngDigits[char] ?? char).join('');
+
+    return "${convert(date.day.toString())} ${banglaMonths[date.month - 1]} ${convert(date.year.toString())}";
   }
 
   Widget _buildQuestionBankTab() =>
