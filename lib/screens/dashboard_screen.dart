@@ -139,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
               buildGlobalSearchSection(context, isDarkMode, jobProvider.allJobs),
-              FeaturedJobSlider(jobProvider: jobProvider),
+              // FeaturedJobSlider(jobProvider: jobProvider),
               _buildCategoryGrid(isDarkMode),
               _buildNoticeSection(),
               _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
