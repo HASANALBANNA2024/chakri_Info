@@ -14,28 +14,28 @@ class AlphabetPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final random = math.Random();
     const textStyle = TextStyle(
-      fontSize: 22, // ১. বর্ণমালা বড় করা হয়েছে
-      fontWeight: FontWeight.w900, // আরও স্পষ্ট করা হয়েছে
+      fontSize: 22,
+      fontWeight: FontWeight.w900,
       fontFamily: 'serif',
     );
 
     final alphabets = ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ', 'ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ', 'ট', 'ঠ', 'ড', 'ঢ', 'ণ'];
 
-    for (int i = 0; i < 30; i++) { // কতগুলো বর্ণ থাকবে তা এখানে নিয়ন্ত্রণ করুন
+    for (int i = 0; i < 30; i++) {
       final char = alphabets[random.nextInt(alphabets.length)];
       final textPainter = TextPainter(
         text: TextSpan(text: char, style: textStyle.copyWith(color: color)),
         textDirection: TextDirection.ltr,
       )..layout();
 
-      // ২. এলোমেলো পজিশন (Random Position)
+      // Random position
       double x = random.nextDouble() * size.width;
       double y = random.nextDouble() * size.height;
 
-      // ৩. বাঁকা-তেরা করার লজিক (Rotation)
+      // design background rotation logic
       canvas.save();
       canvas.translate(x, y);
-      canvas.rotate(random.nextDouble() * 0.5); // হালকা বাঁকা হবে (০.৫ রেডিয়ান)
+      canvas.rotate(random.nextDouble() * 0.5);
 
       textPainter.paint(canvas, const Offset(0, 0));
       canvas.restore();
@@ -173,23 +173,6 @@ class _FeaturedJobSliderState extends State<FeaturedJobSlider> {
                             painter: AlphabetPainter(color: alphabetColor),
                           ),
                         ),
-
-                        if (isUrgent)
-                          Positioned(
-                            top: 0, right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12)),
-                              ),
-                              child: Text(
-                                diff == 0 ? "আজ শেষ" : "বাকি ${_toBN(diff.toString())} দিন",
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 9),
-                              ),
-                            ),
-                          ),
-
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           child: Column(
