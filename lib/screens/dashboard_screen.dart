@@ -13,6 +13,7 @@ import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/user_side_data_sync/sliding_notice_bar.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
+import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -563,82 +564,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Recent  (Maximum Data Density)
   Widget _buildJobList(bool isDarkMode) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: circulars.length,
-      itemBuilder: (context, index) {
-        final job = circulars[index];
-        return InkWell(
-          // onTap: () {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => JobDetailsScreen(job: job),
-          //     ),
-          //   );
-          // },
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.withOpacity(0.05)),
+    final today = DateTime.now();
+    // Sudhu matro ajker date porjonto active check korar jonno
+    final currentDay = DateTime(today.year, today.month, today.day);
+
+    return StreamBuilder<List<JobSyncModel>>(
+      stream: jobProvider.getJobStream(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        // ১. Filter & Sort Logic
+        List<JobSyncModel> filteredJobs = snapshot.data!.where((job) {
+          // Deadline jodi khali thake tobe seta "Choman" dore show korbe
+          if (job.deadline.isEmpty || job.deadline == "null") return true;
+
+          try {
+            DateTime deadlineDate = DateTime.parse(job.deadline);
+            final compareDeadline = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
+
+            // Ajker din ba bhabishyoter deadline hole show korbe
+            return compareDeadline.isAtSameMomentAs(currentDay) || compareDeadline.isAfter(currentDay);
+          } catch (e) {
+            return true; // Date format vul thakle safe thakar jonno show korbe
+          }
+        }).toList();
+
+        // ২. Newest Upload First (Sorting by ID or any timestamp)
+        // Jader ID boro tara shobar upore ashbe (Last Uploaded)
+        filteredJobs.sort((a, b) => b.id.compareTo(a.id));
+
+        if (filteredJobs.isEmpty) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("এই মুহূর্তে কোন সক্রিয় সার্কুলার নেই"),
             ),
-            child: Row(
-              children: [
-                Container(
-                  height: 38,
-                  width: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.indigo.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Center(
-                    child: job.logo.startsWith('http')
-                        ? Image.network(job.logo)
-                        : Text(
-                            job.logo,
-                            style: TextStyle(
-                              color: Colors.indigo,
-                              fontSize: 10,
-                            ),
-                          ),
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        job.title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                        maxLines: 1,
-                      ),
-                      Text(
-                        job.company,
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
-                      ),
-                      Text(
-                        "ডেডলাইন: ${job.deadline}",
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.redAccent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
-              ],
-            ),
-          ),
+          );
+        }
+
+        return ListView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filteredJobs.length,
+          itemBuilder: (context, index) {
+            final job = filteredJobs[index];
+            // Apnar dewa Ultra Modern JobCardWidget ekhane call kora holo
+            return JobCardWidget(job: job);
+          },
         );
       },
     );
