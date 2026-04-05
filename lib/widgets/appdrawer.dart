@@ -96,9 +96,27 @@ class _AppDrawerState extends State<AppDrawer> {
                   _drawerItem(
                     Icons.event_available_rounded,
                     "পরীক্ষার তারিখ (Exam Date)",
-                    () {},
-                  ),
+                        () {
+                      // drawer close
+                      Navigator.pop(context);
 
+                      // filtering logic
+                      final examNoticeJobs = jobProvider.allJobs.where((job) {
+                        return job.step1.trim() == 'Admission (ভর্তি পরীক্ষা)';
+                      }).toList();
+
+                      // go to filter and joblist
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobListScreen(
+                            title: 'Admission (ভর্তি পরীক্ষা)',
+                            jobs: examNoticeJobs, // filter list
+                          ),
+                        ),
+                      );
+                    },
+                  ),
 
                   // start deadline
                   _drawerItem(
@@ -392,9 +410,8 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget _supportButton(IconData icon, String label) {
-    return GestureDetector( // ক্লিক করার ক্ষমতা যোগ করা হয়েছে
+    return GestureDetector(
       onTap: () {
-        // সঠিক পেজে যাওয়ার লজিক
         if (label == "About Us") {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUsScreen()));
         } else if (label == "Contact") {
@@ -406,7 +423,6 @@ class _AppDrawerState extends State<AppDrawer> {
         }
       },
       child: Container(
-        // আপনার দেওয়া ডিজাইন হুবহু এখানে আছে
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.withOpacity(0.2)),
           borderRadius: BorderRadius.circular(8),

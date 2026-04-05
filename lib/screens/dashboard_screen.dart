@@ -304,8 +304,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'c': Colors.indigo,
       },
       {
-        'e': 'Notice',
-        'b': 'নোটিশ',
+        'e': 'Result',
+        'b': 'রেজাল্ট',
         'n': 'Notice or Result (নোটিশ ও রেজাল্ট)',
         'i': Icons.assignment_turned_in,
         'c': Colors.cyan[700],

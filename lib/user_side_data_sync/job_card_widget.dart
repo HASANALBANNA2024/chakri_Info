@@ -29,7 +29,6 @@ class JobCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    // Dynamic Color setup
     final cardBg = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF232631);
     final borderColor = isDarkMode ? Colors.white10 : Colors.grey.withOpacity(0.08);
@@ -37,6 +36,10 @@ class JobCardWidget extends StatelessWidget {
     final companyColor = isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
 
     bool isJobCircular = job.step1.trim() == "Job Circular";
+
+    // ডাটা চেক করার জন্য লজিক
+    bool hasStart = job.start.trim().isNotEmpty;
+    bool hasDeadline = job.deadline.trim().isNotEmpty;
 
     return GestureDetector(
       onTap: () {
@@ -57,13 +60,12 @@ class JobCardWidget extends StatelessWidget {
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: borderColor), // Dynamic border
+          border: Border.all(color: borderColor),
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
-              // --- Govt/Private Badge ---
               if (isJobCircular)
                 Positioned(
                   top: 0, left: 0,
@@ -98,13 +100,12 @@ class JobCardWidget extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Organization Logo
                         Container(
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white, // Logo Background
+                            color: Colors.white,
                             border: Border.all(color: isDarkMode ? Colors.white12 : Colors.blue.shade50, width: 2),
                           ),
                           child: ClipOval(child: _buildImage(job.logo)),
@@ -122,20 +123,21 @@ class JobCardWidget extends StatelessWidget {
                                     height: 1.2,
                                     fontWeight: FontWeight.w800,
                                     fontSize: 14,
-                                    color: titleColor // Dynamic title color
+                                    color: titleColor
                                 ),
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                job.company,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize: 11.5,
-                                    color: companyColor, // dynamic company color
-                                    fontWeight: FontWeight.w600
+                              if (job.company.trim().isNotEmpty) // কোম্পানি না থাকলে শো করবে না
+                                Text(
+                                  job.company,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 11.5,
+                                      color: companyColor,
+                                      fontWeight: FontWeight.w600
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
@@ -143,30 +145,33 @@ class JobCardWidget extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
-
-                    // Date Section
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _dateBadge(
-                            Icons.calendar_today_outlined,
-                            "শুরু: ${job.start}",
-                            isDarkMode ? Colors.green.shade300 : Colors.green.shade800,
-                            isDarkMode ? Colors.green.withOpacity(0.12) : Colors.green.shade50,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _dateBadge(
-                            Icons.alarm_on_outlined,
-                            "শেষ: ${job.deadline}",
-                            isDarkMode ? Colors.red.shade300 : Colors.red.shade800,
-                            isDarkMode ? Colors.red.withOpacity(0.12) : Colors.red.shade50,
-                          ),
-                        ),
-                      ],
-                    ),
+                    // তারিখ যদি দুটিই খালি থাকে তবে এই পুরো সেকশন গায়েব হয়ে যাবে
+                    if (hasStart || hasDeadline) ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          if (hasStart)
+                            Expanded(
+                              child: _dateBadge(
+                                Icons.calendar_today_outlined,
+                                "শুরু: ${job.start}",
+                                isDarkMode ? Colors.green.shade300 : Colors.green.shade800,
+                                isDarkMode ? Colors.green.withOpacity(0.12) : Colors.green.shade50,
+                              ),
+                            ),
+                          if (hasStart && hasDeadline) const SizedBox(width: 8),
+                          if (hasDeadline)
+                            Expanded(
+                              child: _dateBadge(
+                                Icons.alarm_on_outlined,
+                                "শেষ: ${job.deadline}",
+                                isDarkMode ? Colors.red.shade300 : Colors.red.shade800,
+                                isDarkMode ? Colors.red.withOpacity(0.12) : Colors.red.shade50,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
