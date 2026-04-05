@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
+import 'package:chakri_info/internal_sections/about_us.dart';
+import 'package:chakri_info/internal_sections/privacy_policy.dart';
+import 'package:chakri_info/internal_sections/terms_conditions.dart';
+import 'package:chakri_info/internal_sections/contact_us.dart';
 import '../screens/category_screen.dart';
 import 'package:intl/intl.dart';
 
@@ -388,18 +392,34 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Widget _supportButton(IconData icon, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 14, color: Colors.grey),
-          const SizedBox(width: 5),
-          Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-        ],
+    return GestureDetector( // ক্লিক করার ক্ষমতা যোগ করা হয়েছে
+      onTap: () {
+        // সঠিক পেজে যাওয়ার লজিক
+        if (label == "About Us") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUsScreen()));
+        } else if (label == "Contact") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactUsScreen()));
+        } else if (label == "Terms") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsConditionsScreen()));
+        } else if (label == "Privacy") {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()));
+        }
+      },
+      child: Container(
+        // আপনার দেওয়া ডিজাইন হুবহু এখানে আছে
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 8), // ক্লিক এরিয়া একটু আরামদায়ক করার জন্য
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 14, color: Colors.grey),
+            const SizedBox(width: 5),
+            Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+          ],
+        ),
       ),
     );
   }
