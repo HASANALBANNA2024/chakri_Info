@@ -8,7 +8,7 @@ class GlobalSearchDelegate extends SearchDelegate {
 
   GlobalSearchDelegate({required this.allData, required this.isDarkMode});
 
-  // ১. সার্চ স্ক্রিনের প্রিমিয়াম অ্যাপবার থিম
+  // Search screen premium theme
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
@@ -21,7 +21,7 @@ class GlobalSearchDelegate extends SearchDelegate {
         hintStyle: TextStyle(color: Colors.white60, fontSize: 16),
         border: InputBorder.none,
       ),
-      // টাইপ করার সময় টেক্সট কালার
+      // typing text color
       textTheme: const TextTheme(
         titleLarge: TextStyle(color: Colors.white, fontSize: 18),
       ),
@@ -53,7 +53,7 @@ class GlobalSearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) => _buildSearchResults(context);
 
-  // ২. মূল সার্চ রেজাল্ট এবং ডিজাইন
+  // main search result
   Widget _buildSearchResults(BuildContext context) {
     final List<JobSyncModel> suggestions = allData.where((item) {
       final String searchKey = query.toLowerCase().trim();
@@ -105,7 +105,7 @@ class GlobalSearchDelegate extends SearchDelegate {
     );
   }
 
-  // ৩. রেজাল্ট কার্ড ডিজাইন (জোশ লুকের জন্য)
+  // result card design
   Widget _buildResultCard(BuildContext context, JobSyncModel item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -135,7 +135,7 @@ class GlobalSearchDelegate extends SearchDelegate {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                // ক্যাটাগরি আইকন বা লোগো
+                // category icon logo
                 Container(
                   height: 50, width: 50,
                   decoration: BoxDecoration(
@@ -145,7 +145,7 @@ class GlobalSearchDelegate extends SearchDelegate {
                   child: const Icon(Icons.ads_click_rounded, color: Colors.indigo, size: 24),
                 ),
                 const SizedBox(width: 12),
-                // টেক্সট সেকশন
+                // text section
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,7 +181,7 @@ class GlobalSearchDelegate extends SearchDelegate {
   }
 }
 
-// --- ড্যাশবোর্ডে কল করার জন্য ফাংশন ---
+// --- dashboard search ---
 Widget buildGlobalSearchSection(BuildContext context, bool isDarkMode, List<JobSyncModel> allData) {
   return Padding(
     padding: const EdgeInsets.only(left: 14, right: 14, top: 6, bottom: 1),
@@ -218,7 +218,7 @@ Widget buildGlobalSearchSection(BuildContext context, bool isDarkMode, List<JobS
                 ),
               ),
             ),
-            // টিউন আইকন
+            // Tune Icon
             Container(
               margin: const EdgeInsets.all(8),
               padding: const EdgeInsets.all(4),
