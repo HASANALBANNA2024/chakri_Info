@@ -251,10 +251,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 return;
               }
 
-              // filter check
-              List<JobSyncModel> results = jobProvider.getJobsByFilter(
-                clickedName,
-              );
+
+              List<JobSyncModel> results = jobProvider.getJobsByFilter(clickedName);
 
               Navigator.push(
                 context,

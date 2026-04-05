@@ -1,38 +1,54 @@
 name: chakri_info
-description: "A new Flutter project."
+description: "A professional job circular app with offline support."
 publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.11.0 # আপনার বর্তমান SDK ভার্সন ঠিক আছে
+  sdk: ^3.11.0
 
 dependencies:
   flutter:
     sdk: flutter
+
+  # --- Local Database (Offline Persistence) ---
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.5
+
+  # --- Firebase Ecosystem ---
+  firebase_core: ^3.11.0
+  cloud_firestore: ^5.6.3
+  firebase_storage: ^12.4.1
+
+  # --- UI & Icons ---
   cupertino_icons: ^1.0.8
+  provider: ^6.1.5
+  intl: ^0.20.2
+
+  # --- Utilities & Media ---
   share_plus: ^12.0.1
   url_launcher: ^6.3.2
   gal: ^2.3.2
   http: ^1.2.0
-  path_provider: ^2.1.5
   permission_handler: ^11.3.1
+  image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
 
-
-  # --- নতুন ফায়ারবেস এবং ইমেজ হ্যান্ডলিং প্যাকেজসমূহ ---
-  firebase_core: ^3.11.0
-  cloud_firestore: ^5.6.3
-  firebase_storage: ^12.4.1
-  image_picker: ^1.1.2         # গ্যালারি থেকে সার্কুলার ছবি নিতে
-  flutter_image_compress: ^2.3.0 # ছবিকে ২-১০ কেবি (KB) সাইজে ছোট করতে
-  cached_network_image: ^3.4.1 # ৭ দিন বা তার বেশি সময় ক্যাশ ধরে রাখতে
-  flutter_cache_manager: ^3.4.1 # ক্যাশ কন্ট্রোল করার জন্য
-  provider: ^6.1.5+1
-  intl: ^0.20.2
+  # --- Caching & Performance ---
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.4.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # --- Generation Tools (Must for Hive) ---
+  analyzer: ^6.4.1
+  build_runner: ^2.4.8
+  hive_generator: ^2.0.1
+
+  # --- Lints & Icons Generator ---
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.13.1
 
@@ -42,7 +58,6 @@ flutter:
     - assets/images/
     - assets/images/app_icon.png
 
-# আপনার আইকন জেনারেটর সেটিংস ঠিক আছে
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true

@@ -1,18 +1,42 @@
+import 'package:hive/hive.dart';
+
+
+part 'jobsync_model.g.dart';
+
+@HiveType(typeId: 0)
 class JobSyncModel {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String title;
+  @HiveField(2)
   final String company;
+  @HiveField(3)
   final String start;
+  @HiveField(4)
   final String deadline;
+  @HiveField(5)
   final String applyLink;
-  final String logo; // প্রতিষ্ঠানের গোল লোগো
-  final String circularImage; // মেইন বিজ্ঞপ্তির ছবি
+  @HiveField(6)
+  final String logo;
+  @HiveField(7)
+  final String circularImage;
+  @HiveField(8)
   final String totalpost;
+  @HiveField(9)
   final bool isGovt;
+  @HiveField(10)
   final String step1;
+  @HiveField(11)
   final String step2;
+  @HiveField(12)
   final String? step3;
+  @HiveField(13)
   final String? step4;
+  @HiveField(14)
+  final String? publishDate; // নতুন
+  @HiveField(15)
+  final List<dynamic>? positions; // নতুন (পদের নাম, সংখ্যা, স্যালারি)
 
   JobSyncModel({
     required this.id,
@@ -29,27 +53,13 @@ class JobSyncModel {
     required this.step2,
     this.step3,
     this.step4,
+    this.publishDate,
+    this.positions,
   });
 
   factory JobSyncModel.fromMap(Map<String, dynamic> data, String documentId) {
-    // ১. total_posts হ্যান্ডেল করা (সংখ্যা বা লেখা যাই হোক স্ট্রিং এ রূপান্তর)
-    String postCount = (data['total_posts'] ?? '0').toString();
-
-    // ২. is_govt চেক (বুলিয়ান বা স্ট্রিং "true" যাই হোক হ্যান্ডেল করবে)
-    bool govStatus = false;
-    if (data['is_govt'] != null) {
-      if (data['is_govt'] is bool) {
-        govStatus = data['is_govt'];
-      } else {
-        govStatus = data['is_govt'].toString().toLowerCase() == 'true';
-      }
-    }
-
-    // ৩. ইমেজ লিস্ট হ্যান্ডেল করা
     String mainImage = '';
-    if (data['images'] != null &&
-        data['images'] is List &&
-        (data['images'] as List).isNotEmpty) {
+    if (data['images'] != null && data['images'] is List && (data['images'] as List).isNotEmpty) {
       mainImage = data['images'][0].toString();
     }
 
@@ -57,18 +67,19 @@ class JobSyncModel {
       id: documentId,
       title: data['title'] ?? '',
       company: data['company'] ?? '',
-      // logic to deadline to parse end_date
-      deadline: data['end_date'] ?? '',
+      deadline: data['end_date'] ?? '', // ডাটাবেস অনুযায়ী
       start: data['start_date'] ?? '',
+      publishDate: data['publish_date'] ?? '',
       logo: data['logo'] ?? '',
       applyLink: data['apply_link'] ?? '',
-      totalpost: postCount,
+      totalpost: (data['total_posts'] ?? '0').toString(),
       circularImage: mainImage,
-      isGovt: govStatus,
+      isGovt: data['is_govt'] ?? false,
       step1: data['step1'] ?? '',
       step2: data['step2'] ?? '',
-      step3: data['step3'],
-      step4: data['step4'],
+      step3: data['step3']?.toString(),
+      step4: data['step4']?.toString(),
+      positions: data['positions'] as List<dynamic>?,
     );
   }
 }
