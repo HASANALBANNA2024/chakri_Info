@@ -1,4 +1,4 @@
-// জব মডেল: একটি চাকরির সব তথ্য এখানে থাকবে
+
 class JobBookmark {
   final String title;
   final String company;
@@ -15,7 +15,7 @@ class JobBookmark {
   });
 }
 
-// ডামি ডাটা লজিক (এটি পরবর্তীতে ডাটাবেস থেকে আসবে)
+
 List<JobBookmark> allSavedJobs = [
   JobBookmark(
     title: "সফটওয়্যার ইঞ্জিনিয়ার (ফ্লাটার)",
