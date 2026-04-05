@@ -12,7 +12,42 @@ class JobStatsWidget extends StatelessWidget {
     required this.allJobs,
   });
 
-  // ইংরেজি সংখ্যাকে বাংলায় রূপান্তর করার ফাংশন
+  // Helper function to convert Bengali Date ("৩০ এপ্রিল ২০২৬") to DateTime
+  DateTime? _parseBengaliDate(String input) {
+    if (input.isEmpty || input.contains("চলমান") || input.toLowerCase() == "null") return null;
+
+    try {
+      // Map Bengali months to numeric strings
+      Map<String, String> monthMap = {
+        'জানুয়ারি': '01', 'ফেব্রুয়ারি': '02', 'মার্চ': '03', 'এপ্রিল': '04',
+        'মে': '05', 'জুন': '06', 'জুলাই': '07', 'আগস্ট': '08',
+        'সেপ্টেম্বর': '09', 'অক্টোবর': '10', 'নভেম্বর': '11', 'ডিসেম্বর': '12'
+      };
+
+      // Convert Bengali digits to English digits
+      String converted = input
+          .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
+          .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
+          .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+          .replaceAll('৯', '9');
+
+      // Expecting format: "30 এপ্রিল 2026"
+      List<String> parts = converted.split(' ');
+      if (parts.length < 3) return null;
+
+      String day = parts[0].padLeft(2, '0');
+      String? month = monthMap[parts[1]];
+      String year = parts[2];
+
+      if (month == null) return null;
+
+      // Returns YYYY-MM-DD format
+      return DateTime.parse("$year-$month-$day");
+    } catch (e) {
+      return null;
+    }
+  }
+
   String toBengali(String input) {
     const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     const bengali = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -27,45 +62,40 @@ class JobStatsWidget extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // ১. সক্রিয় সার্কুলার ফিল্টার
+    // 1. Filter Active Jobs
     final activeJobs = allJobs.where((job) {
-      if (job.deadline.isEmpty || job.deadline.toLowerCase() == "null" || job.deadline.contains("চলমান")) {
-        return true;
-      }
-      try {
-        DateTime dDate = DateTime.parse(job.deadline);
-        DateTime compareDate = DateTime(dDate.year, dDate.month, dDate.day);
-        return compareDate.isAfter(today) || compareDate.isAtSameMomentAs(today);
-      } catch (e) {
-        return true;
-      }
+      DateTime? dDate = _parseBengaliDate(job.deadline);
+      if (dDate == null) return true; // Keep "Running" or Null as active
+
+      return dDate.isAfter(today) || dDate.isAtSameMomentAs(today);
     }).toList();
 
-    // ২. ৩ দিনের মধ্যে শেষ হবে এমন সার্কুলার
+    // 2. Filter Urgent Jobs (Ending in 3 days)
     final urgentJobs = activeJobs.where((job) {
-      if (job.deadline.isEmpty || job.deadline == "null") return false;
-      DateTime? dDate = DateTime.tryParse(job.deadline);
+      DateTime? dDate = _parseBengaliDate(job.deadline);
       if (dDate == null) return false;
+
       int diffInDays = dDate.difference(today).inDays;
+      // 0 = today, 1 = tomorrow, 2 = day after, 3 = 3rd day
       return diffInDays >= 0 && diffInDays <= 3;
     }).toList();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0), // টপ প্যাডিং কমানো হয়েছে
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
       child: Row(
         children: [
           _buildStatCard(
             context,
-            "${toBengali(activeJobs.length.toString())} টি নতুন", // বাংলা সংখ্যা
-            "সক্রিয় সার্কুলার",
+            "${toBengali(activeJobs.length.toString())} টি নতুন",
+            "সক্রিয় সার্কুলার",
             isDarkMode ? Colors.indigoAccent : Colors.indigo,
             Icons.bolt_rounded,
             activeJobs,
           ),
-          const SizedBox(width: 6), // গ্যাপ কমানো হয়েছে
+          const SizedBox(width: 6),
           _buildStatCard(
             context,
-            "${toBengali(urgentJobs.length.toString())} টি শেষ", // বাংলা সংখ্যা
+            "${toBengali(urgentJobs.length.toString())} টি শেষ",
             "৩ দিনে দ্রুত শেষ হবে",
             isDarkMode ? Colors.redAccent : Colors.redAccent,
             Icons.timer_outlined,
@@ -87,6 +117,7 @@ class JobStatsWidget extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: () {
+          // Navigates if there are jobs in the list
           if (filteredJobs.isNotEmpty) {
             Navigator.push(
               context,
@@ -94,22 +125,26 @@ class JobStatsWidget extends StatelessWidget {
                 builder: (context) => JobListScreen(title: label, jobs: filteredJobs),
               ),
             );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("কোনো সার্কুলার পাওয়া যায়নি")),
+            );
           }
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6), // প্যাডিং কমানো হয়েছে
+          padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
           decoration: BoxDecoration(
             color: color.withOpacity(isDarkMode ? 0.12 : 0.06),
-            borderRadius: BorderRadius.circular(10), // রেডিয়াস কিছুটা কমানো
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: color.withOpacity(isDarkMode ? 0.25 : 0.12),
-              width: 0.8, // বর্ডার উইডথ কমানো
+              width: 0.8,
             ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color, size: 16), // আইকন সাইজ ১৮ থেকে ১৬ করা হয়েছে
+              Icon(icon, color: color, size: 16),
               const SizedBox(width: 5),
               Expanded(
                 child: Column(
@@ -120,14 +155,14 @@ class JobStatsWidget extends StatelessWidget {
                       count,
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        fontSize: 12, // ফন্ট সাইজ ১৪ থেকে ১২ করা হয়েছে
+                        fontSize: 12,
                         color: color,
                       ),
                     ),
                     Text(
                       label,
                       style: TextStyle(
-                        fontSize: 10, // ফন্ট সাইজ ৯ থেকে ৮ করা হয়েছে
+                        fontSize: 10,
                         fontWeight: FontWeight.w600,
                         color: isDarkMode ? Colors.grey[400] : Colors.black54,
                       ),
