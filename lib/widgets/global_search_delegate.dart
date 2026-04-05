@@ -7,8 +7,7 @@ class GlobalSearchDelegate extends SearchDelegate {
   final bool isDarkMode;
 
   GlobalSearchDelegate({required this.allData, required this.isDarkMode});
-
-  // Search screen premium theme
+  //Search screen premium theme
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(

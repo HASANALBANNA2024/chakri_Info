@@ -41,7 +41,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/app_icon.png
-    - assets/images/bpsc_image.webp
 
 # আপনার আইকন জেনারেটর সেটিংস ঠিক আছে
 flutter_launcher_icons:

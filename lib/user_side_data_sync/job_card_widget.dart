@@ -151,7 +151,7 @@ class JobCardWidget extends StatelessWidget {
                         Expanded(
                           child: _dateBadge(
                             Icons.calendar_today_outlined,
-                            "Start: ${job.start}",
+                            "শুরু: ${job.start}",
                             isDarkMode ? Colors.green.shade300 : Colors.green.shade800,
                             isDarkMode ? Colors.green.withOpacity(0.12) : Colors.green.shade50,
                           ),
@@ -160,7 +160,7 @@ class JobCardWidget extends StatelessWidget {
                         Expanded(
                           child: _dateBadge(
                             Icons.alarm_on_outlined,
-                            "End: ${job.deadline}",
+                            "শেষ: ${job.deadline}",
                             isDarkMode ? Colors.red.shade300 : Colors.red.shade800,
                             isDarkMode ? Colors.red.withOpacity(0.12) : Colors.red.shade50,
                           ),
