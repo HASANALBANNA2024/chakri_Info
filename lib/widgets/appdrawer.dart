@@ -111,7 +111,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         MaterialPageRoute(
                           builder: (context) => JobListScreen(
                             title: 'Admission (ভর্তি পরীক্ষা)',
-                            jobs: examNoticeJobs, // filter list
+                            jobs: examNoticeJobs,
                           ),
                         ),
                       );
