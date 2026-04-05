@@ -17,6 +17,7 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return JobSyncModel(
+      education: (fields[16] as List?)?.cast<String>(),
       id: fields[0] as String,
       title: fields[1] as String,
       company: fields[2] as String,
@@ -39,7 +40,7 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
   @override
   void write(BinaryWriter writer, JobSyncModel obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -71,7 +72,9 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
       ..writeByte(14)
       ..write(obj.publishDate)
       ..writeByte(15)
-      ..write(obj.positions);
+      ..write(obj.positions)
+      ..writeByte(16)
+      ..write(obj.education);
   }
 
   @override

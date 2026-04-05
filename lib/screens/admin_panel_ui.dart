@@ -366,6 +366,26 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     ],
   };
 
+  // Education Level
+  final List<String> _educationLevels = [
+    'অষ্টম শ্রেণি পাস',
+    'JSC / JDC',
+    'SSC / সমমান',
+    'HSC / সমমান',
+    'Diploma (ডিপ্লোমা)',
+    'BSc / Honours (অনার্স)',
+    'Masters (মাস্টার্স)',
+    'BBA / MBA',
+    'MBBS / BDS',
+    'Fazil / Kamil',
+    'PhD',
+    'অন্যান্য (ম্যানুয়ালি লিখুন)', // এই অপশনটি আলাদাভাবে কাজ করবে
+  ];
+
+  List<String> _selectedEducationList = [];
+  final TextEditingController _otherEduCtrl = TextEditingController();
+  // education end code
+
   String? selectedStep1, selectedStep2, selectedStep3, selectedStep4;
   bool isGovtJob = true;
 
@@ -514,6 +534,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         logoBase64 = base64Encode(logoBytes);
       }
 
+      // education level code
+      List<String> finalEducation = List.from(_selectedEducationList);
+      // others section of education
+      if (_otherEduCtrl.text.isNotEmpty) {
+        finalEducation.add(_otherEduCtrl.text.trim());
+      }
+
       // 3. Process Positions
       List<Map<String, dynamic>> positionData = positions
           .map(
@@ -527,6 +554,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
       // 4. Organize Data (Logo included here)
       Map<String, dynamic> fullData = {
+        'education': finalEducation,
         'title': _titleCtrl.text.trim(),
         'company': _companyCtrl.text.trim() ?? "",
         'logo': logoBase64 ?? "",
@@ -742,6 +770,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
               isReadOnly: true,
             ),
           ]),
+
+          _buildEducationSection(),
           _buildSectionCard("তারিখ ও লিংক", [
             _buildDateField(
               "সার্কুলার পাবলিশ তারিখ",
@@ -1272,6 +1302,69 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
         input.split('').map((char) => engToBngDigits[char] ?? char).join('');
 
     return "${convert(date.day.toString())} ${banglaMonths[date.month - 1]} ${convert(date.year.toString())}";
+  }
+
+  // Education Level Widget
+  Widget _buildEducationSection() {
+    bool isOtherSelected = _selectedEducationList.contains('অন্যান্য (ম্যানুয়ালি লিখুন)');
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "শিক্ষাগত যোগ্যতা নির্বাচন করুন (একাধিক সম্ভব)",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueGrey),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: _educationLevels.map((edu) {
+            final bool isSelected = _selectedEducationList.contains(edu);
+            return FilterChip(
+              label: Text(edu, style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.black87)),
+              selected: isSelected,
+              onSelected: (bool selected) {
+                setState(() {
+                  if (selected) {
+                    _selectedEducationList.add(edu);
+                  } else {
+                    _selectedEducationList.remove(edu);
+                    if (edu == 'অন্যান্য (ম্যানুয়ালি লিখুন)') _otherEduCtrl.clear();
+                  }
+                });
+              },
+              selectedColor: Colors.blueAccent,
+              checkmarkColor: Colors.white,
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: isSelected ? Colors.blueAccent : Colors.grey.shade300),
+              ),
+            );
+          }).toList(),
+        ),
+
+        // --- ম্যানুয়াল ইনপুট বক্স (অন্যান্য সিলেক্ট করলে আসবে) ---
+        if (isOtherSelected) ...[
+          const SizedBox(height: 12),
+          TextField(
+            controller: _otherEduCtrl,
+            decoration: InputDecoration(
+              hintText: "অন্যান্য শিক্ষাগত যোগ্যতা এখানে লিখুন...",
+              hintStyle: const TextStyle(fontSize: 12),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Colors.blueAccent, width: 1),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 
   Widget _buildQuestionBankTab() =>

@@ -203,29 +203,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         final allJobs = snapshot.data!;
 
-        // ফিল্টারিং লজিক আপডেট
+        // filtering logic
         final noticeJobs = allJobs.where((job) {
-          // পদ সংখ্যা বের করা (যদি খালি থাকে তবে ০ ধরবে)
+          // পদ সংখ্যা বের করা
           String postStr = job.totalpost.replaceAll(RegExp(r'[^0-9]'), '');
           int postCount = postStr.isNotEmpty ? int.parse(postStr) : 0;
 
-          // ডেডলাইন চেক
+          // ডেডলাইন চেক (আগের মতোই থাকবে)
           bool isNotExpired = true;
-          if (job.deadline.isNotEmpty && job.deadline != "null") {
-            DateTime? deadlineDate = DateTime.tryParse(job.deadline);
-            if (deadlineDate != null) {
-              // ডেডলাইন আজকের বা ভবিষ্যতের হলে ট্রু হবে
+          if (job.deadline.isNotEmpty &&
+              job.deadline.toLowerCase() != "null" &&
+              !job.deadline.contains("চলমান")) {
+            try {
+              DateTime deadlineDate = DateTime.parse(job.deadline);
               isNotExpired = deadlineDate.isAfter(today.subtract(const Duration(days: 1)));
+            } catch (e) {
+              isNotExpired = true;
             }
           }
 
-          // আপনার প্রয়োজন অনুযায়ী এখানে পদ সংখ্যা ৬০ এর বদলে কমিয়ে বা বাড়িয়ে চেক করতে পারেন
-          return job.isGovt == true && postCount >= 10 && isNotExpired;
+          // কন্ডিশন: ৫০ এর বেশি পদ এবং ডেডলাইন শেষ হয়নি এমন সব
+          return postCount >= 50 && isNotExpired;
         }).toList();
 
         if (noticeJobs.isEmpty) return const SizedBox.shrink();
 
-        // নোটিশ বারটি একটু প্যাডিং দিয়ে রিটার্ন করা যাতে স্পষ্ট হয়
+        // notice bar padding
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: SlidingNoticeBar(

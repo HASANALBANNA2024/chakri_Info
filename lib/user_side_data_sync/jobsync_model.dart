@@ -34,11 +34,14 @@ class JobSyncModel {
   @HiveField(13)
   final String? step4;
   @HiveField(14)
-  final String? publishDate; // নতুন
+  final String? publishDate;
   @HiveField(15)
-  final List<dynamic>? positions; // নতুন (পদের নাম, সংখ্যা, স্যালারি)
+  final List<dynamic>? positions;
+  @HiveField(16)
+  final List<String>? education;
 
   JobSyncModel({
+    this.education,
     required this.id,
     required this.title,
     required this.company,
@@ -80,6 +83,7 @@ class JobSyncModel {
       step3: data['step3']?.toString(),
       step4: data['step4']?.toString(),
       positions: data['positions'] as List<dynamic>?,
+      education: (data['education'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
     );
   }
 }
