@@ -1,3 +1,4 @@
+import 'package:chakri_info/models/bookmark_model.dart';
 import 'package:chakri_info/screens/admin_panel_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
@@ -8,10 +9,12 @@ import 'package:chakri_info/internal_sections/privacy_policy.dart';
 import 'package:chakri_info/internal_sections/terms_conditions.dart';
 import 'package:chakri_info/internal_sections/contact_us.dart';
 import '../screens/category_screen.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class AppDrawer extends StatefulWidget {
   final bool isDarkMode;
+
 
   const AppDrawer({super.key, required this.isDarkMode});
 
@@ -232,7 +235,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     isHighlight: true,
                   ),
                   _sectionTitle("যোগ্যতা অনুযায়ী চাকরি"),
-                  _buildEducationChips(),
+
                   const Divider(height: 30, thickness: 1),
                   _buildSupportGrid(),
                   const SizedBox(height: 20),
@@ -359,36 +362,9 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget _buildEducationChips() {
-    List<String> edu = [
-      "SSC",
-      "HSC",
-      "Diploma",
-      "BSc",
-      "Hons/Degree",
-      "MBBS",
-      "Masters",
-      "PhD",
-    ];
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        spacing: 6,
-        runSpacing: 0,
-        children: edu
-            .map(
-              (e) => ActionChip(
-                label: Text(e, style: const TextStyle(fontSize: 11)),
-                padding: EdgeInsets.zero,
-                backgroundColor: Colors.indigo.withOpacity(0.05),
-                onPressed: () {},
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
+  // education chips
 
+// education chips end
   Widget _buildSupportGrid() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),

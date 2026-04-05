@@ -222,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
           }
 
-          // কন্ডিশন: ৫০ এর বেশি পদ এবং ডেডলাইন শেষ হয়নি এমন সব
+          // condition 50+ posts
           return postCount >= 50 && isNotExpired;
         }).toList();
 
