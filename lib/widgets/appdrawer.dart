@@ -4,6 +4,7 @@ import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import '../screens/category_screen.dart';
+import 'package:intl/intl.dart';
 
 class AppDrawer extends StatefulWidget {
   final bool isDarkMode;
@@ -100,42 +101,68 @@ class _AppDrawerState extends State<AppDrawer> {
                     Icons.fiber_new_rounded,
                     "ডেডলাইন অনুযায়ী তালিকা",
                         () {
-                      Navigator.pop(context); // Close drawer
+                      Navigator.pop(context);
 
                       final now = DateTime.now();
                       final today = DateTime(now.year, now.month, now.day);
 
-                      // 1. Filter all active jobs
-                      List<JobSyncModel> activeJobs = jobProvider.allJobs.where((job) {
-                        // If deadline is empty or "Running", it is always active
-                        if (job.deadline.isEmpty || job.deadline.toLowerCase() == "null" || job.deadline.contains("চলমান")) {
-                          return true;
-                        }
+                      // Helper function to convert Bengali numbers and months to DateTime
+                      DateTime? parseBengaliDate(String input) {
+                        if (input.isEmpty || input.contains("চলমান") || input.toLowerCase() == "null") return null;
+
                         try {
-                          DateTime dDate = DateTime.parse(job.deadline);
-                          DateTime compareDate = DateTime(dDate.year, dDate.month, dDate.day);
-                          return compareDate.isAfter(today) || compareDate.isAtSameMomentAs(today);
+                          // Map Bengali months to English
+                          Map<String, String> monthMap = {
+                            'জানুয়ারি': '01', 'ফেব্রুয়ারি': '02', 'মার্চ': '03', 'এপ্রিল': '04',
+                            'মে': '05', 'জুন': '06', 'জুলাই': '07', 'আগস্ট': '08',
+                            'সেপ্টেম্বর': '09', 'অক্টোবর': '10', 'নভেম্বর': '11', 'ডিসেম্বর': '12'
+                          };
+
+                          // Convert Bengali digits to English digits
+                          String converted = input
+                              .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
+                              .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
+                              .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+                              .replaceAll('৯', '9');
+
+                          // Split the date (Expecting: "30 এপ্রিল 2026")
+                          List<String> parts = converted.split(' ');
+                          if (parts.length < 3) return null;
+
+                          String day = parts[0].padLeft(2, '0');
+                          String? month = monthMap[parts[1]];
+                          String year = parts[2];
+
+                          if (month == null) return null;
+
+                          // Create standard YYYY-MM-DD format for parsing
+                          return DateTime.parse("$year-$month-$day");
                         } catch (e) {
-                          return true; // Keep it if date parsing fails
+                          return null;
                         }
+                      }
+
+                      // 1. Filtering
+                      List<JobSyncModel> activeJobs = jobProvider.allJobs.where((job) {
+                        DateTime? dDate = parseBengaliDate(job.deadline);
+                        if (dDate == null) return true; // Keep "Running" or invalid dates
+
+                        return dDate.isAfter(today) || dDate.isAtSameMomentAs(today);
                       }).toList();
 
-                      // 2. Sorting Logic: Sort by deadline (Nearest deadline first)
+                      // 2. Sorting
                       activeJobs.sort((a, b) {
-                        // If deadline is "Running" or empty, put it at the end of the list
-                        if (a.deadline.isEmpty || a.deadline.contains("চলমান")) return 1;
-                        if (b.deadline.isEmpty || b.deadline.contains("চলমান")) return -1;
+                        DateTime? dateA = parseBengaliDate(a.deadline);
+                        DateTime? dateB = parseBengaliDate(b.deadline);
 
-                        try {
-                          DateTime dateA = DateTime.parse(a.deadline);
-                          DateTime dateB = DateTime.parse(b.deadline);
-                          return dateA.compareTo(dateB); // Ascending order: Nearest date first
-                        } catch (e) {
-                          return 0;
-                        }
+                        if (dateA == null && dateB == null) return 0;
+                        if (dateA == null) return 1;  // Push "Running" to bottom
+                        if (dateB == null) return -1;
+
+                        return dateA.compareTo(dateB); // Ascending order
                       });
 
-                      // 3. Navigate to screen
+                      // 3. Navigation
                       if (activeJobs.isNotEmpty) {
                         Navigator.push(
                           context,
