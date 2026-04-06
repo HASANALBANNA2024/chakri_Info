@@ -75,7 +75,7 @@ class PrepCenterBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Preparation Center',
+                        'Preparation Cell (প্রস্তুতি সেল)',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,

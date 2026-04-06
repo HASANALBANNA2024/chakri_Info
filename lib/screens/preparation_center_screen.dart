@@ -43,7 +43,10 @@ class PreparationCenterScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: isDarkMode ? const Color(0xFF0D1B2A) : Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Preparation Center'),
+        title: const Text(
+          "Preparation Cell (প্রস্তুতি সেল)",
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: isDarkMode ? const Color(0xFF0D1B2A) : Colors.indigo,
