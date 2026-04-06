@@ -50,7 +50,7 @@ class PreparationCenterScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
-        // ওভারফ্লো রোধ করতে ফিজিক্স সেট করা হয়েছে
+        // overflow protector
         physics: const BouncingScrollPhysics(),
         child: Column(
           children: [
@@ -65,7 +65,7 @@ class PreparationCenterScreen extends StatelessWidget {
               ),
             ),
 
-            // ১. ক্যাটাগরি গ্রিড (হাইট কমানো হয়েছে)
+            //
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14.0),
               child: GridView.builder(
@@ -75,7 +75,7 @@ class PreparationCenterScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  // AspectRatio বাড়িয়ে কার্ডের হাইট কমানো হয়েছে (১.১ বা ১.২ দিলে কার্ড চ্যাপ্টা হবে)
+                  // AspectRatio
                   childAspectRatio: 1.15,
                 ),
                 itemCount: categories.length,
@@ -85,10 +85,10 @@ class PreparationCenterScreen extends StatelessWidget {
               ),
             ),
 
-            // ২. গ্যাপ কমানো হয়েছে
+            //
             const SizedBox(height: 12),
 
-            // ৩. কুইজ ব্যানার
+            // quiz banner
             _buildQuizBanner(isDarkMode),
 
             const SizedBox(height: 20),
@@ -98,13 +98,12 @@ class PreparationCenterScreen extends StatelessWidget {
     );
   }
 
-  // কম্প্যাক্ট ক্যাটাগরি কার্ড
   Widget _buildCategoryCard(Map<String, dynamic> cat, bool isDarkMode) {
     return InkWell(
       borderRadius: BorderRadius.circular(15),
       onTap: () {},
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8), // প্যাডিং কমানো হয়েছে
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1B263B) : Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -118,19 +117,15 @@ class PreparationCenterScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              cat['icon'],
-              size: 28,
-              color: cat['color'],
-            ), // আইকন সাইজ ছোট করা হয়েছে
+            Icon(cat['icon'], size: 28, color: cat['color']),
             const SizedBox(height: 8),
             Text(
               cat['title'],
               textAlign: TextAlign.center,
-              maxLines: 1, // টেক্সট যাতে ওভারফ্লো না করে
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13, // ফন্ট সাইজ অ্যাডজাস্ট করা হয়েছে
+                fontSize: 13,
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black87,
               ),
@@ -149,7 +144,7 @@ class PreparationCenterScreen extends StatelessWidget {
     );
   }
 
-  // কুইজ ব্যানার (হাইট ফিক্সড রাখা হয়েছে যাতে ওভারফ্লো না হয়)
+  // quiz banner
   Widget _buildQuizBanner(bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14),
@@ -167,7 +162,7 @@ class PreparationCenterScreen extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min, // কন্টেন্ট অনুযায়ী হাইট নিবে
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   "ফ্রি মডেল টেস্ট",
@@ -187,7 +182,7 @@ class PreparationCenterScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 SizedBox(
-                  height: 32, // বাটনের হাইট কমানো হয়েছে
+                  height: 32,
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
@@ -205,7 +200,7 @@ class PreparationCenterScreen extends StatelessWidget {
           ),
           Icon(
             Icons.quiz_rounded,
-            size: 55, // আইকন সাইজ ছোট করা হয়েছে যাতে ওভারফ্লো না হয়
+            size: 55,
             color: Colors.white.withOpacity(0.2),
           ),
         ],
