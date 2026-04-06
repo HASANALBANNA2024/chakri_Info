@@ -379,7 +379,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     'MBBS / BDS',
     'Fazil / Kamil',
     'PhD',
-    'অন্যান্য (ম্যানুয়ালি লিখুন)', // এই অপশনটি আলাদাভাবে কাজ করবে
+    'অন্যান্য', // এই অপশনটি আলাদাভাবে কাজ করবে
   ];
 
   List<String> _selectedEducationList = [];
@@ -536,6 +536,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
       // education level code
       List<String> finalEducation = List.from(_selectedEducationList);
+      finalEducation.remove('অন্যান্য');
       // others section of education
       if (_otherEduCtrl.text.isNotEmpty) {
         finalEducation.add(_otherEduCtrl.text.trim());
@@ -1289,13 +1290,31 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
   // date convert
   String formatToBanglaDate(DateTime date) {
     final List<String> banglaMonths = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর'
+      'জানুয়ারি',
+      'ফেব্রুয়ারি',
+      'মার্চ',
+      'এপ্রিল',
+      'মে',
+      'জুন',
+      'জুলাই',
+      'আগস্ট',
+      'সেপ্টেম্বর',
+      'অক্টোবর',
+      'নভেম্বর',
+      'ডিসেম্বর',
     ];
 
     final Map<String, String> engToBngDigits = {
-      '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
-      '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯',
+      '0': '০',
+      '1': '১',
+      '2': '২',
+      '3': '৩',
+      '4': '৪',
+      '5': '৫',
+      '6': '৬',
+      '7': '৭',
+      '8': '৮',
+      '9': '৯',
     };
 
     String convert(String input) =>
@@ -1306,14 +1325,19 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
 
   // Education Level Widget
   Widget _buildEducationSection() {
-    bool isOtherSelected = _selectedEducationList.contains('অন্যান্য (ম্যানুয়ালি লিখুন)');
+    // এখানে আপনার লিস্টের নামের সাথে হুবহু মিল রাখা হয়েছে
+    bool isOtherSelected = _selectedEducationList.contains('অন্যান্য');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           "শিক্ষাগত যোগ্যতা নির্বাচন করুন (একাধিক সম্ভব)",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.blueGrey),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 13,
+            color: Colors.blueGrey,
+          ),
         ),
         const SizedBox(height: 10),
         Wrap(
@@ -1322,7 +1346,13 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
           children: _educationLevels.map((edu) {
             final bool isSelected = _selectedEducationList.contains(edu);
             return FilterChip(
-              label: Text(edu, style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.black87)),
+              label: Text(
+                edu,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : Colors.black87,
+                ),
+              ),
               selected: isSelected,
               onSelected: (bool selected) {
                 setState(() {
@@ -1330,7 +1360,8 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
                     _selectedEducationList.add(edu);
                   } else {
                     _selectedEducationList.remove(edu);
-                    if (edu == 'অন্যান্য (ম্যানুয়ালি লিখুন)') _otherEduCtrl.clear();
+                    // যদি 'অন্যান্য' আন-সিলেক্ট করা হয়, তবে টেক্সট বক্স ক্লিয়ার হবে
+                    if (edu == 'অন্যান্য') _otherEduCtrl.clear();
                   }
                 });
               },
@@ -1339,13 +1370,15 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
-                side: BorderSide(color: isSelected ? Colors.blueAccent : Colors.grey.shade300),
+                side: BorderSide(
+                  color: isSelected ? Colors.blueAccent : Colors.grey.shade300,
+                ),
               ),
             );
           }).toList(),
         ),
 
-        // --- ম্যানুয়াল ইনপুট বক্স (অন্যান্য সিলেক্ট করলে আসবে) ---
+        // --- ম্যানুয়াল ইনপুট বক্স ---
         if (isOtherSelected) ...[
           const SizedBox(height: 12),
           TextField(
@@ -1354,11 +1387,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
               hintText: "অন্যান্য শিক্ষাগত যোগ্যতা এখানে লিখুন...",
               hintStyle: const TextStyle(fontSize: 12),
               filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              fillColor: Colors.grey.shade50,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 15,
+                vertical: 10,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.blueAccent, width: 1),
+                borderSide: const BorderSide(color: Colors.blueAccent),
               ),
             ),
           ),

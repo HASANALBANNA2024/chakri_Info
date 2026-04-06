@@ -1,20 +1,18 @@
-import 'package:chakri_info/models/bookmark_model.dart';
-import 'package:chakri_info/screens/admin_panel_ui.dart';
-import 'package:flutter/material.dart';
-import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
-import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
-import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/internal_sections/about_us.dart';
+import 'package:chakri_info/internal_sections/contact_us.dart';
 import 'package:chakri_info/internal_sections/privacy_policy.dart';
 import 'package:chakri_info/internal_sections/terms_conditions.dart';
-import 'package:chakri_info/internal_sections/contact_us.dart';
+import 'package:chakri_info/screens/admin_panel_ui.dart';
+import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
+import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
+import 'package:chakri_info/widgets/education_filter_widget.dart';
+import 'package:flutter/material.dart';
+
 import '../screens/category_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class AppDrawer extends StatefulWidget {
   final bool isDarkMode;
-
 
   const AppDrawer({super.key, required this.isDarkMode});
 
@@ -48,40 +46,43 @@ class _AppDrawerState extends State<AppDrawer> {
                     () => Navigator.pop(context),
                   ),
                   // new circular
-                  _drawerItem(
-                    Icons.fiber_new_rounded,
-                    "নতুন সার্কুলার",
-                        () {
-                      Navigator.pop(context);
-                      final now = DateTime.now();
-                      final today = DateTime(now.year, now.month, now.day);
-                      final activeJobs = jobProvider.allJobs.where((job) {
-                        if (job.deadline.isEmpty || job.deadline.toLowerCase() == "null" || job.deadline.contains("চলমান")) {
-                          return true;
-                        }
-                        try {
-                          DateTime dDate = DateTime.parse(job.deadline);
-                          DateTime compareDate = DateTime(dDate.year, dDate.month, dDate.day);
-                          return compareDate.isAfter(today) || compareDate.isAtSameMomentAs(today);
-                        } catch (e) {
-                          return true;
-                        }
-                      }).toList();
-
-                      //all active jobs circular page convert
-                      if (activeJobs.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => JobListScreen(
-                              title: "সক্রিয় সার্কুলার",
-                              jobs: activeJobs,
-                            ),
-                          ),
-                        );
+                  _drawerItem(Icons.fiber_new_rounded, "নতুন সার্কুলার", () {
+                    Navigator.pop(context);
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    final activeJobs = jobProvider.allJobs.where((job) {
+                      if (job.deadline.isEmpty ||
+                          job.deadline.toLowerCase() == "null" ||
+                          job.deadline.contains("চলমান")) {
+                        return true;
                       }
-                    },
-                  ),
+                      try {
+                        DateTime dDate = DateTime.parse(job.deadline);
+                        DateTime compareDate = DateTime(
+                          dDate.year,
+                          dDate.month,
+                          dDate.day,
+                        );
+                        return compareDate.isAfter(today) ||
+                            compareDate.isAtSameMomentAs(today);
+                      } catch (e) {
+                        return true;
+                      }
+                    }).toList();
+
+                    //all active jobs circular page convert
+                    if (activeJobs.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobListScreen(
+                            title: "সক্রিয় সার্কুলার",
+                            jobs: activeJobs,
+                          ),
+                        ),
+                      );
+                    }
+                  }),
                   // browse category
                   _drawerItem(Icons.grid_view_rounded, "ব্রাউজ ক্যাটাগরি", () {
                     Navigator.pop(context);
@@ -99,7 +100,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   _drawerItem(
                     Icons.event_available_rounded,
                     "পরীক্ষার তারিখ (Exam Date)",
-                        () {
+                    () {
                       // drawer close
                       Navigator.pop(context);
 
@@ -125,7 +126,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   _drawerItem(
                     Icons.fiber_new_rounded,
                     "ডেডলাইন অনুযায়ী তালিকা",
-                        () {
+                    () {
                       Navigator.pop(context);
 
                       final now = DateTime.now();
@@ -133,21 +134,39 @@ class _AppDrawerState extends State<AppDrawer> {
 
                       // Helper function to convert Bengali numbers and months to DateTime
                       DateTime? parseBengaliDate(String input) {
-                        if (input.isEmpty || input.contains("চলমান") || input.toLowerCase() == "null") return null;
+                        if (input.isEmpty ||
+                            input.contains("চলমান") ||
+                            input.toLowerCase() == "null")
+                          return null;
 
                         try {
                           // Map Bengali months to English
                           Map<String, String> monthMap = {
-                            'জানুয়ারি': '01', 'ফেব্রুয়ারি': '02', 'মার্চ': '03', 'এপ্রিল': '04',
-                            'মে': '05', 'জুন': '06', 'জুলাই': '07', 'আগস্ট': '08',
-                            'সেপ্টেম্বর': '09', 'অক্টোবর': '10', 'নভেম্বর': '11', 'ডিসেম্বর': '12'
+                            'জানুয়ারি': '01',
+                            'ফেব্রুয়ারি': '02',
+                            'মার্চ': '03',
+                            'এপ্রিল': '04',
+                            'মে': '05',
+                            'জুন': '06',
+                            'জুলাই': '07',
+                            'আগস্ট': '08',
+                            'সেপ্টেম্বর': '09',
+                            'অক্টোবর': '10',
+                            'নভেম্বর': '11',
+                            'ডিসেম্বর': '12',
                           };
 
                           // Convert Bengali digits to English digits
                           String converted = input
-                              .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
-                              .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
-                              .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+                              .replaceAll('০', '0')
+                              .replaceAll('১', '1')
+                              .replaceAll('২', '2')
+                              .replaceAll('৩', '3')
+                              .replaceAll('৪', '4')
+                              .replaceAll('৫', '5')
+                              .replaceAll('৬', '6')
+                              .replaceAll('৭', '7')
+                              .replaceAll('৮', '8')
                               .replaceAll('৯', '9');
 
                           // Split the date (Expecting: "30 এপ্রিল 2026")
@@ -168,12 +187,16 @@ class _AppDrawerState extends State<AppDrawer> {
                       }
 
                       // 1. Filtering
-                      List<JobSyncModel> activeJobs = jobProvider.allJobs.where((job) {
-                        DateTime? dDate = parseBengaliDate(job.deadline);
-                        if (dDate == null) return true; // Keep "Running" or invalid dates
+                      List<JobSyncModel> activeJobs = jobProvider.allJobs.where(
+                        (job) {
+                          DateTime? dDate = parseBengaliDate(job.deadline);
+                          if (dDate == null)
+                            return true; // Keep "Running" or invalid dates
 
-                        return dDate.isAfter(today) || dDate.isAtSameMomentAs(today);
-                      }).toList();
+                          return dDate.isAfter(today) ||
+                              dDate.isAtSameMomentAs(today);
+                        },
+                      ).toList();
 
                       // 2. Sorting
                       activeJobs.sort((a, b) {
@@ -181,7 +204,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         DateTime? dateB = parseBengaliDate(b.deadline);
 
                         if (dateA == null && dateB == null) return 0;
-                        if (dateA == null) return 1;  // Push "Running" to bottom
+                        if (dateA == null) return 1; // Push "Running" to bottom
                         if (dateB == null) return -1;
 
                         return dateA.compareTo(dateB); // Ascending order
@@ -237,6 +260,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   _sectionTitle("যোগ্যতা অনুযায়ী চাকরি"),
 
                   const Divider(height: 30, thickness: 1),
+                  const EducationFilterWidget(),
                   _buildSupportGrid(),
                   const SizedBox(height: 20),
                 ],
@@ -364,7 +388,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
   // education chips
 
-// education chips end
+  // education chips end
   Widget _buildSupportGrid() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -389,13 +413,29 @@ class _AppDrawerState extends State<AppDrawer> {
     return GestureDetector(
       onTap: () {
         if (label == "About Us") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUsScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AboutUsScreen()),
+          );
         } else if (label == "Contact") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactUsScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ContactUsScreen()),
+          );
         } else if (label == "Terms") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsConditionsScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TermsConditionsScreen(),
+            ),
+          );
         } else if (label == "Privacy") {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const PrivacyPolicyScreen(),
+            ),
+          );
         }
       },
       child: Container(
@@ -403,13 +443,18 @@ class _AppDrawerState extends State<AppDrawer> {
           border: Border.all(color: Colors.grey.withOpacity(0.2)),
           borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8), // ক্লিক এরিয়া একটু আরামদায়ক করার জন্য
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+        ), // ক্লিক এরিয়া একটু আরামদায়ক করার জন্য
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 14, color: Colors.grey),
             const SizedBox(width: 5),
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
+            ),
           ],
         ),
       ),
