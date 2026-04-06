@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/pdf_upload_section.dart';
-
+// question sync
 class AdminQuestionSyncPage extends StatefulWidget {
   @override
   _AdminQuestionSyncPageState createState() => _AdminQuestionSyncPageState();
