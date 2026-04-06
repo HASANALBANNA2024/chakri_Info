@@ -9,27 +9,23 @@ class PreparationCenterScreen extends StatelessWidget {
 
     final List<Map<String, dynamic>> categories = [
       {
-        'title': 'BCS',
+        'title': 'BCS (বিসিএস প্রশ্ন)',
         'icon': Icons.menu_book_rounded,
         'color': Colors.blue.shade700,
       },
       {
-        'title': 'ভর্তি প্রস্তুতি',
+        'title': 'Admission',
         'icon': Icons.school_outlined,
         'color': Colors.blue,
       },
-      {
-        'title': 'Non-Cadre',
-        'icon': Icons.work_outline,
-        'color': Colors.orange,
-      },
+      {'title': 'Govt Job', 'icon': Icons.work_outline, 'color': Colors.orange},
       {
         'title': 'Bank Job',
         'icon': Icons.account_balance_outlined,
         'color': Colors.teal,
       },
       {
-        'title': 'Medical Job',
+        'title': 'Medical & Nursing',
         'icon': Icons.medical_services_outlined,
         'color': Colors.red,
       },
@@ -39,12 +35,12 @@ class PreparationCenterScreen extends StatelessWidget {
         'color': Colors.green,
       },
       {
-        'title': 'Technical Job',
+        'title': 'Technical (ইঞ্জিনিয়ারিং)',
         'icon': Icons.precision_manufacturing_outlined,
         'color': Colors.purple,
       },
       {
-        'title': 'Primary',
+        'title': 'Primary (শিক্ষক)',
         'icon': Icons.school_rounded,
         'color': Colors.orange.shade800,
       },
@@ -106,12 +102,9 @@ class PreparationCenterScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          const SizedBox(height: 2),
-
           // Quiz Banner - হাইট কিছুটা কমিয়ে নিচে ফিক্সড রাখা হয়েছে
+          const SizedBox(height: 10),
           _buildQuizBanner(isDarkMode),
-
           const SizedBox(height: 15),
         ],
       ),
@@ -129,14 +122,14 @@ class PreparationCenterScreen extends StatelessWidget {
           boxShadow: [
             if (!isDarkMode)
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 5,
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
                 offset: const Offset(0, 2),
               ),
           ],
           border: Border.all(
             color: isDarkMode
-                ? Colors.white.withOpacity(0.05)
+                ? Colors.black.withOpacity(0.05)
                 : cat['color'].withOpacity(0.1),
             width: 1,
           ),
@@ -193,7 +186,7 @@ class PreparationCenterScreen extends StatelessWidget {
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(

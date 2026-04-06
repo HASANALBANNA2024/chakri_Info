@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chakri_info/Questions/admin_question_sync_page.dart';
 import 'package:chakri_info/services/admin_sync_page.dart';
 import 'package:chakri_info/services/firebase_service.dart';
 import 'package:chakri_info/widgets/admin_syn_page_section.dart';
@@ -1403,6 +1404,78 @@ class _AdminPanelScreenState extends State<AdminPanelScreen>
     );
   }
 
-  Widget _buildQuestionBankTab() =>
-      Center(child: Text("Question Bank Coming Soon"));
+  Widget _buildQuestionBankTab() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // একটি সুন্দর আইকন
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.quiz_rounded, size: 80, color: Colors.indigo),
+          ),
+
+          SizedBox(height: 24),
+
+          Text(
+            "Question Bank Management",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+
+          SizedBox(height: 8),
+
+          Text(
+            "বিসিএস, ব্যাংক এবং অন্যান্য পরীক্ষার প্রশ্নসমূহ\nএখান থেকে আপলোড এবং সিঙ্ক করুন।",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+
+          SizedBox(height: 30),
+
+          // সিঙ্ক পেজে যাওয়ার বাটন
+          SizedBox(
+            width: 250,
+            height: 55,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                // আপনার নতুন স্ক্রিনে নেভিগেট করবে
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AdminQuestionSyncPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.sync_rounded, color: Colors.white),
+              label: Text(
+                "Open Sync Console",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                elevation: 5,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
