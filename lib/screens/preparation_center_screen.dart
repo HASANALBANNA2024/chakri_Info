@@ -9,17 +9,22 @@ class PreparationCenterScreen extends StatelessWidget {
 
     final List<Map<String, dynamic>> categories = [
       {
+        'title': 'BCS',
+        'icon': Icons.menu_book_rounded,
+        'color': Colors.blue.shade700,
+      },
+      {
         'title': 'ভর্তি প্রস্তুতি',
         'icon': Icons.school_outlined,
         'color': Colors.blue,
       },
       {
-        'title': 'Job Preparation',
+        'title': 'Non-Cadre',
         'icon': Icons.work_outline,
         'color': Colors.orange,
       },
       {
-        'title': 'Bank Preparation',
+        'title': 'Bank Job',
         'icon': Icons.account_balance_outlined,
         'color': Colors.teal,
       },
@@ -38,6 +43,21 @@ class PreparationCenterScreen extends StatelessWidget {
         'icon': Icons.precision_manufacturing_outlined,
         'color': Colors.purple,
       },
+      {
+        'title': 'Primary',
+        'icon': Icons.school_rounded,
+        'color': Colors.orange.shade800,
+      },
+      {
+        'title': 'NTRCA (নিবন্ধন)',
+        'icon': Icons.assignment_ind_outlined,
+        'color': Colors.green.shade700,
+      },
+      {
+        'title': 'Others (অন্যান্য)',
+        'icon': Icons.more_horiz_rounded,
+        'color': Colors.blueGrey.shade600,
+      },
     ];
 
     return Scaffold(
@@ -52,34 +72,32 @@ class PreparationCenterScreen extends StatelessWidget {
         backgroundColor: isDarkMode ? const Color(0xFF0D1B2A) : Colors.indigo,
         foregroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        // overflow protector
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 15, 20, 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "ক্যাটাগরি সমূহ",
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                ),
+      body: Column(
+        // SingleChildScrollView সরিয়ে সরাসরি Column ব্যবহার করা হয়েছে
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "ক্যাটাগরি সমূহ",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
+          ),
 
-            //
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14.0),
+          // GridView.builder - Expanded ব্যবহার করা হয়েছে যেন এটি বাকি জায়গা নেয়
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: GridView.builder(
-                shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  // AspectRatio
-                  childAspectRatio: 1.15,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio:
+                      1.6, // হাইট কমানোর জন্য রেশিও বাড়ানো হয়েছে (আগে ১.১৫ ছিল)
                 ),
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
@@ -87,29 +105,35 @@ class PreparationCenterScreen extends StatelessWidget {
                 },
               ),
             ),
+          ),
 
-            //
-            const SizedBox(height: 12),
+          const SizedBox(height: 2),
 
-            // quiz banner
-            _buildQuizBanner(isDarkMode),
+          // Quiz Banner - হাইট কিছুটা কমিয়ে নিচে ফিক্সড রাখা হয়েছে
+          _buildQuizBanner(isDarkMode),
 
-            const SizedBox(height: 20),
-          ],
-        ),
+          const SizedBox(height: 15),
+        ],
       ),
     );
   }
 
   Widget _buildCategoryCard(Map<String, dynamic> cat, bool isDarkMode) {
     return InkWell(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(12),
       onTap: () {},
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1B263B) : Colors.white,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            if (!isDarkMode)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+          ],
           border: Border.all(
             color: isDarkMode
                 ? Colors.white.withOpacity(0.05)
@@ -120,25 +144,28 @@ class PreparationCenterScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(cat['icon'], size: 28, color: cat['color']),
-            const SizedBox(height: 8),
+            Icon(
+              cat['icon'],
+              size: 24,
+              color: cat['color'],
+            ), // আইকন সাইজ ২৮ থেকে ২৪ করা হয়েছে
+            const SizedBox(height: 4),
             Text(
               cat['title'],
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 12, // ফন্ট সাইজ ১৩ থেকে ১২ করা হয়েছে
                 fontWeight: FontWeight.bold,
                 color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
-            const SizedBox(height: 2),
             Text(
               'শুরু করুন',
               style: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.white54 : Colors.grey[800],
+                fontSize: 11, // ফন্ট সাইজ ১৪ থেকে ১১ করা হয়েছে যেন এক লাইনে ধরে
+                color: isDarkMode ? Colors.white54 : Colors.grey[600],
               ),
             ),
           ],
@@ -147,11 +174,13 @@ class PreparationCenterScreen extends StatelessWidget {
     );
   }
 
-  // quiz banner
   Widget _buildQuizBanner(bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14),
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 6,
+        vertical: 6,
+      ), // প্যাডিং কমানো হয়েছে
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
@@ -171,30 +200,36 @@ class PreparationCenterScreen extends StatelessWidget {
                   "ফ্রি মডেল টেস্ট",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
-                  "বিসিএস, ব্যাংক ও সকল সরকারি চাকরির প্রস্তুতির জন্য কুইজ দিন",
+                  "বিসিএস ও সকল চাকরির কুইজ দিন", // টেক্সট কিছুটা ছোট করা হয়েছে
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6),
                 SizedBox(
-                  height: 32,
+                  height: 28, // বাটন হাইট ৩২ থেকে ২৮ করা হয়েছে
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange[800],
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     child: const Text(
                       "শুরু করুন",
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -203,7 +238,7 @@ class PreparationCenterScreen extends StatelessWidget {
           ),
           Icon(
             Icons.quiz_rounded,
-            size: 55,
+            size: 45, // আইকন সাইজ ৫৫ থেকে ৪৫ করা হয়েছে
             color: Colors.white.withOpacity(0.2),
           ),
         ],
