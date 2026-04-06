@@ -1,21 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:chakri_info/widgets/featured_job_slider.dart';
+
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
+import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
 import 'package:chakri_info/user_side_data_sync/job_details_screen.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/user_side_data_sync/sliding_notice_bar.dart';
 import 'package:chakri_info/widgets/appdrawer.dart';
-import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
-import 'package:chakri_info/widgets/job_stats_widget.dart';
 import 'package:chakri_info/widgets/global_search_delegate.dart';
+import 'package:chakri_info/widgets/job_stats_widget.dart';
+import 'package:chakri_info/widgets/prep_center_banner.dart';
 import 'package:flutter/material.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -129,7 +128,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return StreamBuilder<List<JobSyncModel>>(
       stream: jobProvider.getJobStream(),
       builder: (context, snapshot) {
-
         final allJobs = snapshot.data ?? [];
 
         return SingleChildScrollView(
@@ -138,9 +136,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
-              buildGlobalSearchSection(context, isDarkMode, jobProvider.allJobs),
+              buildGlobalSearchSection(
+                context,
+                isDarkMode,
+                jobProvider.allJobs,
+              ),
               // FeaturedJobSlider(jobProvider: jobProvider),
               _buildCategoryGrid(isDarkMode),
+              PrepCenterBanner(),
               _buildNoticeSection(),
               _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
               _buildJobList(isDarkMode),
@@ -150,7 +153,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-// home end
+
+  // home end
   PreferredSizeWidget _buildCustomAppBar(bool isDarkMode) {
     return AppBar(
       title: Text(
@@ -189,6 +193,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ],
     );
   }
+
   // notice bar (Ultra Compact)
   Widget _buildNoticeSection() {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -197,7 +202,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return StreamBuilder<List<JobSyncModel>>(
       stream: jobProvider.getJobStream(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+        if (!snapshot.hasData ||
+            snapshot.data == null ||
+            snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
         }
 
@@ -216,7 +223,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               !job.deadline.contains("চলমান")) {
             try {
               DateTime deadlineDate = DateTime.parse(job.deadline);
-              isNotExpired = deadlineDate.isAfter(today.subtract(const Duration(days: 1)));
+              isNotExpired = deadlineDate.isAfter(
+                today.subtract(const Duration(days: 1)),
+              );
             } catch (e) {
               isNotExpired = true;
             }
@@ -247,7 +256,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-// category item
+
+  // category item
   Widget _buildCategoryGrid(bool isDarkMode) {
     List<Map<String, dynamic>> cats = [
       {
@@ -407,7 +417,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-// section title
+
+  // section title
   Widget _buildSectionTitle(String title, bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 6, 16, 2),
@@ -417,6 +428,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+
   // Recent  (Maximum Data Density)
   Widget _buildJobList(bool isDarkMode) {
     final today = DateTime.now();
@@ -426,7 +438,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return StreamBuilder<List<JobSyncModel>>(
       stream: jobProvider.getJobStream(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+        if (!snapshot.hasData ||
+            snapshot.data == null ||
+            snapshot.data!.isEmpty) {
           return const SizedBox.shrink();
         }
 
@@ -437,10 +451,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           try {
             DateTime deadlineDate = DateTime.parse(job.deadline);
-            final compareDeadline = DateTime(deadlineDate.year, deadlineDate.month, deadlineDate.day);
+            final compareDeadline = DateTime(
+              deadlineDate.year,
+              deadlineDate.month,
+              deadlineDate.day,
+            );
 
             // Ajker din ba bhabishyoter deadline hole show korbe
-            return compareDeadline.isAtSameMomentAs(currentDay) || compareDeadline.isAfter(currentDay);
+            return compareDeadline.isAtSameMomentAs(currentDay) ||
+                compareDeadline.isAfter(currentDay);
           } catch (e) {
             return true; // Date format vul thakle safe thakar jonno show korbe
           }
