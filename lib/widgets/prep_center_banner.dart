@@ -1,3 +1,4 @@
+import 'package:chakri_info/screens/preparation_center_screen.dart';
 import 'package:flutter/material.dart';
 
 class PrepCenterBanner extends StatelessWidget {
@@ -15,7 +16,10 @@ class PrepCenterBanner extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // Navigator.push logic here
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => PreparationCenterScreen()),
+            );
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -83,7 +87,8 @@ class PrepCenterBanner extends StatelessWidget {
                         'নিজেকে প্রস্তুত করুন আগামীর জন্য',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
-                          fontSize: 11,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
