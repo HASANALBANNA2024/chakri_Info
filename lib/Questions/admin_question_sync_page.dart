@@ -19,6 +19,7 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
     'Bank Job',
     'Primary (শিক্ষক)',
     'NTRCA (নিবন্ধন)',
+    'কৃষি ও মৎস্য',
     'ভর্তি প্রস্তুতি',
     'Medical & Nursing',
     'Technical (ইঞ্জিনিয়ারিং)',
@@ -43,6 +44,13 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
     'Medical & Nursing': ['Medical Officer', 'Nursing', 'Technician'],
     'Technical (ইঞ্জিনিয়ারিং)': ['BSC Engineering', 'Diploma Engineering'],
     'NTRCA (নিবন্ধন)': ['School Level', 'College Level'],
+    'কৃষি ও মৎস্য': [
+      'কৃষি সম্প্রসারণ অধিদপ্তর (DAE)',
+      'মৎস্য অধিদপ্তর (DoF)',
+      'প্রাণিসম্পদ অধিদপ্তর (DLS)',
+      'কৃষি গবেষণা (BARI/BRRI)',
+      'অন্যান্য সরকারি প্রজেক্ট',
+    ],
   };
 
   String? s1, s2;
@@ -130,29 +138,22 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
         }
       }
 
-      // ২. ফায়ারবেস পাথ (আপনার ইউজার প্যানেলের ট্যাবের সাথে মিল রেখে)
-      // Path: All_Question -> [BCS] -> [MCQ/Written/Viva] -> Exams -> List -> All_Exams -> [Title]
       DocumentReference examRef = _firestore
           .collection('All_Question')
-          .doc(s1) // Document (যেমন: BCS)
-          .collection(_examType) // Collection (যেমন: MCQ)
-          .doc('Exams') // Document (এটি এখন একটি নির্দিষ্ট ডক)
-          .collection('List') // Collection (এর ভেতরে অনেকগুলো লিস্ট থাকতে পারে)
-          .doc('All_Exams') // Document (সব এক্সাম এই ডকুমেন্টের আন্ডারে)
-          .collection('Items') // Collection (আসল এক্সাম লিস্ট)
+          .doc(s1)
+          .collection(_examType)
+          .doc('Exams')
+          .collection('All_Exams')
           .doc(finalTitle);
 
-      // ৩. এক্সাম মেইন ডাটা (যা কার্ডে শো করবে)
       await examRef.set({
         'title': finalTitle,
         'exam_type': _examType,
-        'sub_category': s2 ?? "General",
         'total_questions': rawQuestions.length,
-        'pdf_url': _pdfUrlCtrl.text.trim(),
+        'questions': rawQuestions,
         'updated_at': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
-      // ৪. প্রশ্নগুলো Items সাব-কালেকশনে আপলোড
       WriteBatch batch = _firestore.batch();
       for (var q in rawQuestions) {
         DocumentReference qRef = examRef.collection('Items').doc();

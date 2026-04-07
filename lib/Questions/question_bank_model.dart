@@ -3,7 +3,7 @@ import 'package:hive/hive.dart';
 part 'question_bank_model.g.dart';
 
 @HiveType(typeId: 1)
-class QuestionBankModel {
+class QuestionBankModel extends HiveObject {
   @HiveField(0)
   final String title;
   @HiveField(1)
@@ -33,7 +33,7 @@ class QuestionBankModel {
   ) {
     return QuestionBankModel(
       title: examTitle,
-      // ডাটাবেসে q না থাকলে question ফিল্ড খুঁজবে, তাও না থাকলে খালি থাকবে
+      // json['q'] না পেলে json['question'] খুঁজবে, তাও না পেলে খালি স্ট্রিং
       question: (json['q'] ?? json['question'] ?? '').toString(),
       options: json['options'] != null
           ? List<String>.from(json['options'])

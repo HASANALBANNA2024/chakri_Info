@@ -12,29 +12,34 @@ ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ১. Hive Initialize
+  // ১. Firebase Initialize (এটি সবার আগে রাখা ভালো)
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // ২. Hive Initialize
   await Hive.initFlutter();
 
-  // ২. Register Adapters
-  // JobSyncModelAdapter (আগে থেকেই ছিল - ID: 0)
+  // ৩. Register Adapters (এখানে ডবল initFlutter ছিল, সেটি বাদ দেওয়া হয়েছে)
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(JobSyncModelAdapter());
   }
 
-  // QuestionBankModelAdapter (নতুন - ID: 1)
-  // এটি তখনই কাজ করবে যখন মডেলে @HiveType(typeId: 1) থাকবে
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(QuestionBankModelAdapter());
   }
 
-  // ৩. ওপেন লোকাল বক্সসমূহ
-  await Hive.openBox<JobSyncModel>('jobsBox'); // আগের জব বক্স
-  await Hive.openBox('exam_cache'); // পরীক্ষার কার্ড ক্যাশ করার বক্স
+  // ৪. ওপেন লোকাল বক্সসমূহ (await দিয়ে নিশ্চিত করা)
+  try {
+    await Hive.openBox<JobSyncModel>('jobsBox');
 
-  // ৪. Firebase Initialize
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    // আপনার ৫ নম্বর ফাইলে আপনি "exams_${widget.categoryName}" নামে বক্স ওপেন করছেন।
+    // কিন্তু এখানে 'exam_cache' ওপেন করছেন।
+    // যদি প্রোভাইডারের জন্য 'exam_cache' লাগে তবে এটি ঠিক আছে।
+    await Hive.openBox('exam_cache');
+  } catch (e) {
+    print("Hive Box Open Error: $e");
+  }
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

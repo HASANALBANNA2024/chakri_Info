@@ -15,40 +15,44 @@ class PreparationCenterScreen extends StatelessWidget {
         'color': Colors.blue.shade700,
       },
       {
-        'title': 'Admission',
-        'icon': Icons.school_outlined,
-        'color': Colors.blue,
+        'title': 'Govt Job',
+        'icon': Icons.work_outline,
+        'color': Colors.orange.shade800,
       },
-      {'title': 'Govt Job', 'icon': Icons.work_outline, 'color': Colors.orange},
       {
         'title': 'Bank Job',
         'icon': Icons.account_balance_outlined,
         'color': Colors.teal,
       },
       {
-        'title': 'Medical & Nursing',
-        'icon': Icons.medical_services_outlined,
-        'color': Colors.red,
+        'title': 'Primary (শিক্ষক)',
+        'icon': Icons.school_rounded,
+        'color': Colors.green.shade600,
+      },
+      {
+        'title': 'NTRCA (নিবন্ধন)',
+        'icon': Icons.assignment_ind_outlined,
+        'color': Colors.indigo,
       },
       {
         'title': 'কৃষি ও মৎস্য',
         'icon': Icons.agriculture_outlined,
-        'color': Colors.green,
+        'color': Colors.green.shade800,
+      },
+      {
+        'title': 'ভর্তি প্রস্তুতি',
+        'icon': Icons.school_outlined,
+        'color': Colors.blue.shade600,
+      },
+      {
+        'title': 'Medical & Nursing',
+        'icon': Icons.medical_services_outlined,
+        'color': Colors.red.shade600,
       },
       {
         'title': 'Technical (ইঞ্জিনিয়ারিং)',
         'icon': Icons.precision_manufacturing_outlined,
         'color': Colors.purple,
-      },
-      {
-        'title': 'Primary (শিক্ষক)',
-        'icon': Icons.school_rounded,
-        'color': Colors.orange.shade800,
-      },
-      {
-        'title': 'NTRCA (নিবন্ধন)',
-        'icon': Icons.assignment_ind_outlined,
-        'color': Colors.green.shade700,
       },
       {
         'title': 'Others (অন্যান্য)',
