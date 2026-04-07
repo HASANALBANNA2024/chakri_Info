@@ -144,49 +144,105 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     if (_examList.isEmpty) {
       return Center(
         child: Text(
-          "$_selectedType সেকশনে কোনো ডাটা নেই",
-          style: TextStyle(
-            color: widget.isDarkMode ? Colors.white : Colors.black,
-          ),
+          "কোনো ডাটা নেই",
+          style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black),
         ),
       );
     }
 
-    // গ্রুপ বাই টাইটেল (যদি একই পরীক্ষার সব প্রশ্ন একসাথে দেখতে চান)
+    // ১. ইউনিক টাইটেল অনুযায়ী প্রশ্নগুলোকে গ্রুপ করা
+    // Map<টাইটেল, প্রশ্নের লিস্ট>
+    Map<String, List<QuestionBankModel>> groupedExams = {};
+
+    for (var question in _examList) {
+      if (!groupedExams.containsKey(question.title)) {
+        groupedExams[question.title] = [];
+      }
+      groupedExams[question.title]!.add(question);
+    }
+
+    // ২. শুধুমাত্র ইউনিক টাইটেলগুলোর লিস্ট বের করা (যেমন: BCS Written 2026)
+    List<String> distinctTitles = groupedExams.keys.toList();
+
     return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
-      itemCount: _examList.length,
+      itemCount: distinctTitles.length,
       itemBuilder: (context, index) {
-        final item = _examList[index];
+        String examTitle = distinctTitles[index];
+        List<QuestionBankModel> questionsForThisExam = groupedExams[examTitle]!;
+
         return Card(
           color: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-          elevation: 2,
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            title: Text(
-              item.title,
-              style: TextStyle(
-                color: widget.isDarkMode ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold,
+          elevation: 3,
+          margin: const EdgeInsets.only(bottom: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(15),
+            onTap: () {
+              // ৩. এখানে ক্লিক করলে আপনার কুইজ বা প্রশ্ন দেখানোর পেজে যাবে
+              // আমরা পুরো প্রশ্নর লিস্ট (questionsForThisExam) পাঠিয়ে দিচ্ছি
+              _navigateToExamDetail(examTitle, questionsForThisExam);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Row(
+                children: [
+                  // আইকন বা লোগো
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.indigo.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.menu_book_rounded, color: Colors.indigo),
+                  ),
+                  const SizedBox(width: 15),
+                  // টাইটেল এবং ইনফো
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          examTitle, // যেমন: BCS Written 2026
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: widget.isDarkMode ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          "মোট প্রশ্ন: ${questionsForThisExam.length} টি",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: widget.isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 18, color: Colors.grey),
+                ],
               ),
             ),
-            // ListTile এর ভেতরে subtitle বা বডিতে
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("প্রশ্ন: ${item.question}"),
-                if (item.options != null && item.options!.isNotEmpty)
-                  Text("অপশন আছে (MCQ)")
-                else
-                  Text("সরাসরি উত্তর (Written/Viva)"),
-              ],
-            ),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           ),
         );
       },
     );
+  }
+
+// ৪. নেভিগেশন ফাংশন (আপনার ফিউচার লজিক অনুযায়ী এখানে পেজ নাম দিবেন)
+  void _navigateToExamDetail(String title, List<QuestionBankModel> questions) {
+    // উদাহরণস্বরূপ:
+    /* Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => YourQuestionShowPage(
+        examTitle: title,
+        allQuestions: questions,
+      ),
+    ),
+  ); */
+    print("Moving to $title with ${questions.length} questions");
   }
 }
