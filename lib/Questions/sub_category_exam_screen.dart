@@ -59,88 +59,39 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   }
 
   Future<void> _syncWithFirestore() async {
-    // ১. বক্স চেক (Nullable handle করা হয়েছে)
-    if (_examBox == null || !_examBox!.isOpen) {
-      debugPrint("Hive Box is not open yet!");
-      return;
-    }
+    if (_examBox == null || !_examBox!.isOpen) return;
 
     try {
-      // ২. ডাটাবেস ভার্সন চেক (Settings -> db_status)
-      DocumentSnapshot statusDoc = await FirebaseFirestore.instance
-          .collection('Settings')
-          .doc('db_status')
-          .get();
+      // ডাইনামিক পাথ সেটআপ
+      var examsCollection = FirebaseFirestore.instance
+          .collection('All_Question')
+          .doc(widget.categoryName) // Preparation Center থেকে আসা নাম
+          .collection(_selectedType) // ট্যাব থেকে আসা (MCQ/Written/Viva)
+          .doc('Exams')
+          .collection('All_Exams');
 
-      int remoteVersion = 0;
-      if (statusDoc.exists && statusDoc.data() != null) {
-        remoteVersion =
-            (statusDoc.data() as Map<String, dynamic>)['version'] ?? 0;
+      QuerySnapshot examSnapshots = await examsCollection.get();
+
+      List<QuestionBankModel> allFetchedQuestions = [];
+
+      // প্রতিটি পরীক্ষার ভেতরের 'Items' থেকে ডাটা ফেচ
+      for (var doc in examSnapshots.docs) {
+        String examTitle = doc.id;
+        QuerySnapshot itemSnap = await doc.reference.collection('Items').get();
+
+        for (var itemDoc in itemSnap.docs) {
+          allFetchedQuestions.add(
+            QuestionBankModel.fromJson(itemDoc.data() as Map<String, dynamic>, examTitle, _selectedType),
+          );
+        }
       }
 
-      int localVersion = _examBox!.get('version_$_selectedType') as int? ?? 0;
+      // হাইভে সেভ এবং স্টেট আপডেট
+      await _examBox!.put(_selectedType, allFetchedQuestions);
+      if (mounted) setState(() { _examList = allFetchedQuestions; _isLoading = false; });
 
-      // ৩. কন্ডিশন: ভার্সন নতুন হলে অথবা লোকাল লিস্ট একদম খালি থাকলে ডাটা ফেচ হবে
-      if (remoteVersion > localVersion || _examList.isEmpty) {
-        debugPrint(
-          "Fetching fresh data for: ${widget.categoryName} -> $_selectedType",
-        );
-
-        // সঠিক পাথ: All_Question -> Category -> Type -> Exams -> All_Exams
-        QuerySnapshot examSnapshots = await FirebaseFirestore.instance
-            .collection('All_Question')
-            .doc(widget.categoryName)
-            .collection(_selectedType)
-            .doc('Exams')
-            .collection('All_Exams')
-            .get();
-
-        if (examSnapshots.docs.isEmpty) {
-          debugPrint("No exams found in Firestore for this path.");
-          if (mounted) setState(() => _isLoading = false);
-          return;
-        }
-
-        List<QuestionBankModel> allFetchedQuestions = [];
-
-        // ৪. প্রতিটি পরীক্ষার ভেতরের 'Items' সাব-কালেকশন থেকে প্রশ্ন আনা
-        for (var doc in examSnapshots.docs) {
-          String examTitle = doc.data().toString().contains('title')
-              ? (doc.get('title') ?? doc.id)
-              : doc.id;
-
-          // সাব-কালেকশন 'Items' থেকে ডাটা রিড
-          QuerySnapshot itemSnap = await doc.reference
-              .collection('Items')
-              .get();
-
-          for (var itemDoc in itemSnap.docs) {
-            final data = itemDoc.data() as Map<String, dynamic>;
-            // মডেলের factory method ব্যবহার করে ডাটা অ্যাড করা
-            allFetchedQuestions.add(
-              QuestionBankModel.fromJson(data, examTitle, _selectedType),
-            );
-          }
-        }
-
-        // ৫. হাইভে ডাটা এবং নতুন ভার্সন সেভ করা
-        if (allFetchedQuestions.isNotEmpty) {
-          await _examBox!.put(_selectedType, allFetchedQuestions);
-          await _examBox!.put('version_$_selectedType', remoteVersion);
-        }
-
-        if (mounted) {
-          setState(() {
-            _examList = allFetchedQuestions;
-            _isLoading = false;
-          });
-        }
-      } else {
-        // ভার্সন সেম থাকলে শুধু লোডিং বন্ধ হবে (লোকাল ডাটা অলরেডি লোড হয়েছে)
-        if (mounted) setState(() => _isLoading = false);
-      }
     } catch (e) {
-      debugPrint("Firestore Sync Error: $e");
+      debugPrint("Sync Error: $e");
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -203,6 +154,8 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
 
     // গ্রুপ বাই টাইটেল (যদি একই পরীক্ষার সব প্রশ্ন একসাথে দেখতে চান)
     return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: _examList.length,
       itemBuilder: (context, index) {
@@ -219,11 +172,16 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            subtitle: Text(
-              "প্রশ্ন: ${item.question.substring(0, item.question.length > 30 ? 30 : item.question.length)}...",
-              style: TextStyle(
-                color: widget.isDarkMode ? Colors.white70 : Colors.black54,
-              ),
+            // ListTile এর ভেতরে subtitle বা বডিতে
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("প্রশ্ন: ${item.question}"),
+                if (item.options != null && item.options!.isNotEmpty)
+                  Text("অপশন আছে (MCQ)")
+                else
+                  Text("সরাসরি উত্তর (Written/Viva)"),
+              ],
             ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
           ),

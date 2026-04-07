@@ -141,7 +141,7 @@ class PreparationCenterScreen extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => SubCategoryExamScreen(
-              categoryName: s1, // নিশ্চিত করুন এই নামটাই ক্লাসে আছে
+              categoryName: cat['title'], // selected category
               isDarkMode: isDark,
             ),
           ),

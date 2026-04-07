@@ -94,12 +94,13 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
 
   Future<void> _uploadDataDirectly() async {
     // ১. প্রাথমিক ভ্যালিডেশন (ক্যাটাগরি চেক)
-    if (s1 == null || s2 == null) {
-      _showMsg("❌ ধাপ ১ এবং ২ অবশ্যই সিলেক্ট করুন!");
+    // এখানে s1 = 'BCS (বিসিএস প্রশ্ন)', _examType = 'MCQ' / 'Written' / 'Viva'
+    if (s1 == null || _titleCtrl.text.trim().isEmpty) {
+      _showMsg("❌ ক্যাটাগরি এবং পরীক্ষার টাইটেল অবশ্যই দিন!");
       return;
     }
 
-    List rawQuestions = [];
+    List<Map<String, dynamic>> rawQuestions = [];
     try {
       // ২. ডাটা কালেকশন লজিক (JSON অথবা Manual)
       if (_isJsonMode) {
@@ -108,16 +109,16 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
           if (_bulkJsonCtrl.text.trim().isEmpty) throw "Bulk JSON বক্সটি খালি!";
           var decoded = jsonDecode(_bulkJsonCtrl.text.trim());
           if (decoded is List) {
-            rawQuestions = decoded;
+            rawQuestions = List<Map<String, dynamic>>.from(decoded);
           } else {
-            rawQuestions.add(decoded);
+            rawQuestions.add(Map<String, dynamic>.from(decoded));
           }
         } else {
           // Single JSON Mode (Multiple boxes)
           for (var c in _singleJsonControllers) {
             if (c.text.trim().isEmpty) continue;
             var d = jsonDecode(c.text.trim());
-            if (d is List) rawQuestions.addAll(d); else rawQuestions.add(d);
+            rawQuestions.add(Map<String, dynamic>.from(d));
           }
         }
       } else {
@@ -126,12 +127,13 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
           if (ctrl['q']!.text.trim().isEmpty) continue;
 
           Map<String, dynamic> qMap = {
-            'question': ctrl['q']!.text.trim(),
-            'answer': ctrl['ans']!.text.trim(),
-            'type': _examType,
+            'q': ctrl['q']!.text.trim(), // 'q' matching for DB
+            'ans': ctrl['ans']!.text.trim(), // 'ans' matching for DB
+            'exp': ctrl['exp']!.text.trim(),
             'created_at': DateTime.now().toIso8601String(),
           };
 
+          // MCQ হলে অপশন অ্যাড হবে
           if (_examType == "MCQ") {
             qMap['options'] = [
               ctrl['o1']!.text.trim(),
@@ -139,43 +141,33 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
               ctrl['o3']!.text.trim(),
               ctrl['o4']!.text.trim()
             ];
-            qMap['explanation'] = ctrl['exp']!.text.trim();
           }
           rawQuestions.add(qMap);
         }
       }
 
-      // ৩. কন্টেন্ট চেক (প্রশ্ন অথবা PDF থাকতে হবে)
-      if (rawQuestions.isEmpty && _pdfBytes == null) {
-        throw "অন্তত একটি প্রশ্ন লিখুন অথবা একটি PDF ফাইল আপলোড করুন!";
+      // ৩. কন্টেন্ট চেক
+      if (rawQuestions.isEmpty) {
+        throw "অন্তত একটি প্রশ্ন ইনপুট দিন!";
       }
 
       setState(() => _isUploading = true);
 
-      // ৪. টাইটেল এবং মিডিয়া কনভার্ট (Base64)
-      String finalTitle = _titleCtrl.text.trim().isEmpty
-          ? "Exam_${DateTime.now().millisecondsSinceEpoch}"
-          : _titleCtrl.text.trim();
-
-      // ইমেজ কনভার্ট
+      // ৪. টাইটেল এবং ইমেজ হ্যান্ডলিং (Base64)
+      String finalTitle = _titleCtrl.text.trim();
       String? base64Img;
       if (_pickedImageFile != null) {
         base64Img = base64Encode(await _pickedImageFile!.readAsBytes());
       }
 
-      // PDF Converter
-      String? base64Pdf;
-      if (_pdfBytes != null) {
-        base64Pdf = base64Encode(_pdfBytes!);
-      }
-
-      // firebase dynamic path
-      // মেইন কালেকশন: All_Question (এটি All_Data থেকে আলাদা থাকবে)
+      // ৫. Firebase ডাইনামিক পাথ (আপনার নতুন ৫-লেয়ার স্ট্রাকচার অনুযায়ী)
+      // All_Question -> Category -> Type (MCQ/Written/Viva) -> Exams -> All_Exams -> Title
       DocumentReference examRef = _firestore
-          .collection('All_Question').doc(s1)
-          .collection(s2!)
-          .doc(s3 ?? 'General')
-          .collection(s4 ?? 'Exams')
+          .collection('All_Question')
+          .doc(s1) // যেমন: BCS (বিসিএস প্রশ্ন)
+          .collection(_examType) // MCQ, Written অথবা Viva (বাটন থেকে আসবে)
+          .doc('Exams')
+          .collection('All_Exams')
           .doc(finalTitle);
 
       // ৬. মেইন ডকুমেন্ট (Header) সেভ
@@ -183,39 +175,27 @@ class _AdminQuestionSyncPageState extends State<AdminQuestionSyncPage> {
         'title': finalTitle,
         'image_preview': base64Img,
         'pdf_url': _pdfUrlCtrl.text.trim(),
-        'pdf_direct_data': base64Pdf,
-        'pdf_name': _selectedPdfName,
         'total_questions': rawQuestions.length,
         'exam_type': _examType,
         'status': 'active',
         'updated_at': FieldValue.serverTimestamp(),
-        'category_path': "$s1 > $s2 ${s3 != null ? '> $s3' : ''} ${s4 != null ? '> $s4' : ''}"
       }, SetOptions(merge: true));
 
-      // ৭. ব্যাচ আপলোড (প্রশ্নগুলোর জন্য)
-      if (rawQuestions.isNotEmpty) {
-        WriteBatch batch = _firestore.batch();
-        int count = 1;
-
-        for (var q in rawQuestions) {
-          DocumentReference qRef = examRef.collection('Items').doc();
-
-          if (q is Map) {
-            q['no'] = q['no'] ?? count.toString();
-            batch.set(qRef, Map<String, dynamic>.from(q));
-          }
-          count++;
-        }
-        await batch.commit();
+      // ৭. ব্যাচ আপলোড (প্রশ্নগুলোর জন্য 'Items' সাব-কালেকশন)
+      WriteBatch batch = _firestore.batch();
+      for (var q in rawQuestions) {
+        DocumentReference qRef = examRef.collection('Items').doc();
+        batch.set(qRef, q);
       }
+      await batch.commit();
 
-      _showMsg("✅ '$finalTitle' সফলভাবে All_Question কালেকশনে সিঙ্ক হয়েছে!");
+      _showMsg("✅ '$finalTitle' সফলভাবে আপলোড ও সিঙ্ক হয়েছে!");
       _resetForm();
 
     } catch (e) {
       print("Upload Error: $e");
-      String errorMsg = "তথ্য আপলোড করতে সমস্যা হয়েছে!";
-      if (e is FormatException) errorMsg = "JSON ফরম্যাট ঠিক নেই! দয়া করে চেক করুন।";
+      String errorMsg = "তথ্য আপলোড করতে সমস্যা হয়েছে!";
+      if (e is FormatException) errorMsg = "JSON ফরম্যাট ঠিক নেই! চেক করুন।";
       _showMsg("⚠️ এরর: $errorMsg");
     } finally {
       setState(() => _isUploading = false);

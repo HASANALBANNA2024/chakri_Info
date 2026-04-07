@@ -6,32 +6,15 @@ class ExamProvider with ChangeNotifier {
   final Box _examBox = Hive.box('exam_cache');
 
   // ডাটা গেট করার মেইন ফাংশন (Hive First, Then Firebase)
-  Stream<List<Map<String, dynamic>>> getExams(
-    String s1,
-    String s2,
-    String targetFolder,
-  ) {
-    String cacheKey = "${s1}_${s2}_$targetFolder";
-
-    // ১. ফায়ারবেস থেকে লাইভ ডাটা শোনা
+  Stream<List<Map<String, dynamic>>> getExams(String s1, String s2) {
     return FirebaseFirestore.instance
         .collection('All_Question')
         .doc(s1)
         .collection(s2)
-        .doc(targetFolder)
-        .collection('Exams')
-        .doc('List')
+        .doc('Exams')
         .collection('All_Exams')
         .snapshots()
-        .map((snapshot) {
-          List<Map<String, dynamic>> exams = snapshot.docs
-              .map((doc) => doc.data())
-              .toList();
-
-          // ২. হাইভে সেভ করে রাখা (ভবিষ্যতের জন্য)
-          _examBox.put(cacheKey, exams);
-          return exams;
-        });
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   // লোকাল ডাটা (যদি অফলাইন থাকে বা ইনস্ট্যান্ট দরকার হয়)

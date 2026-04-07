@@ -26,20 +26,14 @@ class QuestionBankModel extends HiveObject {
     required this.type,
   });
 
-  factory QuestionBankModel.fromJson(
-    Map<String, dynamic> json,
-    String examTitle,
-    String examType,
-  ) {
+  // factory method টি এভাবে আপডেট করুন
+  factory QuestionBankModel.fromJson(Map<String, dynamic> json, String examTitle, String examType) {
     return QuestionBankModel(
       title: examTitle,
-      // json['q'] না পেলে json['question'] খুঁজবে, তাও না পেলে খালি স্ট্রিং
-      question: (json['q'] ?? json['question'] ?? '').toString(),
-      options: json['options'] != null
-          ? List<String>.from(json['options'])
-          : null,
-      answer: (json['ans'] ?? json['answer'] ?? '').toString(),
-      explanation: (json['exp'] ?? json['explanation'] ?? '').toString(),
+      question: (json['q'] ?? '').toString(), // 'q' matching
+      options: json['options'] != null ? List<String>.from(json['options']) : null,
+      answer: (json['ans'] ?? '').toString(), // 'ans' matching
+      explanation: (json['exp'] ?? '').toString(), // 'exp' matching
       type: examType,
     );
   }
