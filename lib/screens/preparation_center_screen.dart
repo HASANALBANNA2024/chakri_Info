@@ -1,3 +1,4 @@
+import 'package:chakri_info/Questions/sub_category_exam_screen.dart';
 import 'package:flutter/material.dart';
 
 class PreparationCenterScreen extends StatelessWidget {
@@ -69,7 +70,7 @@ class PreparationCenterScreen extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: Column(
-        // SingleChildScrollView সরিয়ে সরাসরি Column ব্যবহার করা হয়েছে
+        // SingleChildScrollView
         children: [
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -82,7 +83,7 @@ class PreparationCenterScreen extends StatelessWidget {
             ),
           ),
 
-          // GridView.builder - Expanded ব্যবহার করা হয়েছে যেন এটি বাকি জায়গা নেয়
+          // GridView.builder - Expanded
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -92,12 +93,15 @@ class PreparationCenterScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio:
-                      1.6, // হাইট কমানোর জন্য রেশিও বাড়ানো হয়েছে (আগে ১.১৫ ছিল)
+                  childAspectRatio: 1.6,
                 ),
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
-                  return _buildCategoryCard(categories[index], isDarkMode);
+                  return _buildCategoryCard(
+                    context,
+                    categories[index],
+                    isDarkMode,
+                  );
                 },
               ),
             ),
@@ -111,10 +115,34 @@ class PreparationCenterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(Map<String, dynamic> cat, bool isDarkMode) {
+  Widget _buildCategoryCard(
+    BuildContext context,
+    Map<String, dynamic> cat,
+    bool isDarkMode,
+  ) {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
-      onTap: () {},
+      onTap: () {
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+        // ক্যাটাগরির নাম বের করা
+        final String s1 = (cat['title'] ?? cat['name'] ?? '').toString().trim();
+
+        if (s1.isEmpty) {
+          print("Error: Category name is empty");
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubCategoryExamScreen(
+              categoryName: s1, // নিশ্চিত করুন এই নামটাই ক্লাসে আছে
+              isDarkMode: isDark,
+            ),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1B263B) : Colors.white,
@@ -129,7 +157,8 @@ class PreparationCenterScreen extends StatelessWidget {
           ],
           border: Border.all(
             color: isDarkMode
-                ? Colors.black.withOpacity(0.05)
+                ? Colors
+                      .transparent // Dark mode screen invisible
                 : cat['color'].withOpacity(0.1),
             width: 1,
           ),
@@ -137,27 +166,27 @@ class PreparationCenterScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              cat['icon'],
-              size: 24,
-              color: cat['color'],
-            ), // আইকন সাইজ ২৮ থেকে ২৪ করা হয়েছে
-            const SizedBox(height: 4),
-            Text(
-              cat['title'],
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12, // ফন্ট সাইজ ১৩ থেকে ১২ করা হয়েছে
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
+            Icon(cat['icon'], size: 24, color: cat['color']),
+            const SizedBox(height: 6), //
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                cat['title'],
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
               ),
             ),
+            const SizedBox(height: 2),
             Text(
               'শুরু করুন',
               style: TextStyle(
-                fontSize: 11, // ফন্ট সাইজ ১৪ থেকে ১১ করা হয়েছে যেন এক লাইনে ধরে
+                fontSize: 11,
                 color: isDarkMode ? Colors.white54 : Colors.grey[600],
               ),
             ),
