@@ -167,13 +167,82 @@ class PreparationCenterScreen extends StatelessWidget {
     );
   }
 
+  // Widget _buildQuizBanner(bool isDarkMode) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 14),
+  //     padding: const EdgeInsets.symmetric(
+  //       horizontal: 6,
+  //       vertical: 6,
+  //     ), // প্যাডিং কমানো হয়েছে
+  //     decoration: BoxDecoration(
+  //       gradient: LinearGradient(
+  //         colors: isDarkMode
+  //             ? [const Color(0xFF2C3E50), const Color(0xFF1B263B)]
+  //             : [Colors.indigo[700]!, Colors.blue[500]!],
+  //       ),
+  //       borderRadius: BorderRadius.circular(15),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               const Text(
+  //                 "ফ্রি মডেল টেস্ট",
+  //                 style: TextStyle(
+  //                   color: Colors.white,
+  //                   fontSize: 15,
+  //                   fontWeight: FontWeight.bold,
+  //                 ),
+  //               ),
+  //               Text(
+  //                 "বিসিএস ও সকল চাকরির কুইজ দিন", // টেক্সট কিছুটা ছোট করা হয়েছে
+  //                 style: TextStyle(
+  //                   color: Colors.white.withOpacity(0.9),
+  //                   fontSize: 12,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               SizedBox(
+  //                 height: 28, // বাটন হাইট ৩২ থেকে ২৮ করা হয়েছে
+  //                 child: ElevatedButton(
+  //                   onPressed: () {},
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Colors.orange[800],
+  //                     foregroundColor: Colors.white,
+  //                     padding: const EdgeInsets.symmetric(horizontal: 15),
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(8),
+  //                     ),
+  //                   ),
+  //                   child: const Text(
+  //                     "শুরু করুন",
+  //                     style: TextStyle(
+  //                       fontSize: 12,
+  //                       fontWeight: FontWeight.bold,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Icon(
+  //           Icons.quiz_rounded,
+  //           size: 45, // আইকন সাইজ ৫৫ থেকে ৪৫ করা হয়েছে
+  //           color: Colors.white.withOpacity(0.2),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _buildQuizBanner(bool isDarkMode) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 6,
-      ), // প্যাডিং কমানো হয়েছে
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
@@ -185,53 +254,58 @@ class PreparationCenterScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  "ফ্রি মডেল টেস্ট",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "বিসিএস ও সকল চাকরির কুইজ দিন", // টেক্সট কিছুটা ছোট করা হয়েছে
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  height: 28, // বাটন হাইট ৩২ থেকে ২৮ করা হয়েছে
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange[800],
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      "শুরু করুন",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    "ফ্রি মডেল টেস্ট",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
+                  Text(
+                    "বিসিএস ও সকল চাকরির কুইজ দিন",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.9),
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  SizedBox(
+                    height: 28,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[800],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        "শুরু করুন",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Icon(
             Icons.quiz_rounded,
-            size: 45, // আইকন সাইজ ৫৫ থেকে ৪৫ করা হয়েছে
+            size: 45,
             color: Colors.white.withOpacity(0.2),
           ),
         ],
