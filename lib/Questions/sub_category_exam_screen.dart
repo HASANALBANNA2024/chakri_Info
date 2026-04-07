@@ -29,10 +29,10 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     _initAndSmartLoad();
   }
 
-  // ১. স্মার্ট লোডিং ইনিশিয়ালাইজেশন
+
   Future<void> _initAndSmartLoad() async {
     try {
-      // ক্যাটাগরি অনুযায়ী আলাদা বক্স বা কি ব্যবহার করা
+
       String safeName = 'exams_cache_${widget.categoryName.hashCode}';
       _examBox = await Hive.openBox(safeName);
 
@@ -43,8 +43,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     }
   }
 
-  // ২. ডাটা লোড করার লজিক (আগে লোকাল, তারপর আপডেট চেক)
-  Future<void> _loadDataLogic() async {
+ Future<void> _loadDataLogic() async {
     if (_examBox == null || !_examBox!.isOpen) return;
 
     // ক) লোকাল ডাটা চেক
@@ -85,56 +84,81 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   Future<void> _syncWithFirestore() async {
     if (_examBox == null || !_examBox!.isOpen) return;
 
+    // ১. চেক করা হচ্ছে এই ক্যাটাগরি কি আগে একবার সিঙ্ক হয়েছে? (টাকা বাঁচাতে)
+    bool isAlreadySynced = _examBox!.get('${widget.categoryName}_isSynced') ?? false;
+
+    if (isAlreadySynced) {
+      print("🚀 Data already in Hive. Skipping Firebase calls to save free tier limits.");
+      _loadDataFromHive(); // লোকাল থেকে ডাটা লোড করার মেথড
+      return;
+    }
+
     try {
       print("📡 Full Category Sync Started for: ${widget.categoryName}");
-      List<String> types = ['MCQ', 'Written', 'Viva'];
+      setState(() => _isLoading = true); // সিঙ্ক শুরু হলে লোডিং দেখাবে
 
-      // প্রতিটি টাইপের (MCQ, Written, Viva) জন্য আলাদা করে লুপ চলবে
+      List<String> types = ['MCQ', 'Written', 'Viva'];
+      Map<String, List<QuestionBankModel>> allDataMap = {
+        'MCQ': [],
+        'Written': [],
+        'Viva': [],
+      };
+
+      // ২. প্রতিটি টাইপের (MCQ, Written, Viva) জন্য লুপ
       for (String type in types) {
         print("🔍 Fetching data for Type: $type...");
 
         var examsCollection = FirebaseFirestore.instance
             .collection('All_Question')
             .doc(widget.categoryName)
-            .collection(type) // এখানে টাইপটি ডাইনামিক (MCQ/Written/Viva)
+            .collection(type)
             .doc('Exams')
             .collection('All_Exams');
 
         QuerySnapshot examSnapshots = await examsCollection.get();
 
-        print("📥 Received ${examSnapshots.docs.length} exam groups from Firestore.");
-        List<QuestionBankModel> fetchedForThisType = [];
-
         for (var doc in examSnapshots.docs) {
           String examTitle = doc.id;
           QuerySnapshot itemSnap = await doc.reference.collection('Items').get();
-          print("📝 Fetched ${itemSnap.docs.length} items for: $examTitle");
+
           for (var itemDoc in itemSnap.docs) {
-            fetchedForThisType.add(
+            allDataMap[type]!.add(
               QuestionBankModel.fromJson(itemDoc.data() as Map<String, dynamic>, examTitle, type),
             );
           }
         }
 
-        // প্রতিটি টাইপ আলাদা কি (Key) দিয়ে Hive-এ সেভ করা
-        await _examBox!.put(type, fetchedForThisType);
-        print("💾 Data successfully saved to Hive for future use.");
-        // যদি বর্তমান সিলেক্টেড টাইপটি এই লুপের টাইপ হয়, তবে লিস্ট আপডেট করো
-        if (_selectedType == type) {
-          if (mounted) {
-            setState(() {
-              _examList = fetchedForThisType;
-              _isLoading = false;
-            });
-          }
-        }
+        // ৩. প্রতিটি টাইপ আলাদা কি (Key) দিয়ে Hive-এ সেভ করা
+        await _examBox!.put(type, allDataMap[type]);
       }
 
-      print("✅ All Types (MCQ, Written, Viva) cached successfully for ${widget.categoryName}!");
+      // ৪. সিঙ্ক সফল হলে একটি ফ্ল্যাগ সেভ করা যাতে দ্বিতীয়বার কল না হয়
+      await _examBox!.put('${widget.categoryName}_isSynced', true);
+
+      print("✅ All Types cached successfully for ${widget.categoryName}!");
+
+      if (mounted) {
+        setState(() {
+          _examList = allDataMap[_selectedType] ?? [];
+          _isLoading = false;
+        });
+      }
 
     } catch (e) {
       print("❌ Full Sync Error: $e");
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+// ৫. লোকাল থেকে দ্রুত ডাটা লোড করার ছোট ফাংশন
+  void _loadDataFromHive() {
+    if (_examBox != null && _examBox!.isOpen) {
+      final dynamic cachedData = _examBox!.get(_selectedType);
+      setState(() {
+        _examList = cachedData != null ? List<QuestionBankModel>.from(cachedData) : [];
+        _isLoading = false;
+      });
+      print("📂 Loaded $_selectedType instantly from Hive memory.");
     }
   }
 
