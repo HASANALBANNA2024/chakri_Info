@@ -623,8 +623,8 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   Widget _buildInlineAdCard() {
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
-      height: 100,
+      padding: const EdgeInsets.all(18), // প্যাডিং একটু বাড়িয়ে ১২ থেকে ১৮ করা হয়েছে
+      height: 120, // হাইট ১০০ থেকে বাড়িয়ে ১২০ করা হলো
       decoration: BoxDecoration(
         color: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(15),
@@ -632,53 +632,74 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
           color: widget.isDarkMode ? Colors.white10 : Colors.grey.shade200,
         ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04), // শ্যাডো একটু ডিপ করা হয়েছে
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Row(
         children: [
+          // বাম পাশের আইকন কন্টেইনার
           Container(
-            width: 70,
+            width: 80, // উইডথ ৭০ থেকে ৮০ করা হয়েছে
+            height: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: widget.isDarkMode
+                  ? Colors.orange.withOpacity(0.15)
+                  : Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
-              Icons.ads_click,
+              Icons.ads_click_rounded,
               color: Colors.orangeAccent,
-              size: 30,
+              size: 35, // আইকন সাইজ ৩০ থেকে ৩৫ করা হয়েছে
             ),
           ),
           const SizedBox(width: 15),
+
+          // মাঝখানের টেক্সট সেকশন
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "SPONSORED AD",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: widget.isDarkMode ? Colors.white30 : Colors.grey,
-                    letterSpacing: 1.2,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: widget.isDarkMode ? Colors.white10 : Colors.grey[100],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "SPONSORED AD",
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: widget.isDarkMode ? Colors.white38 : Colors.grey[600],
+                      letterSpacing: 1.1,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Text(
-                  "প্রিমিয়াম ফিচারের জন্য প্রো ভার্সন ট্রাই করুন",
+                  "প্রিমিয়াম ফিচারের জন্য প্রো ভার্সন ট্রাই করুন",
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 14, // ফন্ট সাইজ ১৩ থেকে ১৪ করা হয়েছে
+                    fontWeight: FontWeight.w500,
                     color: widget.isDarkMode ? Colors.white70 : Colors.black87,
+                    height: 1.3, // লাইন হাইট বাড়ানো হয়েছে
                   ),
                 ),
               ],
             ),
           ),
+
+          // ডান পাশের ছোট অ্যারো বা আইকন
           Icon(
-            Icons.open_in_new,
-            size: 18,
-            color: Colors.blue.withOpacity(0.5),
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: widget.isDarkMode ? Colors.white24 : Colors.grey.shade400,
           ),
         ],
       ),
