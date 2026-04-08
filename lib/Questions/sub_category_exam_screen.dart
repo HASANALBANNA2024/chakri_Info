@@ -46,19 +46,18 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   Future<void> _loadDataLogic() async {
     if (_examBox == null || !_examBox!.isOpen) return;
 
-    // ক) লোকাল ডাটা চেক
     final dynamic cachedData = _examBox!.get(_selectedType);
 
-    if (cachedData != null && cachedData is List) {
-      print("✅ Loading from Hive (Offline Memory): $_selectedType");
+    // ✅ শুধু cachedData != null চেক করলে হবে না, লিস্টটি খালি কি না তাও দেখতে হবে
+    if (cachedData != null && cachedData is List && cachedData.isNotEmpty) {
+      print("✅ Loading from Hive: $_selectedType");
       setState(() {
         _examList = List<QuestionBankModel>.from(cachedData);
         _isLoading = false;
       });
-      // খ) ব্যাকগ্রাউন্ডে চেক করবে নতুন আপডেট আছে কি না
       _checkForDatabaseUpdates();
     } else {
-      // গ) ডাটা না থাকলে সরাসরি ফায়ারবেস থেকে আনা
+      // ডাটা না থাকলে বা লিস্ট খালি থাকলে সিঙ্ক করবে
       await _syncWithFirestore();
     }
   }
@@ -84,24 +83,15 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   }
 
   // ৪. ফায়ারবেস থেকে ডাটা ফেচ (আপনার অরিজিনাল লজিক অক্ষুণ্ণ রাখা হয়েছে)
+  // ৪. ফায়ারবেস থেকে ডাটা ফেচ (Bundle System অনুযায়ী আপডেট করা)
   Future<void> _syncWithFirestore() async {
     if (_examBox == null || !_examBox!.isOpen) return;
 
-    // ১. চেক করা হচ্ছে এই ক্যাটাগরি কি আগে একবার সিঙ্ক হয়েছে? (টাকা বাঁচাতে)
-    bool isAlreadySynced =
-        _examBox!.get('${widget.categoryName}_isSynced') ?? false;
-
-    if (isAlreadySynced) {
-      print(
-        "🚀 Data already in Hive. Skipping Firebase calls to save free tier limits.",
-      );
-      _loadDataFromHive(); // লোকাল থেকে ডাটা লোড করার মেথড
-      return;
-    }
-
     try {
-      print("📡 Full Category Sync Started for: ${widget.categoryName}");
-      setState(() => _isLoading = true); // সিঙ্ক শুরু হলে লোডিং দেখাবে
+      print(
+        "📡 Full Category Sync Started (Bundle Mode) for: ${widget.categoryName}",
+      );
+      if (mounted) setState(() => _isLoading = true);
 
       List<String> types = ['MCQ', 'Written', 'Viva'];
       Map<String, List<QuestionBankModel>> allDataMap = {
@@ -110,10 +100,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
         'Viva': [],
       };
 
-      // ২. প্রতিটি টাইপের (MCQ, Written, Viva) জন্য লুপ
       for (String type in types) {
-        print("🔍 Fetching data for Type: $type...");
-
         var examsCollection = FirebaseFirestore.instance
             .collection('All_Question')
             .doc(widget.categoryName)
@@ -124,30 +111,29 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
         QuerySnapshot examSnapshots = await examsCollection.get();
 
         for (var doc in examSnapshots.docs) {
-          String examTitle = doc.id;
-          QuerySnapshot itemSnap = await doc.reference
-              .collection('Items')
-              .get();
+          if (!doc.exists) continue;
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-          for (var itemDoc in itemSnap.docs) {
+          // ✅ আগের 'Items' কালেকশনের বদলে এখন 'questions' লিস্ট থেকে ডাটা নিচ্ছে
+          List rawQuestionsList = data['questions'] ?? [];
+          String serverExamType = data['exam_type'] ?? type;
+
+          for (var itemData in rawQuestionsList) {
             allDataMap[type]!.add(
               QuestionBankModel.fromJson(
-                itemDoc.data() as Map<String, dynamic>,
-                examTitle,
-                type,
+                itemData as Map<String, dynamic>,
+                doc.id, // Exam Title
+                serverExamType,
               ),
             );
           }
         }
-
-        // ৩. প্রতিটি টাইপ আলাদা কি (Key) দিয়ে Hive-এ সেভ করা
+        // Hive-এ ওই টাইপের জন্য লিস্টটি সেভ করা
         await _examBox!.put(type, allDataMap[type]);
       }
 
-      // ৪. সিঙ্ক সফল হলে একটি ফ্ল্যাগ সেভ করা যাতে দ্বিতীয়বার কল না হয়
+      // সিঙ্ক শেষ হলে ফ্ল্যাগ সেট করা
       await _examBox!.put('${widget.categoryName}_isSynced', true);
-
-      print("✅ All Types cached successfully for ${widget.categoryName}!");
 
       if (mounted) {
         setState(() {
@@ -156,7 +142,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
         });
       }
     } catch (e) {
-      print("❌ Full Sync Error: $e");
+      print("❌ Sync Error: $e");
       if (mounted) setState(() => _isLoading = false);
     }
   }

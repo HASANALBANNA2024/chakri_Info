@@ -17,12 +17,12 @@ class QuestionBankModelAdapter extends TypeAdapter<QuestionBankModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return QuestionBankModel(
-      title: (fields[0] as String?) ?? 'Untitled',
-      question: (fields[1] as String?) ?? '',
+      title: fields[0] as String,
+      question: fields[1] as String,
       options: (fields[2] as List?)?.cast<String>(),
-      answer: (fields[3] as String?) ?? '',
+      answer: fields[3] as String,
       explanation: fields[4] as String?,
-      type: (fields[5] as String?) ?? 'MCQ',
+      type: fields[5] as String,
     );
   }
 
