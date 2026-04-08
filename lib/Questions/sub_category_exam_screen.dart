@@ -29,10 +29,8 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     _initAndSmartLoad();
   }
 
-
   Future<void> _initAndSmartLoad() async {
     try {
-
       String safeName = 'exams_cache_${widget.categoryName.hashCode}';
       _examBox = await Hive.openBox(safeName);
 
@@ -43,7 +41,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     }
   }
 
- Future<void> _loadDataLogic() async {
+  Future<void> _loadDataLogic() async {
     if (_examBox == null || !_examBox!.isOpen) return;
 
     // ক) লোকাল ডাটা চেক
@@ -67,7 +65,10 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   Future<void> _checkForDatabaseUpdates() async {
     try {
       // ফায়ারবেসে updates/status ডকুমেন্টের version ফিল্ড চেক করবে
-      var updateDoc = await FirebaseFirestore.instance.collection('updates').doc('status').get();
+      var updateDoc = await FirebaseFirestore.instance
+          .collection('updates')
+          .doc('status')
+          .get();
       int serverVersion = updateDoc.data()?['version'] ?? 0;
       int localVersion = _examBox!.get('${_selectedType}_version') ?? 0;
 
@@ -85,10 +86,13 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     if (_examBox == null || !_examBox!.isOpen) return;
 
     // ১. চেক করা হচ্ছে এই ক্যাটাগরি কি আগে একবার সিঙ্ক হয়েছে? (টাকা বাঁচাতে)
-    bool isAlreadySynced = _examBox!.get('${widget.categoryName}_isSynced') ?? false;
+    bool isAlreadySynced =
+        _examBox!.get('${widget.categoryName}_isSynced') ?? false;
 
     if (isAlreadySynced) {
-      print("🚀 Data already in Hive. Skipping Firebase calls to save free tier limits.");
+      print(
+        "🚀 Data already in Hive. Skipping Firebase calls to save free tier limits.",
+      );
       _loadDataFromHive(); // লোকাল থেকে ডাটা লোড করার মেথড
       return;
     }
@@ -119,11 +123,17 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
 
         for (var doc in examSnapshots.docs) {
           String examTitle = doc.id;
-          QuerySnapshot itemSnap = await doc.reference.collection('Items').get();
+          QuerySnapshot itemSnap = await doc.reference
+              .collection('Items')
+              .get();
 
           for (var itemDoc in itemSnap.docs) {
             allDataMap[type]!.add(
-              QuestionBankModel.fromJson(itemDoc.data() as Map<String, dynamic>, examTitle, type),
+              QuestionBankModel.fromJson(
+                itemDoc.data() as Map<String, dynamic>,
+                examTitle,
+                type,
+              ),
             );
           }
         }
@@ -143,19 +153,20 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
           _isLoading = false;
         });
       }
-
     } catch (e) {
       print("❌ Full Sync Error: $e");
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-// ৫. লোকাল থেকে দ্রুত ডাটা লোড করার ছোট ফাংশন
+  // ৫. লোকাল থেকে দ্রুত ডাটা লোড করার ছোট ফাংশন
   void _loadDataFromHive() {
     if (_examBox != null && _examBox!.isOpen) {
       final dynamic cachedData = _examBox!.get(_selectedType);
       setState(() {
-        _examList = cachedData != null ? List<QuestionBankModel>.from(cachedData) : [];
+        _examList = cachedData != null
+            ? List<QuestionBankModel>.from(cachedData)
+            : [];
         _isLoading = false;
       });
       print("📂 Loaded $_selectedType instantly from Hive memory.");
@@ -167,7 +178,9 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: widget.isDarkMode ? const Color(0xFF0F172A) : Colors.white,
+        backgroundColor: widget.isDarkMode
+            ? const Color(0xFF0F172A)
+            : Colors.white,
         appBar: AppBar(
           title: Text(widget.categoryName),
           bottom: TabBar(
@@ -183,7 +196,11 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
             //   }
             // },
             onTap: (index) {
-              String newType = index == 0 ? 'MCQ' : index == 1 ? 'Written' : 'Viva';
+              String newType = index == 0
+                  ? 'MCQ'
+                  : index == 1
+                  ? 'Written'
+                  : 'Viva';
 
               if (_selectedType != newType) {
                 setState(() {
@@ -196,7 +213,9 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
                     _examList = [];
                   }
                 });
-                print("🔄 Tab Switched to $newType. Data loaded instantly from Hive.");
+                print(
+                  "🔄 Tab Switched to $newType. Data loaded instantly from Hive.",
+                );
               }
             },
             tabs: const [
@@ -216,7 +235,14 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   // --- UI কার্ড ডিজাইন (আগে যেমন ছিল তেমনই আছে) ---
   Widget _buildList() {
     if (_examList.isEmpty) {
-      return Center(child: Text("কোনো ডাটা নেই", style: TextStyle(color: widget.isDarkMode ? Colors.white : Colors.black)));
+      return Center(
+        child: Text(
+          "কোনো ডাটা নেই",
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.white : Colors.black,
+          ),
+        ),
+      );
     }
 
     Map<String, List<QuestionBankModel>> groupedExams = {};
@@ -238,25 +264,44 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
           margin: const EdgeInsets.only(bottom: 15),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
-            side: widget.isDarkMode ? BorderSide(color: Colors.white.withOpacity(0.1), width: 1) : BorderSide.none,
+            side: widget.isDarkMode
+                ? BorderSide(color: Colors.white.withOpacity(0.1), width: 1)
+                : BorderSide.none,
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Stack(
               children: [
                 InkWell(
-                  onTap: () => _navigateToExamDetail(examTitle, questionsForThisExam),
+                  onTap: () {
+                    // ✅ এখানে আপডেট করা হয়েছে: সরাসরি পপ-আপ কল এবং ডাটা পাস
+                    _showModeSelection(
+                      context,
+                      examTitle,
+                      questionsForThisExam,
+                    );
+                  },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 25,
+                    ),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: widget.isDarkMode ? Colors.indigo.withOpacity(0.2) : Colors.indigo.withOpacity(0.1),
+                            color: widget.isDarkMode
+                                ? Colors.indigo.withOpacity(0.2)
+                                : Colors.indigo.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.menu_book_rounded, color: widget.isDarkMode ? Colors.indigoAccent : Colors.indigo),
+                          child: Icon(
+                            Icons.menu_book_rounded,
+                            color: widget.isDarkMode
+                                ? Colors.indigoAccent
+                                : Colors.indigo,
+                          ),
                         ),
                         const SizedBox(width: 15),
                         Expanded(
@@ -264,29 +309,64 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(height: 5),
-                              Text(examTitle, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: widget.isDarkMode ? Colors.white : Colors.black)),
+                              Text(
+                                examTitle,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: widget.isDarkMode
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ),
                               const SizedBox(height: 5),
-                              Text("মোট প্রশ্ন: ${questionsForThisExam.length} টি", style: TextStyle(fontSize: 13, color: widget.isDarkMode ? Colors.white70 : Colors.black54)),
+                              Text(
+                                "মোট প্রশ্ন: ${questionsForThisExam.length} টি",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: widget.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        Icon(Icons.arrow_forward_ios_rounded, size: 18, color: widget.isDarkMode ? Colors.white38 : Colors.grey),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 18,
+                          color: widget.isDarkMode
+                              ? Colors.white38
+                              : Colors.grey,
+                        ),
                       ],
                     ),
                   ),
                 ),
+                // ক্যাটাগরি ট্যাগ
                 Positioned(
                   left: 0,
                   top: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
-                      color: widget.isDarkMode ? Colors.indigoAccent : Colors.indigo.shade600,
-                      borderRadius: const BorderRadius.only(bottomRight: Radius.circular(12)),
+                      color: widget.isDarkMode
+                          ? Colors.indigoAccent
+                          : Colors.indigo.shade600,
+                      borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(12),
+                      ),
                     ),
                     child: Text(
                       widget.categoryName.split(' ')[0],
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -298,7 +378,220 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     );
   }
 
-  void _navigateToExamDetail(String title, List<QuestionBankModel> questions) {
-    print("Moving to $title with ${questions.length} questions");
+  // View mode and Exam mode and ad banner mode
+  void _showModeSelection(
+    BuildContext context,
+    String title,
+    List<QuestionBankModel> questions,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          decoration: BoxDecoration(
+            color: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: widget.isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                "মোট প্রশ্ন: ${questions.length} টি",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: widget.isDarkMode ? Colors.white60 : Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 25),
+
+              // Study Mode
+              _buildSelectionTile(
+                icon: Icons.auto_stories_rounded,
+                title: "Study Mode",
+                subtitle: "ব্যাখ্যাসহ উত্তর এবং বিস্তারিত পড়ুন",
+                color: Colors.blue.withOpacity(0.1),
+                iconColor: Colors.blue,
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToExamDetail(
+                    title,
+                    questions,
+                    "study",
+                  ); // ✅ ৩টি প্যারামিটার পাস
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              // Exam Mode
+              _buildSelectionTile(
+                icon: Icons.timer_outlined,
+                title: "Exam Mode",
+                subtitle: "নির্ধারিত সময়ে প্রস্তুতি যাচাই করুন",
+                color: Colors.orange.withOpacity(0.1),
+                iconColor: Colors.orange,
+                onTap: () {
+                  Navigator.pop(context);
+                  _navigateToExamDetail(
+                    title,
+                    questions,
+                    "exam",
+                  ); // ✅ ৩টি প্যারামিটার পাস
+                },
+              ),
+
+              const SizedBox(height: 25),
+
+              // Ad Banner Section
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: widget.isDarkMode
+                      ? Colors.white.withOpacity(0.05)
+                      : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(
+                    color: widget.isDarkMode
+                        ? Colors.white10
+                        : Colors.grey.shade300,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      "SPONSORED AD",
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 50,
+                      width: double.infinity,
+                      color: Colors.transparent,
+                      child: const Center(
+                        child: Icon(
+                          Icons.ads_click,
+                          color: Colors.grey,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _navigateToExamDetail(
+    String title,
+    List<QuestionBankModel> questions,
+    String mode,
+  ) {
+    print(
+      "🚀 অ্যাকশন: $mode | টাইটেল: $title | ডাটা: ${questions.length} টি প্রশ্ন (Offline/Hive)",
+    );
+
+    if (mode == "study") {
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => StudyScreen(title: title, questions: questions)));
+      print("Moving to Study Screen with local Hive data...");
+    } else {
+      // Navigator.push(context, MaterialPageRoute(builder: (context) => ExamScreen(title: title, questions: questions)));
+      print("Moving to Exam Screen with local Hive data...");
+    }
+  }
+
+  // list style button widget
+  Widget _buildSelectionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Color iconColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 28, color: iconColor),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: widget.isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: widget.isDarkMode
+                          ? Colors.white60
+                          : Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: widget.isDarkMode ? Colors.white38 : Colors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -1,31 +1,36 @@
 import 'package:chakri_info/Questions/question_bank_model.dart';
-import 'package:chakri_info/screens/dashboard_screen.dart';
 import 'package:chakri_info/screens/splash_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart'; // নতুন যোগ করা হয়েছে
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'firebase_options.dart';
 
-// গ্লোবাল থিম নটিফায়ার
+// Global Notifier
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
-  // ১. ফ্ল্যাটার বাইন্ডিং নিশ্চিত করা
-  WidgetsFlutterBinding.ensureInitialized();
+  // Flutter binding confirm
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // ২. Firebase Initialize
+  // Native splash screen dore rakha
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // ৩. Firebase Initialize
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint("Firebase Initialize Error: $e");
   }
 
-  // ৩. Hive Initialize
+  // ৪. Hive Initialize
   await Hive.initFlutter();
 
-  // অ্যাডাপ্টারগুলো রেজিস্টার করা
+  // adapter register
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(JobSyncModelAdapter());
   }
@@ -33,14 +38,17 @@ void main() async {
     Hive.registerAdapter(QuestionBankModelAdapter());
   }
 
-  // ৪. সবচাইতে গুরুত্বপূর্ণ বক্সগুলো এখানে ওপেন করুন (যাতে Box Not Found এরর না আসে)
+  // box open
   try {
     await Hive.openBox<JobSyncModel>('jobsBox'); // জব সার্কুলারের জন্য
-    await Hive.openBox('exam_cache');            // এক্সাম রেজাল্ট বা ছোট ডাটার জন্য
-    await Hive.openBox('settings');              // থিম বা অন্য সেটিংসে জন্য
+    await Hive.openBox('exam_cache'); // এক্সাম রেজাল্ট বা ছোট ডাটার জন্য
+    await Hive.openBox('settings'); // থিম বা অন্য সেটিংসে জন্য
   } catch (e) {
     debugPrint("Hive Box Opening Error: $e");
   }
+
+  // after completed the work of android then native remove
+  FlutterNativeSplash.remove();
 
   runApp(const MyApp());
 }
@@ -71,7 +79,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
             ),
           ),
-          home: const SplashScreen(), // লোডিং এর কাজ Splash এ হবে, কিন্তু Box রেডি থাকবে
+          home: const SplashScreen(),
         );
       },
     );

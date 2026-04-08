@@ -493,10 +493,7 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
     bool isGovt = data['is_govt'] ?? false;
 
     return Container(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 5,
-      ), // Vertical margin কমানো হয়েছে
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(15),
@@ -512,15 +509,12 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
         borderRadius: BorderRadius.circular(15),
         child: Stack(
           children: [
-            // --- Compact Badge ---
+            //
             Positioned(
               top: 0,
               left: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ), // Padding কমানো হয়েছে
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: isGovt
                       ? Colors.blue.shade700
@@ -530,7 +524,7 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
                   ),
                 ),
                 child: Text(
-                  isGovt ? "GOVT" : "NON-GOVT", // টেক্সট ছোট করা হয়েছে
+                  isGovt ? "GOVT" : "NON-GOVT",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 7,
@@ -541,16 +535,16 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
             ),
 
             Padding(
-              padding: const EdgeInsets.only(top: 8), // টপ প্যাডিং কমানো হয়েছে
+              padding: const EdgeInsets.only(top: 8),
               child: ListTile(
-                dense: true, // এটি লিস্টের উচ্চতা অনেক কমিয়ে দিবে
+                dense: true,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 0,
-                ), // Vertical padding ০ করা হয়েছে
+                ),
 
                 leading: Container(
-                  width: 45, // লোগোর সাইজ কিছুটা ছোট করা হয়েছে
+                  width: 45,
                   height: 45,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -576,7 +570,7 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
 
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min, // এটি হাইট কমাতে সাহায্য করবে
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       data['company'] ?? '',
@@ -724,15 +718,13 @@ class _AdminSyncPageState extends State<AdminSyncPage> {
           ), // কিবোর্ডের জন্য প্যাডিং
           child: Container(
             constraints: BoxConstraints(
-              maxHeight:
-                  MediaQuery.of(context).size.height *
-                  0.9, // হাইট স্ক্রিনের ৯০% এর বেশি হবে না
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
-                mainAxisSize: MainAxisSize.min, // কন্টেন্ট অনুযায়ী সাইজ হবে
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),

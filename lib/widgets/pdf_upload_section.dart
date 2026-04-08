@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb; // kIsWeb এর জন্য প্রয়োজন
 import 'package:flutter/material.dart';
 
 class PdfUploadSection extends StatefulWidget {
-  final Function(File? file, String? fileName, Uint8List? fileBytes) onFileSelected;
+  final Function(File? file, String? fileName, Uint8List? fileBytes)
+  onFileSelected;
 
-  const PdfUploadSection({Key? key, required this.onFileSelected}) : super(key: key);
+  const PdfUploadSection({Key? key, required this.onFileSelected})
+    : super(key: key);
 
   @override
   _PdfUploadSectionState createState() => _PdfUploadSectionState();
@@ -23,7 +26,7 @@ class _PdfUploadSectionState extends State<PdfUploadSection> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        withData: true, // ওয়েবে ডাটা রিড করার জন্য এটি অবশ্যই true হতে হবে
+        withData: true, // web data read
       );
 
       if (result != null) {
@@ -31,17 +34,17 @@ class _PdfUploadSectionState extends State<PdfUploadSection> {
 
         setState(() {
           _pdfFileName = pickedFile.name;
-          _pdfBytes = pickedFile.bytes; // এটিই প্রিভিউ এবং আপলোডের মূল ডাটা
+          _pdfBytes = pickedFile.bytes; // preview of upload
 
-          // যদি মোবাইল প্ল্যাটফর্ম হয় তবে ফাইল অবজেক্ট তৈরি হবে
+          // to create file for mobile platform
           if (!kIsWeb && pickedFile.path != null) {
             _selectedPDF = File(pickedFile.path!);
           } else {
-            _selectedPDF = null; // ওয়েবে ফাইল পাথ থাকে না
+            _selectedPDF = null; // does not path
           }
         });
 
-        // মেইন পেজের কলব্যাক ফাংশনে ডাটা পাঠানো
+        // main function of call main page
         widget.onFileSelected(_selectedPDF, _pdfFileName, _pdfBytes);
       }
     } catch (e) {
@@ -87,9 +90,15 @@ class _PdfUploadSectionState extends State<PdfUploadSection> {
                 color: isSelected ? Colors.green : Colors.grey[300]!,
                 width: 1.5,
               ),
-              boxShadow: isSelected ? [
-                BoxShadow(color: Colors.green.withOpacity(0.1), blurRadius: 4, offset: Offset(0, 2))
-              ] : [],
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: Colors.green.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ]
+                  : [],
             ),
             child: Row(
               children: [
@@ -108,14 +117,19 @@ class _PdfUploadSectionState extends State<PdfUploadSection> {
                         style: TextStyle(
                           color: isSelected ? Colors.black87 : Colors.black54,
                           fontSize: 14,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       if (isSelected && _pdfBytes != null)
                         Text(
                           "${(_pdfBytes!.lengthInBytes / 1024).toStringAsFixed(1)} KB • Ready to upload",
-                          style: TextStyle(fontSize: 11, color: Colors.green[700]),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.green[700],
+                          ),
                         ),
                     ],
                   ),
@@ -128,7 +142,11 @@ class _PdfUploadSectionState extends State<PdfUploadSection> {
                     constraints: BoxConstraints(),
                   )
                 else
-                  Icon(Icons.cloud_upload_outlined, color: Colors.indigo[300], size: 24),
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    color: Colors.indigo[300],
+                    size: 24,
+                  ),
               ],
             ),
           ),
