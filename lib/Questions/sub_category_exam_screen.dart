@@ -1,4 +1,5 @@
 import 'package:chakri_info/Questions/question_bank_model.dart';
+import 'package:chakri_info/Questions/study_mode_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -518,16 +519,47 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     List<QuestionBankModel> questions,
     String mode,
   ) {
+    // কনসোলে চেক করার জন্য প্রিন্ট
     print(
-      "🚀 অ্যাকশন: $mode | টাইটেল: $title | ডাটা: ${questions.length} টি প্রশ্ন (Offline/Hive)",
+      "🚀 Action: $mode | Title: $title | Questions: ${questions.length} (From Hive)",
     );
 
     if (mode == "study") {
-      // Navigator.push(context, MaterialPageRoute(builder: (context) => StudyScreen(title: title, questions: questions)));
-      print("Moving to Study Screen with local Hive data...");
+      // ১. Study Mode / View Mode নেভিগেশন
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => StudyModeScreen(
+            title: title,
+            questions: questions,
+            isDarkMode: widget.isDarkMode,
+          ),
+        ),
+      );
+      print("✅ Study Screen-এ পাঠানো হয়েছে।");
     } else {
-      // Navigator.push(context, MaterialPageRoute(builder: (context) => ExamScreen(title: title, questions: questions)));
-      print("Moving to Exam Screen with local Hive data...");
+      // ২. Exam Mode / Slider Mode নেভিগেশন (কালকে আমরা এই স্ক্রিনটি বানাবো)
+      /*
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ExamModeScreen( // কালকে এই নামটা আমরা ব্যবহার করবো
+          title: title,
+          questions: questions,
+          isDarkMode: widget.isDarkMode,
+        ),
+      ),
+    );
+    */
+
+      // আপাতত ইউজারকে একটি মেসেজ দিন যে এটি কাজ চলছে
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Exam Mode খুব শীঘ্রই আসছে..."),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      print("🚧 Exam Screen-এর কাজ কালকে (৯ এপ্রিল) করা হবে।");
     }
   }
 
