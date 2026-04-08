@@ -262,12 +262,23 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    // ✅ এখানে আপডেট করা হয়েছে: সরাসরি পপ-আপ কল এবং ডাটা পাস
-                    _showModeSelection(
-                      context,
-                      examTitle,
-                      questionsForThisExam,
-                    );
+                    // ১. চেক করা হচ্ছে এটি কি MCQ?
+                    if (_selectedType == 'MCQ') {
+                      // ✅ MCQ হলে পপ-আপ (Selection Modal) দেখাবে
+                      _showModeSelection(
+                        context,
+                        examTitle,
+                        questionsForThisExam,
+                      );
+                    } else {
+                      // ✅ Written বা Viva হলে সরাসরি Study Mode-এ নিয়ে যাবে
+                      // এখানে সরাসরি 'study' মোড পাস করে দিচ্ছি
+                      _navigateToExamDetail(
+                        examTitle,
+                        questionsForThisExam,
+                        "study",
+                      );
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

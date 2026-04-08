@@ -57,7 +57,7 @@ class _ExamModeScreenState extends State<ExamModeScreen> {
   void _goToNextQuestion() {
     if (currentIndex < widget.questions.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       _startTimer(); // পরের প্রশ্নের জন্য নতুন করে টাইমার শুরু
@@ -230,7 +230,7 @@ class _ExamModeScreenState extends State<ExamModeScreen> {
           });
 
           // ✅ অপশন সিলেক্ট করার ১ সেকেন্ড পর অটোমেটিক পরের প্রশ্নে যাবে
-          Future.delayed(const Duration(milliseconds: 1000), () {
+          Future.delayed(const Duration(milliseconds: 500), () {
             _goToNextQuestion();
           });
         }
