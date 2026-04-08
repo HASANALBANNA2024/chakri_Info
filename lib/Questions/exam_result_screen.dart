@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ExamResultScreen extends StatelessWidget {
   final List<QuestionBankModel> questions;
-  final Map<int, int> userAnswers; // ইউজারের দেওয়া উত্তরের ইনডেক্স
+  final Map<int, int> userAnswers;
   final bool isDarkMode;
 
   const ExamResultScreen({
@@ -41,22 +41,22 @@ class ExamResultScreen extends StatelessWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(15),
-        // ৩টি প্রশ্নের পর পর ১টি অ্যাড যোগ করার জন্য itemCount ক্যালকুলেশন
+        // after 3 question display to add banner
         itemCount: questions.length + (questions.length ~/ 3),
         itemBuilder: (context, index) {
-          // প্রতি ৪ নম্বর পজিশনে অ্যাড দেখানো হবে
+          // ad banner position to 4
           if ((index + 1) % 4 == 0) {
             return _buildInlineAdCard();
           }
 
-          // সঠিক প্রশ্ন ইনডেক্স বের করা (অ্যাড বাদে)
+          // right question add index
           final int questionIndex = index - (index ~/ 4);
           if (questionIndex >= questions.length) return const SizedBox.shrink();
 
           final q = questions[questionIndex];
           final userSelection = userAnswers[questionIndex];
 
-          // সঠিক উত্তরের ইনডেক্স খুঁজে বের করা
+          // to search right question index
           final correctIndex = q.options?.indexWhere(
             (opt) => opt.trim() == q.answer.trim(),
           );
