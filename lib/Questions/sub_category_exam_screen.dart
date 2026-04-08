@@ -31,6 +31,11 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
     _initAndSmartLoad();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _initAndSmartLoad() async {
     try {
       String safeName = 'exams_cache_${widget.categoryName.hashCode}';
@@ -169,20 +174,11 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
         backgroundColor: widget.isDarkMode
             ? const Color(0xFF0F172A)
             : Colors.white,
+        // আপনার কোডের AppBar অংশটি খুঁজে বের করুন
         appBar: AppBar(
           title: Text(widget.categoryName),
           bottom: TabBar(
-            // onTap: (index) {
-            //   String newType = index == 0 ? 'MCQ' : index == 1 ? 'Written' : 'Viva';
-            //   if (_selectedType != newType) {
-            //     setState(() {
-            //       _selectedType = newType;
-            //       _isLoading = true;
-            //       _examList = [];
-            //     });
-            //     _loadDataLogic(); // স্মার্ট লোড কল হবে
-            //   }
-            // },
+            // এই onTap অংশটি নিচে দেওয়া কোড দিয়ে বদলে দিন 👇
             onTap: (index) {
               String newType = index == 0
                   ? 'MCQ'
@@ -193,17 +189,18 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
               if (_selectedType != newType) {
                 setState(() {
                   _selectedType = newType;
-                  // ডাটা সরাসরি Hive থেকে লোড হবে, কোনো লোডিং বা নেটওয়ার্ক কল হবে না
-                  final dynamic cachedData = _examBox!.get(_selectedType);
-                  if (cachedData != null) {
-                    _examList = List<QuestionBankModel>.from(cachedData);
+
+                  // ✅ বক্স নাল (null) কি না তা চেক করে ডাটা লোড করা
+                  if (_examBox != null && _examBox!.isOpen) {
+                    final dynamic cachedData = _examBox!.get(_selectedType);
+                    _examList = cachedData != null
+                        ? List<QuestionBankModel>.from(cachedData)
+                        : [];
                   } else {
                     _examList = [];
                   }
                 });
-                print(
-                  "🔄 Tab Switched to $newType. Data loaded instantly from Hive.",
-                );
+                print("🔄 Tab Switched to $newType. Data loaded safely.");
               }
             },
             tabs: const [
@@ -233,17 +230,31 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
       );
     }
 
+    // ডাটা গ্রুপিং (MCQ/Written/Viva যাই হোক)
     Map<String, List<QuestionBankModel>> groupedExams = {};
     for (var question in _examList) {
       groupedExams.putIfAbsent(question.title, () => []).add(question);
     }
     List<String> distinctTitles = groupedExams.keys.toList();
 
+    // টোটাল আইটেম ক্যালকুলেশন (ডাটা + অ্যাড)
+    int totalItems = distinctTitles.length + (distinctTitles.length ~/ 3);
+
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: distinctTitles.length,
+      itemCount: totalItems,
       itemBuilder: (context, index) {
-        String examTitle = distinctTitles[index];
+        // প্রতি ৪ নম্বর পজিশনে অ্যাড
+        if ((index + 1) % 4 == 0) {
+          return _buildInlineAdCard();
+        }
+
+        // সঠিক ইনডেক্স বের করা
+        final int actualIndex = index - (index ~/ 4);
+        if (actualIndex >= distinctTitles.length)
+          return const SizedBox.shrink();
+
+        String examTitle = distinctTitles[actualIndex];
         List<QuestionBankModel> questionsForThisExam = groupedExams[examTitle]!;
 
         return Card(
@@ -262,17 +273,13 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    // ১. চেক করা হচ্ছে এটি কি MCQ?
                     if (_selectedType == 'MCQ') {
-                      // ✅ MCQ হলে পপ-আপ (Selection Modal) দেখাবে
                       _showModeSelection(
                         context,
                         examTitle,
                         questionsForThisExam,
                       );
                     } else {
-                      // ✅ Written বা Viva হলে সরাসরি Study Mode-এ নিয়ে যাবে
-                      // এখানে সরাসরি 'study' মোড পাস করে দিচ্ছি
                       _navigateToExamDetail(
                         examTitle,
                         questionsForThisExam,
@@ -307,7 +314,6 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 5),
                               Text(
                                 examTitle,
                                 style: TextStyle(
@@ -342,7 +348,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
                     ),
                   ),
                 ),
-                // ক্যাটাগরি ট্যাগ
+                // ট্যাগ লজিক
                 Positioned(
                   left: 0,
                   top: 0,
@@ -609,6 +615,72 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // in-line banner ad card
+  Widget _buildInlineAdCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(15),
+      height: 100,
+      decoration: BoxDecoration(
+        color: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: widget.isDarkMode ? Colors.white10 : Colors.grey.shade200,
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 70,
+            decoration: BoxDecoration(
+              color: Colors.orange.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.ads_click,
+              color: Colors.orangeAccent,
+              size: 30,
+            ),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "SPONSORED AD",
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDarkMode ? Colors.white30 : Colors.grey,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "প্রিমিয়াম ফিচারের জন্য প্রো ভার্সন ট্রাই করুন",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: widget.isDarkMode ? Colors.white70 : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.open_in_new,
+            size: 18,
+            color: Colors.blue.withOpacity(0.5),
+          ),
+        ],
       ),
     );
   }
