@@ -1,3 +1,4 @@
+import 'package:chakri_info/Questions/exam_mode_screen.dart';
 import 'package:chakri_info/Questions/question_bank_model.dart';
 import 'package:chakri_info/Questions/study_mode_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -539,27 +540,15 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
       print("✅ Study Screen-এ পাঠানো হয়েছে।");
     } else {
       // ২. Exam Mode / Slider Mode নেভিগেশন (কালকে আমরা এই স্ক্রিনটি বানাবো)
-      /*
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ExamModeScreen( // কালকে এই নামটা আমরা ব্যবহার করবো
-          title: title,
-          questions: questions,
-          isDarkMode: widget.isDarkMode,
-        ),
-      ),
-    );
-    */
-
-      // আপাতত ইউজারকে একটি মেসেজ দিন যে এটি কাজ চলছে
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Exam Mode খুব শীঘ্রই আসছে..."),
-          duration: Duration(seconds: 1),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ExamModeScreen(
+            questions: questions, // আপনার মডেল লিস্ট
+            isDarkMode: widget.isDarkMode, // ডার্ক মোড স্ট্যাটাস
+          ),
         ),
       );
-      print("🚧 Exam Screen-এর কাজ কালকে (৯ এপ্রিল) করা হবে।");
     }
   }
 
