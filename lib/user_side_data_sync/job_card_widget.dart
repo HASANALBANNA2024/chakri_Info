@@ -48,6 +48,7 @@ class JobCardWidget extends StatelessWidget {
           MaterialPageRoute(builder: (context) => JobDetailsScreen(job: job)),
         );
       },
+
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(

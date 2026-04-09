@@ -28,6 +28,7 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
       totalpost: fields[8] as String,
       circularImage: fields[7] as String,
       isGovt: fields[9] as bool,
+      description: fields[17] as String,
       step1: fields[10] as String,
       step2: fields[11] as String,
       step3: fields[12] as String?,
@@ -40,7 +41,7 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
   @override
   void write(BinaryWriter writer, JobSyncModel obj) {
     writer
-      ..writeByte(17)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -74,7 +75,9 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
       ..writeByte(15)
       ..write(obj.positions)
       ..writeByte(16)
-      ..write(obj.education);
+      ..write(obj.education)
+      ..writeByte(17)
+      ..write(obj.description);
   }
 
   @override

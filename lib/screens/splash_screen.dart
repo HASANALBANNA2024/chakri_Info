@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
             // ১. লোগো পার্ট
             Image.asset(
               'assets/images/app_icon.png',
-              width: 120, // লোগোর সাইজ প্রয়োজনমতো ছোট-বড় করতে পারেন
+              width: 120,
               height: 120,
               fit: BoxFit.contain,
             ),

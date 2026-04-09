@@ -39,6 +39,8 @@ class JobSyncModel {
   final List<dynamic>? positions;
   @HiveField(16)
   final List<String>? education;
+  @HiveField(17)
+  final String description;
 
   JobSyncModel({
     this.education,
@@ -52,6 +54,7 @@ class JobSyncModel {
     required this.totalpost,
     required this.circularImage,
     required this.isGovt,
+    required this.description,
     required this.step1,
     required this.step2,
     this.step3,
@@ -76,6 +79,7 @@ class JobSyncModel {
       logo: data['logo'] ?? '',
       applyLink: data['apply_link'] ?? '',
       totalpost: (data['total_posts'] ?? '0').toString(),
+      description: data['description'],
       circularImage: mainImage,
       isGovt: data['is_govt'] ?? false,
       step1: data['step1'] ?? '',

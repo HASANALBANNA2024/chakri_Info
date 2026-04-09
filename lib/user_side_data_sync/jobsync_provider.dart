@@ -6,13 +6,18 @@ import 'dart:async';
 class JobProvider {
   List<JobSyncModel> _allJobs = [];
   StreamSubscription? _jobSubscription;
-  final _myBox = Hive.box<JobSyncModel>('jobsBox');
+
+  // ১. সরাসরি ভেরিয়েবল না রেখে একটি নিরাপদ Getter ব্যবহার করুন
+  Box<JobSyncModel> get _myBox => Hive.box<JobSyncModel>('jobsBox');
 
   final StreamController<List<JobSyncModel>> _jobStreamController =
   StreamController<List<JobSyncModel>>.broadcast();
 
-  // ১. অফলাইন ডাটা লোড
+  // ২. অফলাইন ডাটা লোড
   void loadOfflineJobs() {
+    // চেক করে নিন বক্সটি ওপেন আছে কি না (সেফটি ফার্স্ট)
+    if (!Hive.isBoxOpen('jobsBox')) return;
+
     if (_myBox.isNotEmpty) {
       _allJobs = _myBox.values.toList();
       _jobStreamController.add(_allJobs);
@@ -20,9 +25,14 @@ class JobProvider {
     }
   }
 
-  // ২. রিয়েল-টাইম সিঙ্ক লজিক
+  // ৩. রিয়েল-টাইম সিঙ্ক লজিক
   void startRealTimeSync() {
-    loadOfflineJobs(); // আগে অফলাইন দেখাও
+    // বক্স ওপেন না থাকলে ওপেন করে নেওয়া (অতিরিক্ত সেফটি)
+    if (!Hive.isBoxOpen('jobsBox')) {
+      Hive.openBox<JobSyncModel>('jobsBox').then((_) => loadOfflineJobs());
+    } else {
+      loadOfflineJobs();
+    }
 
     if (_jobSubscription != null) return;
 
@@ -35,9 +45,11 @@ class JobProvider {
         return JobSyncModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
 
-      // ৩. ডাটাবেস আপডেট (অফলাইনের জন্য সেভ)
-      await _myBox.clear();
-      await _myBox.addAll(_allJobs);
+      // ৪. ডাটাবেস আপডেট করার আগে চেক করা
+      if (Hive.isBoxOpen('jobsBox')) {
+        await _myBox.clear();
+        await _myBox.addAll(_allJobs);
+      }
 
       _jobStreamController.add(_allJobs);
       print("Sync Complete: Local memory updated from Server.");
@@ -56,15 +68,12 @@ class JobProvider {
     _jobStreamController.close();
   }
 
-  // ৪. ফিল্টারিং লজিক (Category Screen এর জন্য)
+  // ৫. ফিল্টারিং লজিক
   List<JobSyncModel> getJobsByFilter(String categoryName) {
     if (categoryName.isEmpty) return _allJobs;
-
-    // সার্চ কি-ওয়ার্ড ছোট হাতের করে নেওয়া যাতে সঠিক রেজাল্ট আসে
     String searchKey = categoryName.toLowerCase().trim();
 
     return _allJobs.where((job) {
-      // step1, step2 বা company-তে ওই নাম আছে কি না চেক করবে
       return job.step1.toLowerCase().contains(searchKey) ||
           job.step2.toLowerCase().contains(searchKey) ||
           job.company.toLowerCase().contains(searchKey) ||
