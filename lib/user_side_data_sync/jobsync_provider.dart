@@ -7,17 +7,16 @@ class JobProvider {
   List<JobSyncModel> _allJobs = [];
   StreamSubscription? _jobSubscription;
 
-  // ১. সরাসরি ভেরিয়েবল না রেখে একটি নিরাপদ Getter ব্যবহার করুন
   Box<JobSyncModel> get _myBox => Hive.box<JobSyncModel>('jobsBox');
+  // ভার্সন সেভ করার জন্য একটি সাধারণ বক্স (এটি মেইন ফাংশনে ওপেন করে নিবেন)
+  Box get _settingsBox => Hive.box('settings');
 
   final StreamController<List<JobSyncModel>> _jobStreamController =
   StreamController<List<JobSyncModel>>.broadcast();
 
-  // ২. অফলাইন ডাটা লোড
+  // ১. অফলাইন ডাটা লোড (আগের মতোই)
   void loadOfflineJobs() {
-    // চেক করে নিন বক্সটি ওপেন আছে কি না (সেফটি ফার্স্ট)
     if (!Hive.isBoxOpen('jobsBox')) return;
-
     if (_myBox.isNotEmpty) {
       _allJobs = _myBox.values.toList();
       _jobStreamController.add(_allJobs);
@@ -25,9 +24,38 @@ class JobProvider {
     }
   }
 
-  // ৩. রিয়েল-টাইম সিঙ্ক লজিক
+  // ২. নতুন ভার্সন চেক লজিক (এটি রিফ্রেশ করলে কল হবে)
+  Future<void> checkUpdateAndSync() async {
+    try {
+      // ফায়ারবেস থেকে শুধু ১টি ডকুমেন্ট রিড হবে (ভার্সন চেক)
+      var doc = await FirebaseFirestore.instance
+          .collection('app_settings')
+          .doc('db_version')
+          .get();
+
+      if (doc.exists) {
+        int serverVersion = doc.data()?['version_code'] ?? 0;
+        int localVersion = _settingsBox.get('local_db_version', defaultValue: 0);
+
+        if (serverVersion > localVersion) {
+          print("New Version Found! Syncing...");
+          startRealTimeSync(); // নতুন ভার্সন থাকলে ডাটাবেস কল হবে
+          await _settingsBox.put('local_db_version', serverVersion);
+        } else {
+          print("Database is up to date.");
+          loadOfflineJobs(); // আপডেট না থাকলে হাইভ থেকেই দেখাবে
+        }
+      } else {
+        startRealTimeSync();
+      }
+    } catch (e) {
+      print("Version Check Error: $e");
+      loadOfflineJobs();
+    }
+  }
+
+  // ৩. রিয়েল-টাইম সিঙ্ক লজিক (আগের মতোই)
   void startRealTimeSync() {
-    // বক্স ওপেন না থাকলে ওপেন করে নেওয়া (অতিরিক্ত সেফটি)
     if (!Hive.isBoxOpen('jobsBox')) {
       Hive.openBox<JobSyncModel>('jobsBox').then((_) => loadOfflineJobs());
     } else {
@@ -45,14 +73,13 @@ class JobProvider {
         return JobSyncModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
 
-      // ৪. ডাটাবেস আপডেট করার আগে চেক করা
       if (Hive.isBoxOpen('jobsBox')) {
         await _myBox.clear();
         await _myBox.addAll(_allJobs);
       }
 
       _jobStreamController.add(_allJobs);
-      print("Sync Complete: Local memory updated from Server.");
+      print("Sync Complete: Firebase to Hive updated.");
     });
   }
 
@@ -68,11 +95,9 @@ class JobProvider {
     _jobStreamController.close();
   }
 
-  // ৫. ফিল্টারিং লজিক
   List<JobSyncModel> getJobsByFilter(String categoryName) {
     if (categoryName.isEmpty) return _allJobs;
     String searchKey = categoryName.toLowerCase().trim();
-
     return _allJobs.where((job) {
       return job.step1.toLowerCase().contains(searchKey) ||
           job.step2.toLowerCase().contains(searchKey) ||

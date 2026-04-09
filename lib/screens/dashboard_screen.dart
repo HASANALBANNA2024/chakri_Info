@@ -124,37 +124,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // --- UI Body (Maximum Space Optimization) ---
+  // Widget _buildHomeBody(bool isDarkMode) {
+  //   return StreamBuilder<List<JobSyncModel>>(
+  //     stream: jobProvider.getJobStream(),
+  //     builder: (context, snapshot) {
+  //       final allJobs = snapshot.data ?? [];
+  //
+  //       return SingleChildScrollView(
+  //         physics: const BouncingScrollPhysics(),
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
+  //             buildGlobalSearchSection(
+  //               context,
+  //               isDarkMode,
+  //               jobProvider.allJobs,
+  //             ),
+  //             // FeaturedJobSlider(jobProvider: jobProvider),
+  //             _buildCategoryGrid(isDarkMode),
+  //             PrepCenterBanner(),
+  //             _buildNoticeSection(),
+  //             _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
+  //             _buildJobList(isDarkMode),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+  // home end
+
   Widget _buildHomeBody(bool isDarkMode) {
     return StreamBuilder<List<JobSyncModel>>(
       stream: jobProvider.getJobStream(),
       builder: (context, snapshot) {
         final allJobs = snapshot.data ?? [];
 
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
-              buildGlobalSearchSection(
-                context,
-                isDarkMode,
-                jobProvider.allJobs,
-              ),
-              // FeaturedJobSlider(jobProvider: jobProvider),
-              _buildCategoryGrid(isDarkMode),
-              PrepCenterBanner(),
-              _buildNoticeSection(),
-              _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
-              _buildJobList(isDarkMode),
-            ],
+        return RefreshIndicator(
+          displacement: 20,
+          color: Colors.indigo,
+          backgroundColor: isDarkMode ? const Color(0xFF1F1F1F) : Colors.white,
+
+          // ঠিক এখানে আপনার দেওয়া কোডটুকু বসবে
+          onRefresh: () async {
+            // এটি ডাটাবেস ভার্সন চেক করবে, নতুন ডাটা থাকলে তবেই রিড করবে
+            await jobProvider.checkUpdateAndSync();
+
+            // ইউজারকে একটু সময় দেওয়ার জন্য ১ সেকেন্ড ডিলে
+            await Future.delayed(const Duration(seconds: 1));
+          },
+
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // অ্যাপবারের ঠিক নিচেই প্রগ্রেস বার (ডাটা সিঙ্ক হওয়ার সময় দেখাবে)
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  const LinearProgressIndicator(
+                    minHeight: 2,
+                    color: Colors.orange,
+                    backgroundColor: Colors.transparent,
+                  ),
+
+                JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
+                buildGlobalSearchSection(
+                  context,
+                  isDarkMode,
+                  allJobs,
+                ),
+
+                _buildCategoryGrid(isDarkMode),
+                const PrepCenterBanner(),
+                _buildNoticeSection(),
+                _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
+                _buildJobList(isDarkMode),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  // home end
   PreferredSizeWidget _buildCustomAppBar(bool isDarkMode) {
     return AppBar(
       title: Text(
