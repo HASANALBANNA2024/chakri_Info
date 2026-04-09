@@ -91,41 +91,13 @@ class JobDetailsScreen extends StatelessWidget {
         actions: [
           IconButton(icon: const Icon(Icons.bookmark_border_rounded, size: 22), onPressed: () {}),
           IconButton(
-            icon: Icon(Icons.share_rounded, color: Theme.of(context).colorScheme.onSurface,),
-            onPressed: () async {
-              try {
-                // ১. ইমেজটি ডাউনলোড করা
-                final response = await http.get(Uri.parse(job.circularImage));
-                final bytes = response.bodyBytes;
-
-                // ২. ইমেজটি সেভ করা (ইউনিক নাম দিয়ে যাতে ক্যাশে সমস্যা না করে)
-                final temp = await getTemporaryDirectory();
-                final path = '${temp.path}/job_${DateTime.now().millisecondsSinceEpoch}.jpg';
-                final file = File(path);
-                await file.writeAsBytes(bytes);
-
-                // ৩. শেয়ার করার মেসেজ
-                final String shareText = '''
-                  🔥 ${job.title}
-                  
-                  📝 বিস্তারিত: ${job.description}
-                  📅 আবেদনের শেষ তারিখ: ${job.deadline}
-                  
-                  📲 আরও বিস্তারিত জানতে অ্যাপটি ডাউনলোড করুন:
-                  🔗 https://play.google.com/store/apps/details?id=your.package.name
-                  ''';
-
-                // ৪. Share.shareXFiles ব্যবহার করা (এটি ফেসবুকের জন্য সবচেয়ে ভালো কাজ করে)
-                await Share.shareXFiles(
-                  [XFile(path)],
-                  text: shareText,
-                  subject: job.title, // ফেসবুক অনেক সময় সাবজেক্ট থেকে টেক্সট নেয়
-                );
-              } catch (e) {
-                debugPrint("Share error: $e");
-              }
-            },
+            icon: Icon(
+              Icons.share_rounded,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            onPressed: () => _shareJobDetails(context, job), // ফাংশনটি কল করা হলো
           ),
+
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
@@ -388,4 +360,66 @@ class JobDetailsScreen extends StatelessWidget {
       ],
     );
   }
+  // share text
+  Future<void> _shareJobDetails(BuildContext context, dynamic job) async {
+    try {
+      List<XFile> imageFiles = [];
+
+      // ১. ইমেজ ইউআরএল লিস্ট তৈরি
+      List<String> imageUrls = [];
+      if (job.circularImage is List) {
+        imageUrls = List<String>.from(job.circularImage);
+      } else if (job.circularImage != null && job.circularImage.toString().isNotEmpty) {
+        imageUrls = [job.circularImage.toString()];
+      }
+
+      // ২. ইমেজ ডাউনলোড লজিক
+      if (imageUrls.isNotEmpty) {
+        final temp = await getTemporaryDirectory();
+        for (int i = 0; i < imageUrls.length; i++) {
+          try {
+            String url = imageUrls[i].trim();
+            if (url.startsWith('http')) {
+              final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+              if (response.statusCode == 200) {
+                final path = '${temp.path}/share_img_${DateTime.now().millisecondsSinceEpoch}_$i.jpg';
+                final file = File(path);
+                await file.writeAsBytes(response.bodyBytes);
+                imageFiles.add(XFile(path));
+              }
+            }
+          } catch (e) {
+            debugPrint("Individual image download error: $e");
+            // একটি ইমেজ ডাউনলোড না হলে যেন লুপ না থামে
+          }
+        }
+      }
+
+      // ৩. শেয়ার মেসেজ (আপনার ভ্যারিয়েবল নাম অনুযায়ী ঠিক করে নিন)
+      // যদি job.tilte এবং job.description আপনার মডেলে থাকে তবে নিচেরটি ঠিক আছে
+      final String shareText = '''
+🔥 ${job.title}
+
+📝 বিস্তারিত: ${job.description}
+📅 আবেদনের শেষ তারিখ: ${job.deadline}
+
+📲 আরও বিস্তারিত জানতে অ্যাপটি ডাউনলোড করুন:
+🔗 https://play.google.com/store/apps/details?id=your.package.name
+''';
+
+      // ৪. শেয়ার এক্সিকিউশন
+      if (imageFiles.isNotEmpty) {
+        await Share.shareXFiles(imageFiles, text: shareText);
+      } else {
+        // ইমেজ না থাকলেও যেন টেক্সট অবশ্যই শেয়ার হয়
+        await Share.share(shareText);
+      }
+
+    } catch (e) {
+      debugPrint("Global Share Error: $e");
+      // একদম শেষ ভরসা: শুধু টাইটেল শেয়ার করা
+      Share.share("${job.title}\nবিস্তারিত জানতে অ্যাপটি ডাউনলোড করুন।");
+    }
+  }
+
 }
