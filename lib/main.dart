@@ -3,22 +3,22 @@ import 'package:chakri_info/screens/splash_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart'; // নতুন যোগ করা হয়েছে
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'firebase_options.dart';
 
-// Global Notifier
+// Global Notifier for Theme Management
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
-  // Flutter binding
+  // Ensure Flutter framework is fully initialized
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // Native splash screen dore rakha
+  // Keep the native splash screen visible until initialization is complete
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // ৩. Firebase Initialize
+  // Initialize Firebase with platform-specific options
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -27,10 +27,11 @@ void main() async {
     debugPrint("Firebase Initialize Error: $e");
   }
 
-  // ৪. Hive Initialize
+  // Initialize Hive for local storage
   await Hive.initFlutter();
 
-  // adapter register
+  // Register Adapters for Hive Models
+  // Check registration to prevent "Adapter already registered" errors
   if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(JobSyncModelAdapter());
   }
@@ -38,16 +39,24 @@ void main() async {
     Hive.registerAdapter(QuestionBankModelAdapter());
   }
 
-  // box open
+  // Open Hive Boxes for various functionalities
   try {
-    await Hive.openBox<JobSyncModel>('jobsBox'); // জব সার্কুলারের জন্য
-    await Hive.openBox('exam_cache'); // এক্সাম রেজাল্ট বা ছোট ডাটার জন্য
-    await Hive.openBox('settings'); // থিম বা অন্য সেটিংসে জন্য
+    // Standard jobs box
+    await Hive.openBox<JobSyncModel>('jobsBox');
+
+    // NEW: Open Bookmark box for saved jobs (Using JobSyncModel)
+    await Hive.openBox<JobSyncModel>('bookmarkBox');
+
+    // Box for exam results and caching
+    await Hive.openBox('exam_cache');
+
+    // Box for app settings and theme preferences
+    await Hive.openBox('settings');
   } catch (e) {
     debugPrint("Hive Box Opening Error: $e");
   }
 
-  // after completed the work of android then native remove
+  // Remove the native splash screen after background tasks are done
   FlutterNativeSplash.remove();
 
   runApp(const MyApp());
@@ -65,6 +74,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Chakri Info',
           themeMode: currentMode,
+          // Light Theme Configuration
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
@@ -72,6 +82,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light,
             ),
           ),
+          // Dark Theme Configuration
           darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
@@ -79,6 +90,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
             ),
           ),
+          // App Entry Point
           home: const SplashScreen(),
         );
       },

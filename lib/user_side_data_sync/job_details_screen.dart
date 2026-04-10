@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:chakri_info/services/share_service.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:flutter/material.dart';
@@ -106,6 +106,8 @@ class JobDetailsScreen extends StatelessWidget {
         : Colors.grey.shade300;
 
     // কোম্পানি নামের জন্য মানানসই কালার
+
+    final Box<JobSyncModel> bookmarkBox = Hive.box<JobSyncModel>('bookmarkBox');
     final Color companyColor = isDarkMode
         ? Colors.amber.shade400
         : const Color(0xFF0D47A1);
@@ -130,9 +132,34 @@ class JobDetailsScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.bookmark_border_outlined),
+          // বুকমার্ক বাটন (আইকন এবং লজিকসহ)
+          ValueListenableBuilder(
+            valueListenable: Hive.box<JobSyncModel>('bookmarkBox').listenable(),
+            builder: (context, Box<JobSyncModel> box, _) {
+              // চেক করা হচ্ছে এই জবটি আগে থেকেই বুকমার্ক করা কি না
+              final isSaved = box.containsKey(job.id);
+
+              return IconButton(
+                onPressed: () {
+                  if (isSaved) {
+                    box.delete(job.id); // বুকমার্ক থাকলে মুছে ফেলবে
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("বুকমার্ক থেকে সরানো হয়েছে"), duration: Duration(seconds: 1)),
+                    );
+                  } else {
+                    box.put(job.id, job); // বুকমার্ক না থাকলে সেভ করবে
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("বুকমার্ক করা হয়েছে"), duration: Duration(seconds: 1)),
+                    );
+                  }
+                },
+                // বুকমার্ক স্ট্যাটাস অনুযায়ী আইকন পরিবর্তন
+                icon: Icon(
+                  isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
+                  color: isSaved ? Colors.amber : null, // সেভ করা থাকলে সোনালী রঙ হবে
+                ),
+              );
+            },
           ),
           IconButton(
             onPressed: () async {

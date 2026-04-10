@@ -9,6 +9,7 @@ import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
 import 'package:chakri_info/widgets/education_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:chakri_info/Questions/sub_category_exam_screen.dart';
+import 'package:chakri_info/widgets/bookmark_screen.dart';
 import '../screens/category_screen.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -96,7 +97,15 @@ class _AppDrawerState extends State<AppDrawer> {
                   _drawerItem(
                     Icons.bookmark_rounded,
                     "ফেভারিট ও বুকমার্ক",
-                    () {},
+                        () {
+                      // স্ক্রিনটি ওপেন করার জন্য নেভিগেশন
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const BookmarkScreen(),
+                        ),
+                      );
+                    },
                   ),
                   _sectionTitle("সময়সীমা ও তালিকা"),
                   _drawerItem(
