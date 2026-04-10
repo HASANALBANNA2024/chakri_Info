@@ -12,7 +12,7 @@ import 'firebase_options.dart';
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
-  // Flutter binding confirm
+  // Flutter binding
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   // Native splash screen dore rakha
