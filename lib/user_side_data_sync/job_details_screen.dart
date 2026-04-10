@@ -131,8 +131,22 @@ class JobDetailsScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () => ShareService.shareJob(context, job),
+            onPressed: () {},
+            icon: Icon(Icons.bookmark_border_outlined),
+          ),
+          IconButton(
+            onPressed: () async {
+              // শেয়ার করার সময় লোডিং ইন্ডিকেটর দেখাতে চাইলে এখানে দিতে পারেন
+              await ShareService.shareJob(
+                title: job.title,
+                company: job.company,
+                applyLink: job.applyLink,
+                images: job.circularImage,
+                description: job.description,
+              );
+            },
             icon: const Icon(Icons.share_outlined),
+            tooltip: 'শেয়ার করুন', // অপশনাল: চেপে ধরে রাখলে নাম দেখাবে
           ),
         ],
         bottom: PreferredSize(
@@ -156,24 +170,17 @@ class JobDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-
-            // কোম্পানি নাম (নতুন কালার সহ)
+            // company name
             if (job.company.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: companyColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   job.company,
                   style: TextStyle(
-                    fontSize: 16,
-                    color: companyColor,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 17, // সাইজ একটু বাড়িয়েছি যেন দেখতে ভালো লাগে
+                    color: companyColor, // আপনার ডিফাইন করা কালারটিই থাকবে
+                    fontWeight: FontWeight.w600, // হালকা বোল্ড
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -226,7 +233,7 @@ class JobDetailsScreen extends StatelessWidget {
             // আবেদন লিংক
             if (job.applyLink.isNotEmpty) ...[
               const Text(
-                "আবেদন করার লিংক:",
+                "আবেদন লিংক:",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
               ),
               const SizedBox(height: 4),
