@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-
 part 'jobsync_model.g.dart';
 
 @HiveType(typeId: 0)
@@ -20,7 +19,7 @@ class JobSyncModel {
   @HiveField(6)
   final String logo;
   @HiveField(7)
-  final String circularImage;
+  final List<String> circularImage; // এখানে String বদলে List<String> করা হয়েছে
   @HiveField(8)
   final String totalpost;
   @HiveField(9)
@@ -64,30 +63,33 @@ class JobSyncModel {
   });
 
   factory JobSyncModel.fromMap(Map<String, dynamic> data, String documentId) {
-    String mainImage = '';
-    if (data['images'] != null && data['images'] is List && (data['images'] as List).isNotEmpty) {
-      mainImage = data['images'][0].toString();
+    // ইমেজ লিস্ট হ্যান্ডেল করার সঠিক লজিক
+    List<String> allImages = [];
+    if (data['images'] != null && data['images'] is List) {
+      allImages = (data['images'] as List).map((e) => e.toString()).toList();
     }
 
     return JobSyncModel(
       id: documentId,
       title: data['title'] ?? '',
       company: data['company'] ?? '',
-      deadline: data['end_date'] ?? '', // ডাটাবেস অনুযায়ী
+      deadline: data['end_date'] ?? '',
       start: data['start_date'] ?? '',
       publishDate: data['publish_date'] ?? '',
       logo: data['logo'] ?? '',
       applyLink: data['apply_link'] ?? '',
       totalpost: (data['total_posts'] ?? '0').toString(),
-      description: data['description'],
-      circularImage: mainImage,
+      description: data['description'] ?? '',
+      circularImage: allImages, // এখন সব ইমেজই এই লিস্টে থাকবে
       isGovt: data['is_govt'] ?? false,
       step1: data['step1'] ?? '',
       step2: data['step2'] ?? '',
       step3: data['step3']?.toString(),
       step4: data['step4']?.toString(),
       positions: data['positions'] as List<dynamic>?,
-      education: (data['education'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
+      education: (data['education'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
     );
   }
 }

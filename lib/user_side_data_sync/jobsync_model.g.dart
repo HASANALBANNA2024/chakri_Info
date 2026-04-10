@@ -26,7 +26,7 @@ class JobSyncModelAdapter extends TypeAdapter<JobSyncModel> {
       deadline: fields[4] as String,
       logo: fields[6] as String,
       totalpost: fields[8] as String,
-      circularImage: fields[7] as String,
+      circularImage: (fields[7] as List).cast<String>(),
       isGovt: fields[9] as bool,
       description: fields[17] as String,
       step1: fields[10] as String,
