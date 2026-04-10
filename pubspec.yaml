@@ -39,6 +39,8 @@ dependencies:
   # --- Caching & Performance ---
   cached_network_image: ^3.4.1
   flutter_cache_manager: ^3.4.1
+  pdf: ^3.12.0
+  printing: ^5.14.3
 
 dev_dependencies:
   flutter_test:
@@ -57,9 +59,18 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # ইমেজ এবং অন্যান্য অ্যাসেট এখানে থাকবে
   assets:
     - assets/images/
     - assets/images/app_icon.png
+    - assets/fonts/SolaimanLipi.ttf  # পিডিএফ জেনারেট করার জন্য এটি এখানেও ডিক্লেয়ার করা ভালো
+
+  # ফন্ট ডিক্লেয়ারেশন এখানে থাকবে
+  fonts:
+    - family: SolaimanLipi
+      fonts:
+        - asset: assets/fonts/SolaimanLipi.ttf
 
 # app icon configuration
 flutter_launcher_icons:

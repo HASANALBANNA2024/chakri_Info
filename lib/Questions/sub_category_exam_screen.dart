@@ -3,6 +3,7 @@ import 'package:chakri_info/Questions/question_bank_model.dart';
 import 'package:chakri_info/Questions/study_mode_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:chakri_info/services/pdf_generator_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class SubCategoryExamScreen extends StatefulWidget {
@@ -273,19 +274,11 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
               children: [
                 InkWell(
                   onTap: () {
-                    if (_selectedType == 'MCQ') {
-                      _showModeSelection(
-                        context,
-                        examTitle,
-                        questionsForThisExam,
-                      );
-                    } else {
-                      _navigateToExamDetail(
-                        examTitle,
-                        questionsForThisExam,
-                        "study",
-                      );
-                    }
+                    _showModeSelection(
+                      context,
+                      examTitle,
+                      questionsForThisExam,
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -384,11 +377,149 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
   }
 
   // View mode and Exam mode and ad banner mode
+  // void _showModeSelection(
+  //   BuildContext context,
+  //   String title,
+  //   List<QuestionBankModel> questions,
+  // ) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) {
+  //       return Container(
+  //         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+  //         decoration: BoxDecoration(
+  //           color: widget.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+  //           borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+  //         ),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Container(
+  //               width: 40,
+  //               height: 4,
+  //               decoration: BoxDecoration(
+  //                 color: Colors.grey[400],
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //             ),
+  //             const SizedBox(height: 20),
+  //             Text(
+  //               title,
+  //               textAlign: TextAlign.center,
+  //               style: TextStyle(
+  //                 fontSize: 18,
+  //                 fontWeight: FontWeight.bold,
+  //                 color: widget.isDarkMode ? Colors.white : Colors.black87,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 5),
+  //             Text(
+  //               "মোট প্রশ্ন: ${questions.length} টি",
+  //               style: TextStyle(
+  //                 fontSize: 14,
+  //                 color: widget.isDarkMode ? Colors.white60 : Colors.black54,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 25),
+  //
+  //             // Study Mode
+  //             _buildSelectionTile(
+  //               icon: Icons.auto_stories_rounded,
+  //               title: "Study Mode",
+  //               subtitle: "ব্যাখ্যাসহ উত্তর এবং বিস্তারিত পড়ুন",
+  //               color: Colors.blue.withOpacity(0.1),
+  //               iconColor: Colors.blue,
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 _navigateToExamDetail(
+  //                   title,
+  //                   questions,
+  //                   "study",
+  //                 ); // ✅ ৩টি প্যারামিটার পাস
+  //               },
+  //             ),
+  //
+  //             const SizedBox(height: 12),
+  //
+  //             // Exam Mode
+  //             _buildSelectionTile(
+  //               icon: Icons.timer_outlined,
+  //               title: "Exam Mode",
+  //               subtitle: "নির্ধারিত সময়ে প্রস্তুতি যাচাই করুন",
+  //               color: Colors.orange.withOpacity(0.1),
+  //               iconColor: Colors.orange,
+  //               onTap: () {
+  //                 Navigator.pop(context);
+  //                 _navigateToExamDetail(
+  //                   title,
+  //                   questions,
+  //                   "exam",
+  //                 ); // ✅ ৩টি প্যারামিটার পাস
+  //               },
+  //             ),
+  //
+  //             const SizedBox(height: 25),
+  //
+  //             // Ad Banner Section
+  //             Container(
+  //               width: double.infinity,
+  //               padding: const EdgeInsets.all(10),
+  //               decoration: BoxDecoration(
+  //                 color: widget.isDarkMode
+  //                     ? Colors.white.withOpacity(0.05)
+  //                     : Colors.grey[100],
+  //                 borderRadius: BorderRadius.circular(15),
+  //                 border: Border.all(
+  //                   color: widget.isDarkMode
+  //                       ? Colors.white10
+  //                       : Colors.grey.shade300,
+  //                 ),
+  //               ),
+  //               child: Column(
+  //                 children: [
+  //                   const Text(
+  //                     "SPONSORED AD",
+  //                     style: TextStyle(
+  //                       fontSize: 9,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Colors.grey,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 8),
+  //                   Container(
+  //                     height: 50,
+  //                     width: double.infinity,
+  //                     color: Colors.transparent,
+  //                     child: const Center(
+  //                       child: Icon(
+  //                         Icons.ads_click,
+  //                         color: Colors.grey,
+  //                         size: 30,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             const SizedBox(height: 15),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   void _showModeSelection(
-    BuildContext context,
-    String title,
-    List<QuestionBankModel> questions,
-  ) {
+      BuildContext context,
+      String title,
+      List<QuestionBankModel> questions,
+      ) {
+    // ১. PDF জেনারেট করার অপশন আমরা সবসময় রাখবো (আপনার লজিক অনুযায়ী)
+    // অথবা questions.any দিয়ে চেক করতে পারেন
+    final bool hasPdf = questions.isNotEmpty;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -403,6 +534,7 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // ড্র্যাগ হ্যান্ডেল
               Container(
                 width: 40,
                 height: 4,
@@ -431,90 +563,91 @@ class _SubCategoryExamScreenState extends State<SubCategoryExamScreen> {
               ),
               const SizedBox(height: 25),
 
-              // Study Mode
+              // --- ১. Study Mode (সব ট্যাবে থাকবে: MCQ, Written, Viva) ---
               _buildSelectionTile(
                 icon: Icons.auto_stories_rounded,
                 title: "Study Mode",
-                subtitle: "ব্যাখ্যাসহ উত্তর এবং বিস্তারিত পড়ুন",
+                subtitle: "ব্যাখ্যাসহ উত্তর এবং বিস্তারিত পড়ুন",
                 color: Colors.blue.withOpacity(0.1),
                 iconColor: Colors.blue,
                 onTap: () {
                   Navigator.pop(context);
-                  _navigateToExamDetail(
-                    title,
-                    questions,
-                    "study",
-                  ); // ✅ ৩টি প্যারামিটার পাস
+                  _navigateToExamDetail(title, questions, "study");
                 },
               ),
 
               const SizedBox(height: 12),
 
-              // Exam Mode
-              _buildSelectionTile(
-                icon: Icons.timer_outlined,
-                title: "Exam Mode",
-                subtitle: "নির্ধারিত সময়ে প্রস্তুতি যাচাই করুন",
-                color: Colors.orange.withOpacity(0.1),
-                iconColor: Colors.orange,
-                onTap: () {
-                  Navigator.pop(context);
-                  _navigateToExamDetail(
-                    title,
-                    questions,
-                    "exam",
-                  ); // ✅ ৩টি প্যারামিটার পাস
-                },
-              ),
+              // --- ২. Exam Mode (শুধুমাত্র MCQ ট্যাবে দেখাবে) ---
+              if (_selectedType == 'MCQ') ...[
+                _buildSelectionTile(
+                  icon: Icons.timer_outlined,
+                  title: "Exam Mode",
+                  subtitle: "নির্ধারিত সময়ে প্রস্তুতি যাচাই করুন",
+                  color: Colors.orange.withOpacity(0.1),
+                  iconColor: Colors.orange,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _navigateToExamDetail(title, questions, "exam");
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+
+              // --- ৩. PDF View Mode (সব ট্যাবে থাকবে) ---
+              if (hasPdf)
+                _buildSelectionTile(
+                  icon: Icons.picture_as_pdf_rounded,
+                  title: "PDF View Mode",
+                  subtitle: "প্রশ্নপত্রটি PDF আকারে দেখুন বা ডাউনলোড করুন",
+                  color: Colors.red.withOpacity(0.1),
+                  iconColor: Colors.red,
+                  onTap: () {
+                    Navigator.pop(context);
+                    // পিডিএফ জেনারেটর সার্ভিস কল
+                    PdfGeneratorService.generateJobPdf(
+                      title: title,
+                      questions: questions,
+                      type: _selectedType,
+                    );
+                  },
+                ),
 
               const SizedBox(height: 25),
 
-              // Ad Banner Section
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: widget.isDarkMode
-                      ? Colors.white.withOpacity(0.05)
-                      : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(
-                    color: widget.isDarkMode
-                        ? Colors.white10
-                        : Colors.grey.shade300,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    const Text(
-                      "SPONSORED AD",
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      height: 50,
-                      width: double.infinity,
-                      color: Colors.transparent,
-                      child: const Center(
-                        child: Icon(
-                          Icons.ads_click,
-                          color: Colors.grey,
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // --- ৪. Ad Banner Section (সব সময় নিচে থাকবে) ---
+              _buildAdBannerSection(),
+
               const SizedBox(height: 15),
             ],
           ),
         );
       },
+    );
+  }
+
+  // অ্যাড ব্যানারের জন্য ছোট উইজেট (কোড পরিষ্কার রাখার জন্য)
+  Widget _buildAdBannerSection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: widget.isDarkMode ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: widget.isDarkMode ? Colors.white10 : Colors.grey.shade300,
+        ),
+      ),
+      child: Column(
+        children: [
+          const Text(
+            "SPONSORED AD",
+            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+          const SizedBox(height: 8),
+          const Icon(Icons.ads_click, color: Colors.grey, size: 30),
+        ],
+      ),
     );
   }
 
