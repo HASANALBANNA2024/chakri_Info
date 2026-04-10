@@ -60,17 +60,14 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # ইমেজ এবং অন্যান্য অ্যাসেট এখানে থাকবে
   assets:
     - assets/images/
     - assets/images/app_icon.png
-    - assets/fonts/SolaimanLipi.ttf  # পিডিএফ জেনারেট করার জন্য এটি এখানেও ডিক্লেয়ার করা ভালো
 
-  # ফন্ট ডিক্লেয়ারেশন এখানে থাকবে
   fonts:
-    - family: SolaimanLipi
+    - family: Nikosh
       fonts:
-        - asset: assets/fonts/SolaimanLipi.ttf
+        - asset: assets/fonts/Nikosh.ttf
 
 # app icon configuration
 flutter_launcher_icons:
