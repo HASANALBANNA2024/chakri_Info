@@ -1,14 +1,10 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
     id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Fixed version variables for Flutter with fallback values
 val flutterVersionCode = (project.findProperty("flutter.versionCode") as? String) ?: "1"
 val flutterVersionName = (project.findProperty("flutter.versionName") as? String) ?: "1.0"
 
@@ -18,32 +14,28 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // ১. এখানে coreLibraryDesugaring এনাবল করা হলো
+        isCoreLibraryDesugaringEnabled = true
+
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        // Updated to use the recommended string format for jvmTarget
         jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId = "com.example.chakri_info"
-
-        // Using explicit minSdk 21 for Firebase and modern package compatibility
-        minSdk = flutter.minSdkVersion
+        minSdk = flutter.minSdkVersion // অন্তত ২১ রাখা ভালো নোটিফিকেশনের জন্য
         targetSdk = flutter.targetSdkVersion
-
         versionCode = flutterVersionCode.toInt()
         versionName = flutterVersionName
-
-        // Enabled MultiDex for Firebase compatibility
         multiDexEnabled = true
     }
 
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -51,4 +43,9 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // ২. এই লাইনটি অবশ্যই যোগ করতে হবে ডেসুগারিং লাইব্রেরির জন্য
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

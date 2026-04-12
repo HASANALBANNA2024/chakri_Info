@@ -21,6 +21,8 @@ dependencies:
   firebase_core: ^3.11.0
   cloud_firestore: ^5.6.3
   firebase_storage: ^12.4.1
+  firebase_messaging: ^15.2.10
+  flutter_local_notifications: ^18.0.1
 
   # --- UI & Icons ---
   cupertino_icons: ^1.0.8
@@ -63,11 +65,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/app_icon.png
-
-  fonts:
-    - family: Nikosh
-      fonts:
-        - asset: assets/fonts/Nikosh.ttf
 
 # app icon configuration
 flutter_launcher_icons:
