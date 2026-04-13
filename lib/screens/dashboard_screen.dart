@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:chakri_info/controllers/job_controller.dart';
 import 'package:chakri_info/main.dart';
 import 'package:chakri_info/models/job_model.dart';
+import 'package:chakri_info/notifications/notification_model.dart';
+import 'package:chakri_info/notifications/notification_screen.dart';
 import 'package:chakri_info/screens/bookmark_screen.dart';
 import 'package:chakri_info/screens/category_screen.dart';
 import 'package:chakri_info/user_side_data_sync/job_card_widget.dart';
@@ -16,6 +18,7 @@ import 'package:chakri_info/widgets/global_search_delegate.dart';
 import 'package:chakri_info/widgets/job_stats_widget.dart';
 import 'package:chakri_info/widgets/prep_center_banner.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -123,39 +126,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // --- UI Body (Maximum Space Optimization) ---
-  // Widget _buildHomeBody(bool isDarkMode) {
-  //   return StreamBuilder<List<JobSyncModel>>(
-  //     stream: jobProvider.getJobStream(),
-  //     builder: (context, snapshot) {
-  //       final allJobs = snapshot.data ?? [];
-  //
-  //       return SingleChildScrollView(
-  //         physics: const BouncingScrollPhysics(),
-  //         child: Column(
-  //           crossAxisAlignment: CrossAxisAlignment.start,
-  //           children: [
-  //             JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
-  //             buildGlobalSearchSection(
-  //               context,
-  //               isDarkMode,
-  //               jobProvider.allJobs,
-  //             ),
-  //             // FeaturedJobSlider(jobProvider: jobProvider),
-  //             _buildCategoryGrid(isDarkMode),
-  //             PrepCenterBanner(),
-  //             _buildNoticeSection(),
-  //             _buildSectionTitle("সাম্প্রতিক সার্কুলার", isDarkMode),
-  //             _buildJobList(isDarkMode),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
-  // home end
-
   Widget _buildHomeBody(bool isDarkMode) {
     return StreamBuilder<List<JobSyncModel>>(
       stream: jobProvider.getJobStream(),
@@ -192,11 +162,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
 
                 JobStatsWidget(isDarkMode: isDarkMode, allJobs: allJobs),
-                buildGlobalSearchSection(
-                  context,
-                  isDarkMode,
-                  allJobs,
-                ),
+                buildGlobalSearchSection(context, isDarkMode, allJobs),
 
                 _buildCategoryGrid(isDarkMode),
                 const PrepCenterBanner(),
@@ -242,10 +208,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ? ThemeMode.light
               : ThemeMode.dark,
         ),
-        IconButton(
-          icon: Icon(Icons.notifications_none, size: 22, color: Colors.white),
-          onPressed: () {},
-        ),
+        //Notifications Icon
+        _buildNotificationBell(),
       ],
     );
   }
@@ -543,6 +507,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Apnar dewa Ultra Modern JobCardWidget ekhane call kora holo
             return JobCardWidget(job: job);
           },
+        );
+      },
+    );
+  }
+
+  // notifications call widget
+  Widget _buildNotificationBell() {
+    return ValueListenableBuilder(
+      valueListenable: Hive.box<NotificationModel>(
+        'notifications',
+      ).listenable(),
+      builder: (context, Box<NotificationModel> box, _) {
+        // Count unread notifications
+        int unreadCount = box.values
+            .where((notification) => !notification.isRead)
+            .length;
+
+        return Stack(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications_active),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationScreen(),
+                ),
+              ),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    '$unreadCount',
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
         );
       },
     );
