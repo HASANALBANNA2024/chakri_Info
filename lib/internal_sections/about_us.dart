@@ -12,7 +12,7 @@ class AboutUsScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
-            // অ্যাপ লোগো সেকশন
+            // App logo section
             Center(
               child: CircleAvatar(
                 radius: 60,
