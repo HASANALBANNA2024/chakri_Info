@@ -1,15 +1,17 @@
+import 'package:chakri_info/Questions/sub_category_exam_screen.dart';
 import 'package:chakri_info/internal_sections/about_us.dart';
 import 'package:chakri_info/internal_sections/contact_us.dart';
 import 'package:chakri_info/internal_sections/privacy_policy.dart';
 import 'package:chakri_info/internal_sections/terms_conditions.dart';
+import 'package:chakri_info/notifications/notification_settings_screen.dart';
 import 'package:chakri_info/screens/admin_panel_ui.dart';
 import 'package:chakri_info/user_side_data_sync/joblist_screen.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_model.dart';
 import 'package:chakri_info/user_side_data_sync/jobsync_provider.dart';
+import 'package:chakri_info/widgets/bookmark_screen.dart';
 import 'package:chakri_info/widgets/education_filter_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:chakri_info/Questions/sub_category_exam_screen.dart';
-import 'package:chakri_info/widgets/bookmark_screen.dart';
+
 import '../screens/category_screen.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -22,10 +24,8 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
-
   // secret open to admin panel
   int _clickCount = 0;
-
 
   @override
   Widget build(BuildContext context) {
@@ -94,19 +94,15 @@ class _AppDrawerState extends State<AppDrawer> {
                       MaterialPageRoute(builder: (context) => CategoryScreen()),
                     );
                   }),
-                  _drawerItem(
-                    Icons.bookmark_rounded,
-                    "ফেভারিট ও বুকমার্ক",
-                        () {
-                      // স্ক্রিনটি ওপেন করার জন্য নেভিগেশন
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BookmarkScreen(),
-                        ),
-                      );
-                    },
-                  ),
+                  _drawerItem(Icons.bookmark_rounded, "ফেভারিট ও বুকমার্ক", () {
+                    // স্ক্রিনটি ওপেন করার জন্য নেভিগেশন
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BookmarkScreen(),
+                      ),
+                    );
+                  }),
                   _sectionTitle("সময়সীমা ও তালিকা"),
                   _drawerItem(
                     Icons.event_available_rounded,
@@ -240,64 +236,78 @@ class _AppDrawerState extends State<AppDrawer> {
                   _drawerItem(
                     Icons.quiz_rounded,
                     "কুইজ ও মডেল টেস্ট",
-                        () {},
+                    () {},
                     isHighlight: true,
+                  ),
+                  const Divider(height: 30, thickness: 1),
+                  _drawerItem(
+                    Icons.notifications_active_rounded, // Notification Icon
+                    "নোটিফিকেশন সেটিংস", // Title in Bangla
+                    () {
+                      Navigator.pop(context); // Close the drawer first
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              const NotificationSettingsScreen(),
+                        ),
+                      );
+                    },
                   ),
                   // Preparation Center
                   _sectionTitle("প্রিপারেশন সেন্টার"),
                   _drawerItem(
                     Icons.auto_stories_rounded,
                     "BCS (বিসিএস প্রশ্ন)",
-                        () => _navigateToExam("BCS (বিসিএস প্রশ্ন)"),
+                    () => _navigateToExam("BCS (বিসিএস প্রশ্ন)"),
                   ),
                   _drawerItem(
                     Icons.account_balance_rounded,
                     "Govt Job",
-                        () => _navigateToExam("Govt Job"),
+                    () => _navigateToExam("Govt Job"),
                   ),
                   _drawerItem(
                     Icons.savings_rounded,
                     "Bank Job",
-                        () => _navigateToExam("Bank Job"),
+                    () => _navigateToExam("Bank Job"),
                   ),
                   _drawerItem(
                     Icons.school_rounded,
                     "Primary (শিক্ষক)",
-                        () => _navigateToExam("Primary (শিক্ষক)"),
+                    () => _navigateToExam("Primary (শিক্ষক)"),
                   ),
                   _drawerItem(
                     Icons.assignment_ind_rounded,
                     "NTRCA (নিবন্ধন)",
-                        () => _navigateToExam("NTRCA (নিবন্ধন)"),
+                    () => _navigateToExam("NTRCA (নিবন্ধন)"),
                   ),
                   _drawerItem(
                     Icons.local_library_rounded,
                     "ভর্তি প্রস্তুতি",
-                        () => _navigateToExam("ভর্তি প্রস্তুতি"),
+                    () => _navigateToExam("ভর্তি প্রস্তুতি"),
                   ),
                   _drawerItem(
                     Icons.medical_services_rounded,
                     "Medical & Nursing",
-                        () => _navigateToExam("Medical & Nursing"),
+                    () => _navigateToExam("Medical & Nursing"),
                   ),
                   _drawerItem(
                     Icons.handyman_rounded,
                     "Technical (ইঞ্জিনিয়ারিং)",
-                        () => _navigateToExam("Technical (ইঞ্জিনিয়ারিং)"),
+                    () => _navigateToExam("Technical (ইঞ্জিনিয়ারিং)"),
                   ),
                   _drawerItem(
                     Icons.agriculture_rounded,
                     "কৃষি ও মৎস্য",
-                        () => _navigateToExam("কৃষি ও মৎস্য"),
+                    () => _navigateToExam("কৃষি ও মৎস্য"),
                   ),
                   _drawerItem(
                     Icons.more_horiz_rounded,
                     "Others (অন্যান্য)",
-                        () => _navigateToExam("Others (অন্যান্য)"),
+                    () => _navigateToExam("Others (অন্যান্য)"),
                   ),
 
                   // preparation center end
-
                   _sectionTitle("যোগ্যতা অনুযায়ী চাকরি"),
 
                   const Divider(height: 30, thickness: 1),
@@ -427,19 +437,16 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-
   void _navigateToExam(String name) {
-  // Dark Mode Checker
+    // Dark Mode Checker
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     Navigator.pop(context);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SubCategoryExamScreen(
-          categoryName: name,
-          isDarkMode: isDark,
-        ),
+        builder: (context) =>
+            SubCategoryExamScreen(categoryName: name, isDarkMode: isDark),
       ),
     );
   }
