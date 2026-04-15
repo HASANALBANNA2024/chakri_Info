@@ -514,20 +514,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // notifications call widget
   Widget _buildNotificationBell() {
+    // ১. সেফটি চেক: যদি বক্স ওপেন না থাকে তবে ক্র্যাশ করবে না
+    if (!Hive.isBoxOpen('notifications')) {
+      return const IconButton(
+        icon: Icon(Icons.notifications_none_rounded, size: 28),
+        onPressed: null,
+      );
+    }
+
     return ValueListenableBuilder(
       valueListenable: Hive.box<NotificationModel>(
         'notifications',
       ).listenable(),
       builder: (context, Box<NotificationModel> box, _) {
-        // Count unread notifications
         int unreadCount = box.values
             .where((notification) => !notification.isRead)
             .length;
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+        // ২. লাইট মোডে একদম ক্লিয়ার ব্ল্যাক কালার সেট করা
+        final Color iconColor = isDark ? Colors.amberAccent : Colors.black;
 
         return Stack(
+          alignment: Alignment.center,
           children: [
             IconButton(
-              icon: const Icon(Icons.notifications_active),
+              icon: Icon(
+                Icons.notifications_none_rounded,
+                size: 28,
+                color: iconColor,
+              ),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -537,22 +553,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             if (unreadCount > 0)
               Positioned(
-                right: 8,
-                top: 8,
+                right: 4,
+                top: 4,
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.redAccent,
+                    shape: BoxShape.circle,
+                    // ৩. বর্ডার কালার ফিক্স: লাইট মোডে সাদা বর্ডার লাল ডটকে ফুটিয়ে তোলে
+                    border: Border.all(
+                      color: isDark ? const Color(0xFF121212) : Colors.white,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   constraints: const BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
+                    minWidth: 18,
+                    minHeight: 18,
                   ),
-                  child: Text(
-                    '$unreadCount',
-                    style: const TextStyle(color: Colors.white, fontSize: 10),
-                    textAlign: TextAlign.center,
+                  child: Center(
+                    child: Text(
+                      unreadCount > 9 ? '9+' : '$unreadCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
               ),
