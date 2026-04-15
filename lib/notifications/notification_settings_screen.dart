@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart'; // ডায়নামিক ডাটার জন্য
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -13,7 +15,7 @@ class _NotificationSettingsScreenState
     extends State<NotificationSettingsScreen> {
   late Box settingsBox;
 
-  // List of Job Circular categories
+  // আপনার দেওয়া অরিজিনাল লিস্ট (এগুলো যেমন আছে তেমনই থাকবে)
   final List<String> jobCats = [
     'Government (সরকারি)',
     'Engineering (ইঞ্জিনিয়ারিং)',
@@ -29,7 +31,6 @@ class _NotificationSettingsScreenState
     'Others (অন্যান্য)',
   ];
 
-  // List of Question Bank categories
   final List<String> quesCats = [
     'BCS (বিসিএস প্রশ্ন)',
     'Govt Job',
@@ -46,21 +47,51 @@ class _NotificationSettingsScreenState
   @override
   void initState() {
     super.initState();
-    // Load settings from Hive box
     settingsBox = Hive.box('settings');
+    // ডাটাবেস থেকে নতুন ক্যাটাগরি চেক করার জন্য কল করতে পারেন (ঐচ্ছিক)
+    _syncDynamicCategories();
+  }
+
+  // ডাটাবেস থেকে নতুন কোনো ক্যাটাগরি আসলে তা লিস্টে যুক্ত করার লজিক
+  Future<void> _syncDynamicCategories() async {
+    try {
+      final jobSnap = await FirebaseFirestore.instance.collection('All_Data').get();
+      final quesSnap = await FirebaseFirestore.instance.collection('All_Question').get();
+
+      setState(() {
+        for (var doc in jobSnap.docs) {
+          if (!jobCats.contains(doc.id)) jobCats.add(doc.id);
+        }
+        for (var doc in quesSnap.docs) {
+          if (!quesCats.contains(doc.id)) quesCats.add(doc.id);
+        }
+      });
+    } catch (e) {
+      debugPrint("Dynamic sync error: $e");
+    }
+  }
+
+  Future<void> _handleTopic(String category, bool subscribe) async {
+    // ক্লিন টপিক নেম লজিক
+    String topic = category.split(' ')[0].toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+    try {
+      if (subscribe) {
+        await FirebaseMessaging.instance.subscribeToTopic(topic);
+      } else {
+        await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
+      }
+    } catch (e) {
+      debugPrint("Topic Error: $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Check if the theme is in dark mode
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "নোটিফিকেশন সেটিংস",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text("নোটিফিকেশন সেটিংস", style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
@@ -70,15 +101,15 @@ class _NotificationSettingsScreenState
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         children: [
-          // Info box to guide the user
+          // আপনার ইনফো বক্স
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.indigo.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Icon(Icons.info_outline, size: 18, color: Colors.indigo),
                 SizedBox(width: 10),
                 Expanded(
@@ -92,24 +123,22 @@ class _NotificationSettingsScreenState
           ),
           const SizedBox(height: 20),
 
-          // 1. Job Circular Settings Section
           _buildModernSettings(
             title: "চাকরির বিজ্ঞপ্তি নোটিফিকেশন",
             mainKey: "all_circular_enabled",
             categoryKey: "circular_map",
-            categories: jobCats,
+            categories: jobCats, // অরিজিনাল লিস্ট + ডায়নামিক
             icon: Icons.work_history_rounded,
             isDark: isDark,
           ),
 
           const SizedBox(height: 16),
 
-          // 2. Question Bank Settings Section
           _buildModernSettings(
             title: "প্রশ্ন ব্যাংক নোটিফিকেশন",
             mainKey: "all_questions_enabled",
             categoryKey: "question_map",
-            categories: quesCats,
+            categories: quesCats, // অরিজিনাল লিস্ট + ডায়নামিক
             icon: Icons.menu_book_rounded,
             isDark: isDark,
           ),
@@ -118,7 +147,6 @@ class _NotificationSettingsScreenState
     );
   }
 
-  // Custom function to build the modern settings card
   Widget _buildModernSettings({
     required String title,
     required String mainKey,
@@ -127,18 +155,15 @@ class _NotificationSettingsScreenState
     required IconData icon,
     required bool isDark,
   }) {
-    // Master switch status from Hive
     bool isMainEnabled = settingsBox.get(mainKey, defaultValue: true);
-    // Specific categories map from Hive
-    Map categoryMap = settingsBox.get(categoryKey, defaultValue: {});
+    // Hive থেকে ম্যাপটি নেওয়ার সময় টাইপ কাস্টিং নিশ্চিত করা হয়েছে
+    Map categoryMap = Map.from(settingsBox.get(categoryKey, defaultValue: {}));
 
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
-        ),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
@@ -150,56 +175,23 @@ class _NotificationSettingsScreenState
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          // Set to 'false' so it stays closed initially
-          initiallyExpanded: false,
           leading: CircleAvatar(
-            backgroundColor: isMainEnabled
-                ? Colors.indigo
-                : Colors.grey.withOpacity(0.2),
-            child: Icon(
-              icon,
-              color: isMainEnabled ? Colors.white : Colors.grey,
-              size: 18,
-            ),
+            backgroundColor: isMainEnabled ? Colors.indigo : Colors.grey.withOpacity(0.2),
+            child: Icon(icon, color: isMainEnabled ? Colors.white : Colors.grey, size: 18),
           ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: isMainEnabled
-                  ? (isDark ? Colors.white : Colors.indigo[900])
-                  : Colors.grey,
-            ),
-          ),
+          title: Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isMainEnabled ? (isDark ? Colors.white : Colors.indigo[900]) : Colors.grey)),
           children: [
             const Divider(height: 1, indent: 20, endIndent: 20),
-
-            // Section Master Switch controller of decision of notification control
             SwitchListTile(
-              title: const Text(
-                "সব নোটিফিকেশন",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              subtitle: const Text(
-                "Receive all updates for this section",
-                style: TextStyle(fontSize: 11),
-              ),
+              title: const Text("সব নোটিফিকেশন", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              subtitle: const Text("Receive all updates for this section", style: TextStyle(fontSize: 11)),
               value: isMainEnabled,
               activeColor: Colors.indigo,
               onChanged: (val) {
-                setState(() {
-                  settingsBox.put(mainKey, val);
-                });
+                setState(() => settingsBox.put(mainKey, val));
               },
             ),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Divider(height: 1),
-            ),
-
-            // Individual Categories
+            const Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: Divider(height: 1)),
             Opacity(
               opacity: isMainEnabled ? 1.0 : 0.4,
               child: AbsorbPointer(
@@ -215,16 +207,7 @@ class _NotificationSettingsScreenState
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              isCatEnabled ? "ON" : "OFF",
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isCatEnabled
-                                    ? Colors.indigo
-                                    : Colors.grey,
-                              ),
-                            ),
+                            Text(isCatEnabled ? "ON" : "OFF", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isCatEnabled ? Colors.indigo : Colors.grey)),
                             const SizedBox(width: 4),
                             Transform.scale(
                               scale: 0.7,
@@ -236,6 +219,7 @@ class _NotificationSettingsScreenState
                                     categoryMap[cat] = val;
                                     settingsBox.put(categoryKey, categoryMap);
                                   });
+                                  _handleTopic(cat, val);
                                 },
                               ),
                             ),

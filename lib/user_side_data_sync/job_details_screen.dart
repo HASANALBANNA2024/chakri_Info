@@ -12,12 +12,26 @@ class JobDetailsScreen extends StatelessWidget {
 
   const JobDetailsScreen({super.key, required this.job});
 
+  // --- NEW: Static entry point for Notification ---
+  // This helps to open the screen directly using jobId from Hive
+  static Widget fromNotification(String jobId) {
+    final box = Hive.box<JobSyncModel>('jobsBox');
+    final jobData = box.get(jobId);
+
+    if (jobData == null) {
+      return const Scaffold(
+        body: Center(child: Text("Circular data not found locally.")),
+      );
+    }
+    return JobDetailsScreen(job: jobData);
+  }
+
   // --- সিঙ্গেল ইমেজ ডাউনলোড ---
   Future<void> _downloadImage(
-    String imgStr,
-    BuildContext context,
-    int index,
-  ) async {
+      String imgStr,
+      BuildContext context,
+      int index,
+      ) async {
     if (imgStr.isEmpty) return;
     try {
       bool hasAccess = await Gal.hasAccess();
@@ -57,9 +71,9 @@ class JobDetailsScreen extends StatelessWidget {
 
   // --- সব ইমেজ একসাথে ডাউনলোড ---
   Future<void> _downloadAllImages(
-    List<String> images,
-    BuildContext context,
-  ) async {
+      List<String> images,
+      BuildContext context,
+      ) async {
     try {
       bool hasAccess = await Gal.hasAccess();
       if (!hasAccess) await Gal.requestAccess();
@@ -105,9 +119,6 @@ class JobDetailsScreen extends StatelessWidget {
         ? Colors.white10
         : Colors.grey.shade300;
 
-    // কোম্পানি নামের জন্য মানানসই কালার
-
-    final Box<JobSyncModel> bookmarkBox = Hive.box<JobSyncModel>('bookmarkBox');
     final Color companyColor = isDarkMode
         ? Colors.amber.shade400
         : const Color(0xFF0D47A1);
@@ -132,38 +143,34 @@ class JobDetailsScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          // বুকমার্ক বাটন (আইকন এবং লজিকসহ)
           ValueListenableBuilder(
             valueListenable: Hive.box<JobSyncModel>('bookmarkBox').listenable(),
             builder: (context, Box<JobSyncModel> box, _) {
-              // চেক করা হচ্ছে এই জবটি আগে থেকেই বুকমার্ক করা কি না
               final isSaved = box.containsKey(job.id);
 
               return IconButton(
                 onPressed: () {
                   if (isSaved) {
-                    box.delete(job.id); // বুকমার্ক থাকলে মুছে ফেলবে
+                    box.delete(job.id);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("বুকমার্ক থেকে সরানো হয়েছে"), duration: Duration(seconds: 1)),
+                      const SnackBar(content: Text("বুকমার্ক থেকে সরানো হয়েছে"), duration: Duration(seconds: 1)),
                     );
                   } else {
-                    box.put(job.id, job); // বুকমার্ক না থাকলে সেভ করবে
+                    box.put(job.id, job);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("বুকমার্ক করা হয়েছে"), duration: Duration(seconds: 1)),
+                      const SnackBar(content: Text("বুকমার্ক করা হয়েছে"), duration: Duration(seconds: 1)),
                     );
                   }
                 },
-                // বুকমার্ক স্ট্যাটাস অনুযায়ী আইকন পরিবর্তন
                 icon: Icon(
                   isSaved ? Icons.bookmark : Icons.bookmark_border_outlined,
-                  color: isSaved ? Colors.amber : null, // সেভ করা থাকলে সোনালী রঙ হবে
+                  color: isSaved ? Colors.amber : null,
                 ),
               );
             },
           ),
           IconButton(
             onPressed: () async {
-              // শেয়ার করার সময় লোডিং ইন্ডিকেটর দেখাতে চাইলে এখানে দিতে পারেন
               await ShareService.shareJob(
                 title: job.title,
                 company: job.company,
@@ -173,7 +180,7 @@ class JobDetailsScreen extends StatelessWidget {
               );
             },
             icon: const Icon(Icons.share_outlined),
-            tooltip: 'শেয়ার করুন', // অপশনাল: চেপে ধরে রাখলে নাম দেখাবে
+            tooltip: 'শেয়ার করুন',
           ),
         ],
         bottom: PreferredSize(
@@ -186,7 +193,6 @@ class JobDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // টাইটেল
             Text(
               job.title,
               style: TextStyle(
@@ -197,16 +203,15 @@ class JobDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 6),
-            // company name
             if (job.company.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
                   job.company,
                   style: TextStyle(
-                    fontSize: 17, // সাইজ একটু বাড়িয়েছি যেন দেখতে ভালো লাগে
-                    color: companyColor, // আপনার ডিফাইন করা কালারটিই থাকবে
-                    fontWeight: FontWeight.w600, // হালকা বোল্ড
+                    fontSize: 17,
+                    color: companyColor,
+                    fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),
                 ),
@@ -216,7 +221,6 @@ class JobDetailsScreen extends StatelessWidget {
             Divider(color: borderColor),
             const SizedBox(height: 15),
 
-            // তারিখ সেকশন
             Row(
               children: [
                 if (job.start.isNotEmpty)
@@ -239,7 +243,6 @@ class JobDetailsScreen extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // বিস্তারিত বিবরণ
             if (job.description.trim().isNotEmpty) ...[
               const Text(
                 "বিস্তারিত বিবরণ:",
@@ -257,7 +260,6 @@ class JobDetailsScreen extends StatelessWidget {
               const SizedBox(height: 25),
             ],
 
-            // আবেদন লিংক
             if (job.applyLink.isNotEmpty) ...[
               const Text(
                 "আবেদন লিংক:",
@@ -283,7 +285,6 @@ class JobDetailsScreen extends StatelessWidget {
               const SizedBox(height: 30),
             ],
 
-            // সার্কুলার ইমেজ সেকশন (নতুন মডেল অনুযায়ী আপডেট করা)
             if (job.circularImage.isNotEmpty) ...[
               const Text(
                 "অফিসিয়াল সার্কুলার কপি (জুম করতে ডাবল ট্যাপ করুন):",
@@ -291,7 +292,6 @@ class JobDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // Column এর মাধ্যমে সব ইমেজ লিস্ট করা
               Column(
                 children: List.generate(job.circularImage.length, (index) {
                   String currentImg = job.circularImage[index];
@@ -319,14 +319,14 @@ class JobDetailsScreen extends StatelessWidget {
                                 fit: BoxFit.contain,
                                 filterQuality: FilterQuality.high,
                                 errorBuilder: (context, error, stackTrace) =>
-                                    const Padding(
-                                      padding: EdgeInsets.all(20.0),
-                                      child: Icon(
-                                        Icons.broken_image,
-                                        color: Colors.red,
-                                        size: 40,
-                                      ),
-                                    ),
+                                const Padding(
+                                  padding: EdgeInsets.all(20.0),
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color: Colors.red,
+                                    size: 40,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -344,7 +344,6 @@ class JobDetailsScreen extends StatelessWidget {
                 }),
               ),
 
-              // অল ইমেজ ডাউনলোড বাটন
               if (job.circularImage.length > 1)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
@@ -396,11 +395,11 @@ class JobDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildDateInfo(
-    String label,
-    String value,
-    IconData icon,
-    bool isDark,
-  ) {
+      String label,
+      String value,
+      IconData icon,
+      bool isDark,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
