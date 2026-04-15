@@ -28,7 +28,7 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // ১. ফায়ারবেস সেটআপ
+  // firebase setup
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -36,7 +36,7 @@ void main() async {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await NotificationService.initialize();
 
-    // টোকেন দেখার জন্য ৩ সেকেন্ড ডিলে (যাতে নিশ্চিতভাবে জেনারেট হয়)
+    // token generat
     Future.delayed(const Duration(seconds: 3), () async {
       String? token = await NotificationService.getDeviceToken();
       if (token != null) {
@@ -49,7 +49,7 @@ void main() async {
     debugPrint("Firebase Setup Error: $e");
   }
 
-  // ২. হাইভ সেটআপ
+  // hive setup
   try {
     await Hive.initFlutter();
 
