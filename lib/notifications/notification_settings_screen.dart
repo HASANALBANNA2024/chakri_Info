@@ -175,7 +175,7 @@ class _NotificationSettingsScreenState
           children: [
             const Divider(height: 1, indent: 20, endIndent: 20),
 
-            // Section Master Switch
+            // Section Master Switch controller of decision of notification control
             SwitchListTile(
               title: const Text(
                 "সব নোটিফিকেশন",
