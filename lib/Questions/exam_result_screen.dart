@@ -56,7 +56,7 @@ class ExamResultScreen extends StatelessWidget {
           final q = questions[questionIndex];
           final userSelection = userAnswers[questionIndex];
 
-          // to search right question index
+          // to search right question index .
           final correctIndex = q.options?.indexWhere(
             (opt) => opt.trim() == q.answer.trim(),
           );
